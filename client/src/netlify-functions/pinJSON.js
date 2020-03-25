@@ -1,4 +1,4 @@
-const config = require("./config.js");
+//const config = require("./config.js");
 const axios = require("axios");
 
 exports.handler = async (event, context) => {
