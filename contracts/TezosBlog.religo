@@ -1,6 +1,5 @@
 type post = {
   ipfs_hash: string,
-  title: string,
   timestamp: timestamp
 }
 
@@ -13,10 +12,7 @@ type blogger = {
   name: string
 }
 
-type post_params = {
-  ipfs_hash: string,
-  title: string
-}
+type ipfs_hash = string;
 
 type storage = {
     bloggers: big_map(address, blogger),
@@ -27,16 +23,16 @@ type storage = {
 type return = (list(operation), storage);
 
 type action = 
-    | Post (post_params)
+    | Post (ipfs_hash)
     | Tip (address)
     | UpdateBlogger (string)
     | Withdraw
 
-let post = ((params, storage): (post_params, storage)): return => {
+let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
   /* checks that valid ipfs hash is provided */
-  if(String.size(params.ipfs_hash) == 46n && String.slice(0n, 1n, params.ipfs_hash) == "Qm"){
+  if(String.size(ipfs_hash) == 46n && String.sub(0n, 2n, ipfs_hash) == "Qm"){
     /* updates blogger's info */
-    let new_post: post = {ipfs_hash: params.ipfs_hash, title: params.title, timestamp: Tezos.now};
+    let new_post: post = {ipfs_hash: ipfs_hash, timestamp: Tezos.now};
     switch (Big_map.find_opt(Tezos.sender, storage.bloggers)) {
       /* creates new blogger */
       | None => {
@@ -103,7 +99,7 @@ let withdraw = (storage: storage): return => {
 
 let main = ((param, storage): (action, storage)): return => {
   switch (param) {
-    | Post (params) => post ((params, storage))
+    | Post (ipfs_hash) => post ((ipfs_hash, storage))
     | Tip (blogger) => tip ((blogger, storage))
     | UpdateBlogger (name) => updateBlogger ((name, storage))
     | Withdraw => withdraw (storage)

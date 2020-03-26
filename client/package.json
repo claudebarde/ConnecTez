@@ -21,6 +21,7 @@
     "@taquito/taquito": "^6.1.1-beta.0",
     "@taquito/tezbridge-signer": "^6.1.1-beta.0",
     "axios": "^0.19.2",
+    "moment": "^2.24.0",
     "snarkdown": "^1.2.2",
     "svelte-spa-router": "^2.1.0"
   }

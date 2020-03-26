@@ -6,8 +6,9 @@ const store = () => {
     //userBalance: 20,
     userAddress: undefined,
     userBalance: undefined,
-    contractAddress: "KT1MzLqhd1aQhkAr9Y6RzWVu7p3gkyp5vysC",
-    storage: {}
+    contractAddress: "KT1KXoytiwQBPFF1nzix4qLqV46gwvrtsW2H",
+    contractInstance: undefined,
+    storage: undefined
   });
 
   return {
@@ -18,9 +19,14 @@ const store = () => {
     updateUserBalance: balance => {
       update(currentStore => ({ ...currentStore, userBalance: balance }));
     },
-    setStorage: storage => {
+    updateContractInstance: instance => {
+      update(currentStore => ({ ...currentStore, contractInstance: instance }));
+    },
+    updateStorage: storage => {
       update(currentStore => ({ ...currentStore, storage }));
-    }
+    },
+    shortenAddress: addr =>
+      addr.slice(0, 6) + "..." + addr.slice(addr.length - 6)
   };
 };
 

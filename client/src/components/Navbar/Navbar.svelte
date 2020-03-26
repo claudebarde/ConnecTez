@@ -1,8 +1,10 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { Tezos } from "@taquito/taquito";
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
   import store from "../../store/store";
+
+  let refreshStorageInterval;
 
   const initWallet = async () => {
     try {
@@ -17,9 +19,6 @@
     }
   };
 
-  const shortenAddress = addr =>
-    addr.slice(0, 6) + "..." + addr.slice(addr.length - 6);
-
   onMount(async () => {
     // sets RPC
     Tezos.setProvider({
@@ -28,9 +27,10 @@
     });
     // creates contract instance
     const contract = await Tezos.contract.at($store.contractAddress);
+    store.updateContractInstance(contract);
     // fetches contract storage
     const storage = await contract.storage();
-    store.setStorage(storage);
+    store.updateStorage(storage);
     try {
       const address = await window.tezbridge.request({ method: "get_source" });
       store.updateUserAddress(address);
@@ -40,6 +40,45 @@
       store.updateUserAddress(undefined);
       store.updateUserBalance(undefined);
     }
+    refreshStorageInterval = setInterval(async () => {
+      const newStorage = await $store.contractInstance.storage();
+      if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
+        let newValues = newStorage.last_posts.filter(
+          el => !$store.storage.last_posts.includes(el)
+        );
+        console.log("New values!", newValues);
+      }
+      store.updateStorage(newStorage);
+    }, 3000);
+    /*const sub = Tezos.stream.subscribeOperation({
+      or: [
+        {
+          and: [
+            { destination: $store.contractAddress },
+            { kind: "transaction" }
+          ]
+        }
+      ]
+    });
+    sub.on("data", data => {
+      // updates storage when new post is created
+      try {
+        if (data.parameters.entrypoint === "post") {
+          const ipfsHash = data.parameters.value.string;
+          store.updateStorage({
+            ...$store.storage,
+            last_posts: [ipfsHash, ...$store.storage.last_posts]
+          });
+          console.log("New post:", ipfsHash);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });*/
+  });
+
+  onDestroy(() => {
+    clearInterval(refreshStorageInterval);
   });
 </script>
 
@@ -94,7 +133,7 @@
             ꜩ {$store.userBalance.toNumber() / 1000000}
           </span>
           <button class="button is-success is-light">
-            {shortenAddress($store.userAddress)}
+            {store.shortenAddress($store.userAddress)}
           </button>
         {:else}
           <button class="button is-info is-light" on:click={initWallet}>

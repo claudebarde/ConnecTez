@@ -1,4 +1,3 @@
 build/
 node_modules/
-client/src/netlify-functions/config.js
 .vscode

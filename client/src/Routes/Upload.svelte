@@ -1,14 +1,97 @@
 <script>
+  import { onMount } from "svelte";
   import snarkdown from "snarkdown";
   import store from "../store/store";
 
   let preview = false;
   let title = "";
   let post = "";
-  let uploadConfirm = false;
+  let IPFSHash = undefined;
+  let txHash = undefined;
+  let errorMessage = undefined;
+  let savePost = undefined; // "uploadConfirm" | "waitingForIPFSHash" | "waitingForBlockchain" | "confirmed" | "error"
+  let selectIcon = false;
+  let selectedIcon = undefined;
+  const availableIcons = [
+    "box",
+    "clock",
+    "edit",
+    "female-user",
+    "idea",
+    "image-file",
+    "lock",
+    "puzzle",
+    "rating",
+    "scroll",
+    "search",
+    "share",
+    "toolbox",
+    "trash",
+    "twitter",
+    "user-male"
+  ];
 
   const writePost = event => {
     post = event.target.value;
+  };
+
+  const confirmUpload = async () => {
+    const PINJSON =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:34567/pinJSON"
+        : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/pinJSON";
+    try {
+      // checks if title and post is provided
+      if (!!title.trim() && !!post.trim()) {
+        savePost = "waitingForIPFSHash";
+        const data = await fetch(PINJSON, {
+          body: JSON.stringify({
+            title,
+            content: post,
+            author: $store.userAddress,
+            icon: selectedIcon || "scroll"
+          }),
+          method: "POST"
+        });
+        const response = await data.json();
+        // checks if IPFS hash is received
+        if (response.IpfsHash) {
+          IPFSHash = response.IpfsHash;
+          savePost = "waitingForBlockchain";
+          // saves IPFS hash onto the blockchain
+          const op = await $store.contractInstance.methods
+            .post(IPFSHash)
+            .send();
+          txHash = op.hash;
+          const hash = await op.confirmation(1);
+          savePost = "confirmed";
+        } else {
+          throw new Error("No IPFS hash received");
+        }
+      } else {
+        throw new Error("Invalid title or post");
+      }
+    } catch (error) {
+      console.log(error);
+      savePost = "error";
+      if (error.message) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = error;
+      }
+      // if transaction was rejected
+      if (error === "rejected") {
+        const UNPINJSON =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:34567/unpinJSON"
+            : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
+        const response = await fetch(UNPINJSON, {
+          body: JSON.stringify({ hash: IPFSHash }),
+          method: "POST"
+        });
+        console.log(response);
+      }
+    }
   };
 </script>
 
@@ -31,6 +114,7 @@
 
   .upload-markdown {
     height: 400px;
+    overflow: auto;
   }
 
   .confirm-buttons {
@@ -43,10 +127,16 @@
   .confirm-buttons button {
     margin-right: 10px;
   }
+
+  .icon-select {
+    margin: 0 auto;
+    cursor: pointer;
+  }
 </style>
 
 {#if $store.userAddress}
-  <div class="modal" class:is-active={uploadConfirm}>
+  <!-- MODAL TO CONFIRM UPLOAD TO IPFS -->
+  <div class="modal" class:is-active={savePost === 'uploadConfirm'}>
     <div class="modal-background" />
     <div class="modal-content">
       <div class="box">
@@ -59,28 +149,196 @@
         <div class="confirm-buttons">
           <button
             class="button is-danger is-light"
-            on:click={() => (uploadConfirm = false)}>
+            on:click={() => (savePost = undefined)}>
             Cancel
           </button>
-          <button class="button is-success is-light">Confirm</button>
+          <button class="button is-success is-light" on:click={confirmUpload}>
+            Confirm
+          </button>
         </div>
       </div>
     </div>
     <button
       class="modal-close is-large"
       aria-label="close"
-      on:click={() => (uploadConfirm = false)} />
+      on:click={() => (savePost = undefined)} />
+  </div>
+  <!-- MODAL WAITING FOR CONFIRMATION FROM PINATA -->
+  <div class="modal" class:is-active={savePost === 'waitingForIPFSHash'}>
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box">
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img src="pinata.png" alt="pinata" />
+            </p>
+          </figure>
+          <div class="media-content">
+            <p>
+              <strong>Waiting for confirmation from Pinata</strong>
+            </p>
+            <p>This may take a few seconds, please wait.</p>
+          </div>
+          <div class="media-right">
+            <p class="image is-64x64">
+              <img src="loader.svg" alt="loader" />
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL WAITING FOR CONFIRMATION FROM BLOCKCHAIN -->
+  <div class="modal" class:is-active={savePost === 'waitingForBlockchain'}>
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box">
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img src="tezos.svg" alt="tezos-logo" class="image is-64x64" />
+            </p>
+          </figure>
+          <div class="media-content">
+            {#if txHash}
+              <p>
+                <strong>Waiting for confirmation from Tezos blockchain</strong>
+              </p>
+              <p>This may take a few seconds, please wait.</p>
+              <br />
+              <p class="is-size-7">IPFS Hash: {IPFSHash}</p>
+              {#if txHash}
+                <p class="is-size-7">Transaction Hash: {txHash}</p>
+              {/if}
+            {:else}
+              <p>
+                <strong>Please approve the transaction to continue.</strong>
+              </p>
+            {/if}
+          </div>
+          {#if txHash}
+            <div class="media-right">
+              <p class="image is-64x64">
+                <img src="loader.svg" alt="loader" />
+              </p>
+            </div>
+          {/if}
+        </article>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL CONFIRMATION -->
+  <div class="modal" class:is-active={savePost === 'confirmed'}>
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box">
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img
+                src="ipfs-tezos.png"
+                alt="tezos-ipfs"
+                class="image is-64x64" />
+            </p>
+          </figure>
+          <div class="media-content">
+            <p>
+              <strong>Your post has been successfully uploaded!</strong>
+            </p>
+            <p>IPFS Hash: {IPFSHash}</p>
+            <p>Transaction Hash: {txHash}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+    <button
+      class="modal-close is-large"
+      aria-label="close"
+      on:click={() => (savePost = undefined)} />
+  </div>
+  <!-- MODAL ERROR -->
+  <div class="modal" class:is-active={savePost === 'error'}>
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box">
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img src="error.png" alt="error" />
+            </p>
+          </figure>
+          <div class="media-content">
+            <p>
+              <strong>An error has occured</strong>
+            </p>
+            <p>Please try again later.</p>
+            <p>Error message: {errorMessage || 'No error message provided'}</p>
+          </div>
+        </article>
+      </div>
+    </div>
+    <button
+      class="modal-close is-large"
+      aria-label="close"
+      on:click={() => (savePost = undefined)} />
+  </div>
+  <!-- MODAL FOR ICON SELECTION -->
+  <div class="modal" class:is-active={selectIcon}>
+    <div class="modal-background" />
+    <div class="modal-content">
+      <div class="box">
+        <div class="columns is-multiline">
+          {#each availableIcons as icon}
+            <div class="column is-one-quarter">
+              <img
+                class="image is-48x48 icon-select"
+                src={`icons/${icon}-64.png`}
+                alt={`${icon}-icon`}
+                on:click={() => {
+                  selectedIcon = icon;
+                  selectIcon = false;
+                }} />
+            </div>
+          {/each}
+        </div>
+        <div>
+          Icons by
+          <a target="_blank" href="https://icons8.com">Icons8</a>
+        </div>
+      </div>
+    </div>
+    <button
+      class="modal-close is-large"
+      aria-label="close"
+      on:click={() => (selectIcon = false)} />
   </div>
   <section class="hero is-medium is-fullheight-with-navbar">
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="upload-container">
           <h1 class="title">Write a new blog post</h1>
-          <input
-            class="input"
-            type="text"
-            placeholder="Post title"
-            bind:value={title} />
+          <div class="field has-addons">
+            <div class="control" style="width: 100%">
+              <input
+                class="input"
+                type="text"
+                placeholder="Post title"
+                bind:value={title} />
+            </div>
+            <div class="control">
+              <button
+                class="button is-light is-info"
+                on:click={() => (selectIcon = true)}>
+                Select Icon
+              </button>
+            </div>
+          </div>
+          {#if selectedIcon}
+            <p class="is-size-7" style="padding:10px 0px">
+              Selected icon: "{selectedIcon}"
+            </p>
+          {/if}
           <p class="is-size-7" style="padding:10px 0px">
             Use Markdown to style your post
           </p>
@@ -104,7 +362,7 @@
             {#if !!title && !!post}
               <button
                 class="button is-link is-light"
-                on:click={() => (uploadConfirm = true)}>
+                on:click={() => (savePost = 'uploadConfirm')}>
                 Upload
               </button>
             {:else}
