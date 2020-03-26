@@ -1,7 +1,9 @@
 <script>
   import { onMount } from "svelte";
+  import { fly } from "svelte/transition";
   import snarkdown from "snarkdown";
   import moment from "moment";
+  import { push } from "svelte-spa-router";
   import store from "../store/store.js";
 
   export let postData;
@@ -28,7 +30,7 @@
 </style>
 
 {#if post}
-  <div class="card">
+  <div class="card" in:fly={{ y: 300, delay: 200, duration: 400 }}>
     <div class="card-content">
       <div class="media">
         <figure class="media-left">
@@ -38,7 +40,10 @@
               alt="icon" />
           </p>
         </figure>
-        <div class="media-content">
+        <div
+          class="media-content"
+          on:click={() => push(`/post/${postData.ipfs_hash}`)}
+          style="cursor:pointer">
           <p class="title is-5">{post.title}</p>
           <p class="subtitle is-6">From {store.shortenAddress(post.author)}</p>
         </div>
@@ -49,7 +54,7 @@
           {@html snarkdown(post.content || 'Unavailable')}
         </div>
         <div class="date is-size-7">
-          {moment(post.timestamp).format('h:mm A - MMM Do Y')}
+          {moment(post.timestamp).format('MMM Do Y - h:mm A')}
         </div>
       </div>
     </div>

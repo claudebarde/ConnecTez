@@ -5,7 +5,9 @@
 
 <style>
   main {
-    padding: 30px;
+    padding: 80px;
+    height: 100vh;
+    background-color: #f7f8f9;
   }
 </style>
 

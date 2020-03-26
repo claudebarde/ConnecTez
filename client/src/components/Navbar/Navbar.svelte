@@ -46,7 +46,7 @@
         let newValues = newStorage.last_posts.filter(
           el => !$store.storage.last_posts.includes(el)
         );
-        console.log("New values!", newValues);
+        console.log("New post!");
       }
       store.updateStorage(newStorage);
     }, 3000);
@@ -102,7 +102,10 @@
   }
 </style>
 
-<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+<nav
+  class="navbar is-fixed-top has-shadow is-spaced"
+  role="navigation"
+  aria-label="main navigation">
   <div class="navbar-brand">
     <a class="navbar-item" href="#/">
       <img src="ipfs-tezos.png" alt="logo" />
