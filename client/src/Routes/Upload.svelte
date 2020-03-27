@@ -3,6 +3,7 @@
   import { fade, fly } from "svelte/transition";
   import snarkdown from "snarkdown";
   import store from "../store/store";
+  import Loader from "../components/Loader.svelte";
 
   let preview = false;
   let title = "";
@@ -87,7 +88,7 @@
             .post(IPFSHash)
             .send();
           txHash = op.hash;
-          const hash = await op.confirmation(1);
+          await op.confirmation(1);
           savePost = "confirmed";
         } else {
           throw new Error("No IPFS hash received");
@@ -168,33 +169,41 @@
 
 {#if $store.userAddress}
   <!-- MODAL TO CONFIRM UPLOAD TO IPFS -->
-  <div class="modal" class:is-active={savePost === 'uploadConfirm'}>
-    <div class="modal-background" />
-    <div class="modal-content">
-      <div class="box">
-        <h2 class="subtitle">Confirm IPFS Upload?</h2>
-        <p>Are you sure you want to upload this post to the IPFS?</p>
-        <p>
-          Content uploaded to the IPFS cannot be modified without modifying its
-          reference hash.
-        </p>
-        <div class="confirm-buttons">
-          <button
-            class="button is-danger is-light"
-            on:click={() => (savePost = undefined)}>
-            Cancel
-          </button>
-          <button class="button is-success is-light" on:click={confirmUpload}>
-            Confirm
-          </button>
+  {#if savePost === 'uploadConfirm'}
+    <div class="modal is-active">
+      <div
+        class="modal-background"
+        in:fade={{ duration: 200 }}
+        out:fade={{ delay: 100, duration: 200 }} />
+      <div
+        class="modal-content"
+        in:fly={{ y: -200, duration: 400, delay: 100 }}
+        out:fly={{ y: -200, duration: 400, delay: 0 }}>
+        <div class="box">
+          <h2 class="subtitle">Confirm IPFS Upload?</h2>
+          <p>Are you sure you want to upload this post to the IPFS?</p>
+          <p>
+            Content uploaded to the IPFS cannot be modified without modifying
+            its reference hash.
+          </p>
+          <div class="confirm-buttons">
+            <button
+              class="button is-danger is-light"
+              on:click={() => (savePost = undefined)}>
+              Cancel
+            </button>
+            <button class="button is-success is-light" on:click={confirmUpload}>
+              Confirm
+            </button>
+          </div>
         </div>
       </div>
+      <button
+        class="modal-close is-large"
+        aria-label="close"
+        on:click={() => (savePost = undefined)} />
     </div>
-    <button
-      class="modal-close is-large"
-      aria-label="close"
-      on:click={() => (savePost = undefined)} />
-  </div>
+  {/if}
   <!-- MODAL WAITING FOR CONFIRMATION FROM PINATA -->
   <div class="modal" class:is-active={savePost === 'waitingForIPFSHash'}>
     <div class="modal-background" />
@@ -214,7 +223,9 @@
           </div>
           <div class="media-right">
             <p class="image is-64x64">
-              <img src="loader.svg" alt="loader" />
+              <Loader
+                color="#ffffff"
+                size={{ width: '64px', height: '64px' }} />
             </p>
           </div>
         </article>
@@ -252,7 +263,9 @@
           {#if txHash}
             <div class="media-right">
               <p class="image is-64x64">
-                <img src="loader.svg" alt="loader" />
+                <Loader
+                  color="#ffffff"
+                  size={{ width: '64px', height: '64px' }} />
               </p>
             </div>
           {/if}

@@ -1,26 +1,39 @@
 <script>
-  import { onMount } from "svelte";
+  import { afterUpdate } from "svelte";
   import { slide } from "svelte/transition";
   import snarkdown from "snarkdown";
   import moment from "moment";
   import store from "../store/store.js";
+  import TippingBox from "../components/TippingBox.svelte";
 
   export let params;
+  let loading = true;
   let post;
   let openTipModal = false;
 
-  onMount(async () => {
-    if (params.ipfsHash) {
+  afterUpdate(async () => {
+    if (params.ipfsHash && $store.storage && loading) {
+      // checks if the hash exists in the smart contract
       try {
+        if (
+          $store.storage.last_posts.filter(
+            el => el.ipfs_hash === params.ipfsHash
+          ).length === 0
+        ) {
+          throw new Error("Unknown IPFS hash");
+        }
+
         const postIPFS = await fetch(
           `https://gateway.pinata.cloud/ipfs/${params.ipfsHash}`
         );
         post = await postIPFS.json();
+        loading = false;
       } catch (error) {
         console.log(error);
         post = "error";
+        loading = false;
       }
-    } else {
+    } else if (!params.ipfsHash) {
       post = "error";
     }
   });
@@ -37,6 +50,30 @@
   .error {
     width: 50%;
     margin: 0 auto;
+  }
+
+  .tip-image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.4s;
+  }
+
+  .tezos-hand {
+    transition: 0.4s;
+  }
+
+  .tip-image-container:hover {
+    padding-top: 15px;
+  }
+  .tip-image-container:hover .tezos-hand {
+    margin-top: 0px;
+  }
+
+  .tip-image {
+    width: 38px;
+    margin-top: 15px;
   }
 </style>
 
@@ -55,20 +92,7 @@
     <div class="card post" in:slide={{ duration: 800 }}>
       <div class="card-content">
         {#if openTipModal}
-          <article class="message is-info" transition:slide={{ duration: 400 }}>
-            <div class="message-body">
-              <div>How much would you like to tip?</div>
-              <br />
-              <div class="tags">
-                <span class="tag is-info">XTZ 0.1</span>
-                <span class="tag is-info">XTZ 0.2</span>
-                <span class="tag is-info">XTZ 0.5</span>
-                <span class="tag is-info">XTZ 0.8</span>
-                <span class="tag is-info">XTZ 1</span>
-                <span class="tag is-info">XTZ 2</span>
-              </div>
-            </div>
-          </article>
+          <TippingBox blogger={post.author} />
         {/if}
         <div class="media">
           <figure class="media-left">
@@ -85,12 +109,18 @@
             </p>
           </div>
           <div class="media-right">
-            <img
-              src="tezos-coin-in-hand-100.png"
-              alt="tip-icon"
-              class="image is-32x32"
-              style="cursor:pointer"
-              on:click={() => (openTipModal = !openTipModal)} />
+            <div
+              class="tip-image-container"
+              on:click={() => (openTipModal = !openTipModal)}>
+              <img
+                class="tip-image tezos-coin"
+                src="tezos-coin.png"
+                alt="tezos-coin" />
+              <img
+                class="tip-image tezos-hand"
+                src="tezos-hand.png"
+                alt="tezos-hand" />
+            </div>
           </div>
         </div>
         <br />

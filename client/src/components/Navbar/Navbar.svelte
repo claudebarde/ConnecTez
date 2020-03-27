@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Tezos } from "@taquito/taquito";
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
+  import { push } from "svelte-spa-router";
   import store from "../../store/store";
 
   let refreshStorageInterval;
@@ -19,18 +20,37 @@
     }
   };
 
+  const withdrawTips = async () => {
+    try {
+      const op = await $store.contractInstance.methods
+        .withdraw([["unit"]])
+        .send();
+      await op.confirmation(1);
+      // updates UI
+      const balance = await $store.TezosProvider.tz.getBalance(
+        $store.userAddress
+      );
+      store.updateUserBalance(balance);
+      store.updateUserTips(0);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   onMount(async () => {
     // sets RPC
     Tezos.setProvider({
       rpc: "http://localhost:8732",
       signer: new TezBridgeSigner()
     });
+    store.setTezosProvider(Tezos);
     // creates contract instance
     const contract = await Tezos.contract.at($store.contractAddress);
     store.updateContractInstance(contract);
     // fetches contract storage
     const storage = await contract.storage();
     store.updateStorage(storage);
+    // updates address and balance
     try {
       const address = await window.tezbridge.request({ method: "get_source" });
       store.updateUserAddress(address);
@@ -40,16 +60,39 @@
       store.updateUserAddress(undefined);
       store.updateUserBalance(undefined);
     }
+    // updates tips if any
+    try {
+      const tips = await storage.bloggers_tips.get($store.userAddress);
+      store.updateUserTips(tips.toNumber());
+    } catch (error) {
+      store.updateUserTips(undefined);
+    }
     refreshStorageInterval = setInterval(async () => {
-      const newStorage = await $store.contractInstance.storage();
-      if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
-        let newValues = newStorage.last_posts.filter(
-          el => !$store.storage.last_posts.includes(el)
-        );
-        console.log("New post!");
+      try {
+        const newStorage = await $store.contractInstance.storage();
+        // checks if new posts were added
+        if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
+          let newValues = newStorage.last_posts.filter(
+            el => !$store.storage.last_posts.includes(el)
+          );
+          console.log("New post!");
+        }
+        store.updateStorage(newStorage);
+      } catch (error) {
+        //console.log(error);
       }
-      store.updateStorage(newStorage);
-    }, 3000);
+      try {
+        // checks if new tips were sent
+        const newStorage = await $store.contractInstance.storage();
+        const newTips = await newStorage.bloggers_tips.get($store.userAddress);
+        if (newTips && newTips.toNumber() !== $store.userTips) {
+          console.log("New tip!", newTips.toNumber());
+          store.updateUserTips(newTips.toNumber());
+        }
+      } catch (error) {
+        //console.log(error);
+      }
+    }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
       or: [
         {
@@ -62,14 +105,26 @@
     });
     sub.on("data", data => {
       // updates storage when new post is created
+      console.log("New data", data);
       try {
         if (data.parameters.entrypoint === "post") {
           const ipfsHash = data.parameters.value.string;
           store.updateStorage({
             ...$store.storage,
-            last_posts: [ipfsHash, ...$store.storage.last_posts]
+            last_posts: [
+              { ipfs_hash: ipfsHash, timestamp: "" },
+              ...$store.storage.last_posts
+            ]
           });
           console.log("New post:", ipfsHash);
+        } else if (data.parameters.entrypoint === "tip") {
+          console.log("New tip", data);
+          // updates user's tips balance if current user is the recipient
+          if (data.parameters.value.string === $store.userAddress) {
+            store.updateUserTips(
+              parseInt($store.userTips) + parseInt(data.amount)
+            );
+          }
         }
       } catch (error) {
         console.log(error);
@@ -100,6 +155,15 @@
   .balance {
     padding-right: 10px;
   }
+
+  .navbar-navigation {
+    transition: 0.3s;
+  }
+  .navbar-navigation:hover {
+    cursor: pointer;
+    background-color: #f7f8f9;
+    border-radius: 10px;
+  }
 </style>
 
 <nav
@@ -125,8 +189,19 @@
   </div>
   <div class="navbar-menu">
     <div class="navbar-start">
-      <a class="navbar-item" href="#/">Home</a>
-      <a class="navbar-item" href="#/upload">Upload</a>
+      <div class="navbar-item navbar-navigation" on:click={() => push('/')}>
+        Home
+      </div>
+      <div
+        class="navbar-item navbar-navigation"
+        on:click={() => push('/upload')}>
+        Upload
+      </div>
+      {#if $store.userTips && $store.userTips > 0}
+        <div class="navbar-item navbar-navigation" on:click={withdrawTips}>
+          Withdraw ꜩ{$store.userTips / 1000000}
+        </div>
+      {/if}
     </div>
 
     <div class="navbar-end">

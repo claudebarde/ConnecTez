@@ -89,8 +89,10 @@ let withdraw = (storage: storage): return => {
       switch (opt_address) {
         | None => failwith ("Error formatting user's address"): return;
         | Some (formatted_address) => {
+          // prepares transaction and sets blogger's tips to zero
           let payment : operation = Tezos.transaction (unit, tips, formatted_address);
-          ([payment], storage);
+          ([payment], {...storage, 
+            bloggers_tips: Big_map.update(Tezos.sender, Some (0tez), storage.bloggers_tips)});
         }
       }
     }
