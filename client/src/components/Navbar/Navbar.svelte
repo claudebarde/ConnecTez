@@ -40,7 +40,10 @@
   onMount(async () => {
     // sets RPC
     Tezos.setProvider({
-      rpc: "http://localhost:8732",
+      rpc:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:8732"
+          : "https://api.tez.ie/rpc/mainnet",
       signer: new TezBridgeSigner()
     });
     store.setTezosProvider(Tezos);
@@ -56,6 +59,7 @@
       store.updateUserAddress(address);
       const balance = await Tezos.tz.getBalance(address);
       store.updateUserBalance(balance);
+      //console.log(await storage.bloggers.get(address));
     } catch (error) {
       store.updateUserAddress(undefined);
       store.updateUserBalance(undefined);
@@ -75,7 +79,7 @@
           let newValues = newStorage.last_posts.filter(
             el => !$store.storage.last_posts.includes(el)
           );
-          console.log("New post!");
+          console.log("New post!", newValues);
         }
         store.updateStorage(newStorage);
       } catch (error) {
@@ -197,6 +201,13 @@
         on:click={() => push('/upload')}>
         Upload
       </div>
+      {#if $store.userAddress}
+        <div
+          class="navbar-item navbar-navigation"
+          on:click={() => push('/profile')}>
+          Profile
+        </div>
+      {/if}
       {#if $store.userTips && $store.userTips > 0}
         <div class="navbar-item navbar-navigation" on:click={withdrawTips}>
           Withdraw ꜩ{$store.userTips / 1000000}

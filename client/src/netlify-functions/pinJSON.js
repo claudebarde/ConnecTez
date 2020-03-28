@@ -41,6 +41,7 @@ exports.handler = async (event, context) => {
           content: req.content,
           author: req.author,
           icon: req.icon,
+          tags: req.tags,
           timestamp: Date.now()
         }
       },

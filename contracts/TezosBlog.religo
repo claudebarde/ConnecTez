@@ -7,16 +7,18 @@ type posts_list = list (post);
 
 type blogger = {
   posts_list: posts_list,
-  current_tips: tez,
   total_tips: tez,
   name: string
 }
 
+type bloggers_list = big_map(address, tez);
+type bloggers = big_map(address, blogger);
+
 type ipfs_hash = string;
 
 type storage = {
-    bloggers: big_map(address, blogger),
-    bloggers_tips: big_map(address, tez),
+    bloggers: bloggers,
+    bloggers_tips: bloggers_list,
     last_posts: posts_list
 }
 
@@ -37,8 +39,7 @@ let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
       /* creates new blogger */
       | None => {
         let blogger : blogger = {
-          posts_list: [new_post], 
-          current_tips: 0mutez, 
+          posts_list: [new_post],
           total_tips: 0mutez, 
           name: "undefined"
         };
@@ -64,13 +65,25 @@ let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
 }
 
 let tip = ((blogger_address, storage): (address, storage)): return => {
-  switch (Big_map.find_opt(blogger_address, storage.bloggers_tips)) {
-    | None => failwith ("Unable to find blogger"): return;
-    | Some (blogger_tips) => 
-      ([]: list(operation), {...storage, 
-        bloggers_tips: 
-          Big_map.update(blogger_address, Some (blogger_tips + Tezos.amount), storage.bloggers_tips)})
-  }
+  let new_bloggers_tips: bloggers_list = 
+    switch (Big_map.find_opt(blogger_address, storage.bloggers_tips)) {
+      | None => failwith ("Unable to find blogger"): bloggers_list;
+      | Some (blogger_tips) => 
+          Big_map.update(blogger_address, 
+                          Some (blogger_tips + Tezos.amount), 
+                          storage.bloggers_tips);
+    };
+
+  let new_bloggers: bloggers = 
+    switch(Big_map.find_opt(blogger_address, storage.bloggers)){
+      | None => failwith ("Unable to find blogger"): bloggers;
+      | Some (blogger) => 
+        Big_map.update(blogger_address, 
+                        Some ({...blogger, total_tips: Tezos.amount + blogger.total_tips}),
+                        storage.bloggers);
+    };
+
+  ([]: list(operation), {...storage, bloggers_tips: new_bloggers_tips, bloggers: new_bloggers})
 }
 
 let updateBlogger = ((name, storage): (string, storage)): return => {

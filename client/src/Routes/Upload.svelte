@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import snarkdown from "snarkdown";
+  import { push } from "svelte-spa-router";
   import store from "../store/store";
   import Loader from "../components/Loader.svelte";
 
@@ -33,6 +34,8 @@
     "twitter",
     "user-male"
   ];
+  let currentTag = "";
+  let tags = [];
 
   const byteLength = str => {
     // returns the byte length of an utf8 string
@@ -60,6 +63,16 @@
     post = event.target.value;
   };
 
+  const addTag = () => {
+    const tag = currentTag.trim().replace(/ +/g, "-");
+    if (tag.length > 0 && tags.length < 3) {
+      const newTags = new Set(tags);
+      newTags.add(tag);
+      tags = [...newTags];
+      currentTag = "";
+    }
+  };
+
   const confirmUpload = async () => {
     const PINJSON =
       process.env.NODE_ENV === "development"
@@ -74,7 +87,8 @@
             title,
             content: post,
             author: $store.userAddress,
-            icon: selectedIcon || "scroll"
+            icon: selectedIcon || "scroll",
+            tags
           }),
           method: "POST"
         });
@@ -300,7 +314,10 @@
     <button
       class="modal-close is-large"
       aria-label="close"
-      on:click={() => (savePost = undefined)} />
+      on:click={() => {
+        savePost = undefined;
+        push(`/post/${IPFSHash}`);
+      }} />
   </div>
   <!-- MODAL ERROR -->
   <div class="modal" class:is-active={savePost === 'error'}>
@@ -384,6 +401,45 @@
               on:click={() => (selectIcon = true)}>
               Select Icon
             </button>
+          </div>
+        </div>
+        <div class="columns is-vcentered">
+          <div class="column is-two-thirds">
+            <div class="field is-grouped is-grouped-multiline">
+              {#each tags as tag}
+                <div class="control">
+                  <div class="tags has-addons">
+                    <span class="tag is-info">{tag}</span>
+                    <span
+                      class="tag is-delete"
+                      style="cursor:pointer"
+                      on:click={() => {
+                        const newTags = new Set(tags);
+                        newTags.delete(tag);
+                        tags = [...newTags];
+                      }} />
+                  </div>
+                </div>
+              {:else}No tag{/each}
+            </div>
+          </div>
+          <div class="column">
+            <div class="field has-addons">
+              <div class="control">
+                <input
+                  class="input"
+                  class:is-danger={tags.length >= 3}
+                  type="text"
+                  placeholder={tags.length < 3 ? 'Add a tag' : '3 tags max.'}
+                  bind:value={currentTag}
+                  disabled={tags.length >= 5} />
+              </div>
+              <div class="control">
+                <button class="button is-light is-info" on:click={addTag}>
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         {#if selectedIcon}

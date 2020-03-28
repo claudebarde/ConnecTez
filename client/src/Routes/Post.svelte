@@ -72,7 +72,7 @@
   }
 
   .tip-image {
-    width: 38px;
+    width: 32px;
     margin-top: 15px;
   }
 </style>
@@ -126,6 +126,15 @@
         <br />
         <div class="content">
           {@html snarkdown(post.content)}
+        </div>
+        <div class="tags">
+          {#if !post.tags}
+            No tags
+          {:else}
+            {#each post.tags as tag}
+              <span class="tag is-size-7 is-info is-light">#{tag}</span>
+            {/each}
+          {/if}
         </div>
         <div class="is-size-7 has-text-right">
           Posted on {moment(post.timestamp).format('MMM Do Y - h:mm A')}

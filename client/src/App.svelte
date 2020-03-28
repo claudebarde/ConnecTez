@@ -3,6 +3,7 @@
   import Home from "./Routes/Home.svelte";
   import Post from "./Routes/Post.svelte";
   import Upload from "./Routes/Upload.svelte";
+  import Profile from "./Routes/Profile.svelte";
   import NotFound from "./Routes/NotFound.svelte";
   import Navbar from "./components/Navbar/Navbar.svelte";
 
@@ -10,6 +11,7 @@
     "/": Home,
     "/post/:ipfsHash": Post,
     "/upload": Upload,
+    "/profile": Profile,
     "*": NotFound
   };
 </script>
