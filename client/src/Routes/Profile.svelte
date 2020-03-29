@@ -35,6 +35,13 @@
   .profile {
     width: 100%;
   }
+
+  @media only screen and (max-width: 1023px) {
+    .profile-container {
+      padding-top: 30px;
+      width: 90%;
+    }
+  }
 </style>
 
 <main>
@@ -67,8 +74,8 @@
             <tr>
               <td>Blog posts</td>
               <td>
-                <div class="columns">
-                  {#each profile.posts_list as post}
+                {#each profile.posts_list as post}
+                  <div class="columns is-mobile">
                     <div class="column is-half">
                       <a href={`/#/post/${post.ipfs_hash}`}>
                         {post.ipfs_hash.slice(0, 10)}...
@@ -79,8 +86,10 @@
                         {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
                       </span>
                     </div>
-                  {:else}No post yet{/each}
-                </div>
+                  </div>
+                {:else}
+                  <div>No post yet</div>
+                {/each}
               </td>
             </tr>
           </tbody>

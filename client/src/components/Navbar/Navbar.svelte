@@ -1,11 +1,13 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { fly } from "svelte/transition";
   import { Tezos } from "@taquito/taquito";
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
   import { push } from "svelte-spa-router";
   import store from "../../store/store";
 
   let refreshStorageInterval;
+  let isSidebarVisible = false;
 
   const initWallet = async () => {
     try {
@@ -76,10 +78,13 @@
         const newStorage = await $store.contractInstance.storage();
         // checks if new posts were added
         if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
-          let newValues = newStorage.last_posts.filter(
-            el => !$store.storage.last_posts.includes(el)
-          );
-          console.log("New post!", newValues);
+          let newValues = newStorage.last_posts
+            .map(el => el.ipfs_hash)
+            .filter(
+              el =>
+                !$store.storage.last_posts.map(el => el.ipfs_hash).includes(el)
+            );
+          console.log("New post!", newValues[0]);
         }
         store.updateStorage(newStorage);
       } catch (error) {
@@ -168,6 +173,32 @@
     background-color: #f7f8f9;
     border-radius: 10px;
   }
+
+  .sidebar {
+    position: fixed;
+    min-height: 100vh;
+    width: 180px;
+    background-color: #f7f8f9;
+    z-index: 100;
+    -webkit-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+    -moz-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+    box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+    padding: 10px;
+  }
+
+  .sidebar .menu-custom-label {
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+
+  .sidebar .menu-custom-list {
+    line-height: 2.5rem;
+    padding-left: 10px;
+  }
+
+  .sidebar .menu-icon {
+    width: 16px;
+  }
 </style>
 
 <nav
@@ -180,16 +211,18 @@
       <span class="logo-title">Tezos-IPFS Blog</span>
     </a>
 
-    <!--<a
+    <div
       role="button"
       class="navbar-burger burger"
+      class:is-active={isSidebarVisible}
       aria-label="menu"
       aria-expanded="false"
-      data-target="navbarBasicExample">
+      data-target="navbarBasicExample"
+      on:click={() => (isSidebarVisible = !isSidebarVisible)}>
       <span aria-hidden="true" />
       <span aria-hidden="true" />
       <span aria-hidden="true" />
-    </a>-->
+    </div>
   </div>
   <div class="navbar-menu">
     <div class="navbar-start">
@@ -233,3 +266,53 @@
     </div>
   </div>
 </nav>
+{#if isSidebarVisible}
+  <div
+    class="sidebar is-hidden-desktop"
+    transition:fly={{ x: -100, duration: 300 }}>
+    <div class="menu-custom">
+      <p class="menu-custom-label">Menu</p>
+      <ul class="menu-custom-list">
+        <li
+          on:click={() => {
+            isSidebarVisible = false;
+            push('/');
+          }}>
+          <img src="menu-icons/home.svg" alt="home" class="menu-icon" />
+          Home
+        </li>
+        <li
+          on:click={() => {
+            isSidebarVisible = false;
+            push('/upload');
+          }}>
+          <img
+            src="menu-icons/upload-cloud.svg"
+            alt="upload"
+            class="menu-icon" />
+          Upload
+        </li>
+        {#if $store.userAddress}
+          <li
+            on:click={() => {
+              isSidebarVisible = false;
+              push('/profile');
+            }}>
+            <img src="menu-icons/user.svg" alt="user" class="menu-icon" />
+            Profile
+          </li>
+        {/if}
+        {#if $store.userTips && $store.userTips > 0}
+          <li
+            on:click={() => {
+              isSidebarVisible = false;
+              withdrawTips();
+            }}>
+            <img src="menu-icons/gift.svg" alt="gift" class="menu-icon" />
+            Withdraw ꜩ{$store.userTips / 1000000}
+          </li>
+        {/if}
+      </ul>
+    </div>
+  </div>
+{/if}

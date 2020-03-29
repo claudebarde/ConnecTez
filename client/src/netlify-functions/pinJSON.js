@@ -30,11 +30,16 @@ exports.handler = async (event, context) => {
         pinataOptions: { cidVersion: 0 },
         pinataMetadata: {
           name:
-            req.title.toLowerCase().replace(/ +/g, "-") +
-            "-" +
+            "tzblgipfs-" +
+            Math.round(Math.random() * 36 ** 12).toString(36) +
             Date.now()
               .toString()
-              .slice(-5)
+              .slice(-5),
+          keyvalues: {
+            author: req.author,
+            origin: "tezos-ipfs-blog",
+            timestamp: Date.now()
+          }
         },
         pinataContent: {
           title: req.title,

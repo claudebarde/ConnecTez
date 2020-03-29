@@ -6,14 +6,20 @@
 <style>
   main {
     padding: 80px;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f7f8f9;
+  }
+
+  @media only screen and (max-width: 1023px) {
+    main {
+      padding: 30px;
+    }
   }
 </style>
 
 <main>
   {#if $store.storage !== undefined}
-    <div class="columns is-multiline is-mobile">
+    <div class="columns is-multiline">
       {#each $store.storage.last_posts as postData}
         <div class="column is-one-third">
           <BlogCard {postData} />

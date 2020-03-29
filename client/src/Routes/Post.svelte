@@ -43,7 +43,7 @@
   main {
     padding: 80px 30px;
     background-color: #f7f8f9;
-    height: 100vh;
+    min-height: 100vh;
   }
 
   .post,
@@ -74,6 +74,17 @@
   .tip-image {
     width: 32px;
     margin-top: 15px;
+  }
+
+  @media only screen and (max-width: 1023px) {
+    main {
+      padding: 30px;
+    }
+    .post,
+    .error {
+      width: 90%;
+      margin: 0 auto;
+    }
   }
 </style>
 

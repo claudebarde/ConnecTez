@@ -137,7 +137,7 @@
 <style>
   main {
     background-color: #f7f8f9;
-    height: 100vh;
+    min-height: 100%;
   }
 
   .upload-container {
@@ -178,6 +178,15 @@
   .icon-select {
     margin: 0 auto;
     cursor: pointer;
+  }
+
+  @media only screen and (max-width: 1023px) {
+    .upload-container {
+      padding-top: 30px;
+      width: 90%;
+      height: auto;
+      min-height: 100%;
+    }
   }
 </style>
 
@@ -403,7 +412,7 @@
             </button>
           </div>
         </div>
-        <div class="columns is-vcentered">
+        <div class="columns is-vcentered is-mobile">
           <div class="column is-two-thirds">
             <div class="field is-grouped is-grouped-multiline">
               {#each tags as tag}
