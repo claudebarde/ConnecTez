@@ -8,13 +8,26 @@
 
   export let ipfsHash;
 
-  let post = undefined;
+  let post, author;
 
   onMount(async () => {
     const postIPFS = await fetch(
       `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
     );
     post = await postIPFS.json();
+    // checks if blogger registered his/her name
+    if ($store.storage && $store.userAddress) {
+      try {
+        const info = await $store.storage.bloggers.get($store.userAddress);
+        if (info.name) {
+          author = info.name;
+        } else {
+          author = store.shortenAddress(post.author);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   });
 </script>
 
@@ -45,7 +58,7 @@
           on:click={() => push(`/post/${ipfsHash}`)}
           style="cursor:pointer">
           <p class="title is-5">{post.title}</p>
-          <p class="subtitle is-6">From {store.shortenAddress(post.author)}</p>
+          <p class="subtitle is-6">From {author}</p>
         </div>
       </div>
 

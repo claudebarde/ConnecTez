@@ -9,6 +9,9 @@
   let deletePostModal = false;
   let hashToDelete = undefined;
   let waitingForRemoval = undefined;
+  let addNameInputOpen = false;
+  let userName = "";
+  let updatingUserName = false;
 
   const confirmDelete = async () => {
     if (hashToDelete) {
@@ -62,6 +65,23 @@
         }
       })
     );
+
+  const updateName = async () => {
+    if (userName) {
+      updatingUserName = true;
+      try {
+        const op = await $store.contractInstance.methods
+          .updateBlogger(userName)
+          .send();
+        await op.confirmation(1);
+        profile = { ...profile, name: userName };
+        updatingUserName = false;
+        userName = "";
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   afterUpdate(async () => {
     if ($store.storage && $store.userAddress && loading) {
@@ -170,12 +190,59 @@
             <tr>
               <td>Name</td>
               {#if profile.name !== null}
-                <td>{profile.name}</td>
+                <td>
+                  <div class="columns">
+                    <div class="column is-half">{profile.name}</div>
+                    <div class="column is-half">
+                      <button
+                        class="button is-small is-light is-info"
+                        on:click={() => {
+                          profile = { ...profile, name: null };
+                          addNameInputOpen = true;
+                        }}>
+                        Update
+                      </button>
+                    </div>
+                  </div>
+                </td>
               {:else}
                 <td>
-                  <button class="button is-small is-light is-info">
-                    Add your name
-                  </button>
+                  {#if addNameInputOpen}
+                    <div class="field has-addons">
+                      <div
+                        class="control is-small"
+                        style="width:50%"
+                        class:is-loading={updatingUserName}>
+                        <input
+                          class="input is-small"
+                          type="text"
+                          placeholder="Choose your display name"
+                          bind:value={userName}
+                          disabled={userName.length >= 20 || updatingUserName} />
+                      </div>
+                      <div class="control">
+                        {#if updatingUserName}
+                          <button
+                            class="button is-light is-info is-small"
+                            disabled>
+                            Please wait
+                          </button>
+                        {:else}
+                          <button
+                            class="button is-light is-info is-small"
+                            on:click={updateName}>
+                            Update
+                          </button>
+                        {/if}
+                      </div>
+                    </div>
+                  {:else}
+                    <button
+                      class="button is-small is-light is-info"
+                      on:click={() => (addNameInputOpen = true)}>
+                      Add your name
+                    </button>
+                  {/if}
                 </td>
               {/if}
             </tr>
@@ -196,7 +263,7 @@
                   {#each profile.posts_set as post}
                     <div
                       class="columns is-mobile"
-                      out:fly={{ x: 200, duration: 400 }}>
+                      out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
                       <div class="column is-two-fifths">
                         <a href={`/#/post/${post.ipfsHash}`}>
                           {post.ipfsHash.slice(0, 10)}...
