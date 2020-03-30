@@ -16,9 +16,8 @@
       // checks if the hash exists in the smart contract
       try {
         if (
-          $store.storage.last_posts.filter(
-            el => el.ipfs_hash === params.ipfsHash
-          ).length === 0
+          $store.storage.last_posts.filter(el => el === params.ipfsHash)
+            .length === 0
         ) {
           throw new Error("Unknown IPFS hash");
         }

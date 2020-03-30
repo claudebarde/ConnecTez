@@ -7,7 +7,8 @@ const store = () => {
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
-    contractAddress: "KT1CsYSLQYUexPZzW6rSKgypQMQJh4YbBmew",
+    userTips: 0,
+    contractAddress: "KT1KMpPcNWe7gje8eX1M11z93GBhn4wBPyWo",
     contractInstance: undefined,
     storage: undefined
   });

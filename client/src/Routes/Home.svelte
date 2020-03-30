@@ -20,9 +20,9 @@
 <main>
   {#if $store.storage !== undefined}
     <div class="columns is-multiline">
-      {#each $store.storage.last_posts as postData}
+      {#each $store.storage.last_posts.reverse() as ipfsHash}
         <div class="column is-one-third">
-          <BlogCard {postData} />
+          <BlogCard {ipfsHash} />
         </div>
       {:else}No post available yet!{/each}
     </div>

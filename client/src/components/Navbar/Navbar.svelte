@@ -66,25 +66,18 @@
       store.updateUserAddress(undefined);
       store.updateUserBalance(undefined);
     }
-    // updates tips if any
-    try {
-      const tips = await storage.bloggers_tips.get($store.userAddress);
-      store.updateUserTips(tips.toNumber());
-    } catch (error) {
-      store.updateUserTips(undefined);
-    }
     refreshStorageInterval = setInterval(async () => {
+      const newStorage = await $store.contractInstance.storage();
       try {
-        const newStorage = await $store.contractInstance.storage();
         // checks if new posts were added
         if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
-          let newValues = newStorage.last_posts
-            .map(el => el.ipfs_hash)
-            .filter(
-              el =>
-                !$store.storage.last_posts.map(el => el.ipfs_hash).includes(el)
-            );
-          console.log("New post!", newValues[0]);
+          let newValues = newStorage.last_posts.filter(
+            el => !$store.storage.last_posts.includes(el)
+          );
+          console.log(
+            "New post!",
+            newValues.length > 0 ? newValues[0] : newValues
+          );
         }
         store.updateStorage(newStorage);
       } catch (error) {
@@ -92,7 +85,6 @@
       }
       try {
         // checks if new tips were sent
-        const newStorage = await $store.contractInstance.storage();
         const newTips = await newStorage.bloggers_tips.get($store.userAddress);
         if (newTips && newTips.toNumber() !== $store.userTips) {
           console.log("New tip!", newTips.toNumber());

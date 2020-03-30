@@ -4,7 +4,9 @@ const { alice } = require("./../scripts/sandbox/accounts");
 const initial_storage = {
   bloggers: [],
   bloggers_tips: [],
-  last_posts: []
+  last_posts: [],
+  all_posts: [],
+  admin: alice.pkh
 };
 
 module.exports = async deployer => {

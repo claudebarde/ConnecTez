@@ -6,13 +6,13 @@
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
 
-  export let postData;
+  export let ipfsHash;
 
   let post = undefined;
 
   onMount(async () => {
     const postIPFS = await fetch(
-      `https://gateway.pinata.cloud/ipfs/${postData.ipfs_hash}`
+      `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
     );
     post = await postIPFS.json();
   });
@@ -42,7 +42,7 @@
         </figure>
         <div
           class="media-content"
-          on:click={() => push(`/post/${postData.ipfs_hash}`)}
+          on:click={() => push(`/post/${ipfsHash}`)}
           style="cursor:pointer">
           <p class="title is-5">{post.title}</p>
           <p class="subtitle is-6">From {store.shortenAddress(post.author)}</p>

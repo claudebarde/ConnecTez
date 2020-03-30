@@ -1,25 +1,27 @@
+type ipfs_hash = string;
+
 type post = {
   ipfs_hash: string,
-  timestamp: timestamp
+  timestamp: timestamp,
+  author: address
 }
-
-type posts_list = list (post);
 
 type blogger = {
-  posts_list: posts_list,
+  posts_set: set (ipfs_hash),
   total_tips: tez,
-  name: string
+  name: option (string)
 }
 
+type posts_map = big_map(ipfs_hash, post);
 type bloggers_list = big_map(address, tez);
 type bloggers = big_map(address, blogger);
-
-type ipfs_hash = string;
 
 type storage = {
     bloggers: bloggers,
     bloggers_tips: bloggers_list,
-    last_posts: posts_list
+    all_posts: posts_map,
+    last_posts: set (ipfs_hash),
+    admin: address
 }
 
 type return = (list(operation), storage);
@@ -28,35 +30,38 @@ type action =
     | Post (ipfs_hash)
     | Tip (address)
     | UpdateBlogger (string)
+    | Delete (ipfs_hash)
     | Withdraw
 
 let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
   /* checks that valid ipfs hash is provided */
   if(String.size(ipfs_hash) == 46n && String.sub(0n, 2n, ipfs_hash) == "Qm"){
     /* updates blogger's info */
-    let new_post: post = {ipfs_hash: ipfs_hash, timestamp: Tezos.now};
+    let new_post: post = {ipfs_hash: ipfs_hash, timestamp: Tezos.now, author: Tezos.source};
     switch (Big_map.find_opt(Tezos.sender, storage.bloggers)) {
       /* creates new blogger */
       | None => {
         let blogger : blogger = {
-          posts_list: [new_post],
+          posts_set: Set.add(ipfs_hash, Set.empty: set (ipfs_hash)),
           total_tips: 0mutez, 
-          name: "undefined"
+          name: None: option (string)
         };
         /* return */
         ([]: list(operation), {...storage, 
           bloggers_tips: Big_map.add(Tezos.sender, 0mutez, storage.bloggers_tips),
           bloggers: Big_map.add(Tezos.sender, blogger, storage.bloggers),
-          last_posts: [new_post, ...storage.last_posts]});
+          all_posts: Big_map.add(ipfs_hash, new_post, storage.all_posts),
+          last_posts: Set.add(ipfs_hash, storage.last_posts)});
       }
       /* updates blogger's account */
       | Some (blogger) => {
         /* return */
         ([]: list(operation), {...storage, 
           bloggers: Big_map.update(Tezos.sender, 
-            Some ({...blogger, posts_list: [new_post,...blogger.posts_list]}), 
+            Some ({...blogger, posts_set: Set.add(ipfs_hash, blogger.posts_set)}), 
             storage.bloggers),
-          last_posts: [new_post, ...storage.last_posts]});
+          all_posts: Big_map.add(ipfs_hash, new_post, storage.all_posts),
+          last_posts: Set.add(ipfs_hash, storage.last_posts)});
       }
     }
   } else {
@@ -90,7 +95,27 @@ let updateBlogger = ((name, storage): (string, storage)): return => {
   switch(Big_map.find_opt(Tezos.sender, storage.bloggers)) {
     | None => failwith ("Unknown blogger"): return
     | Some (blogger) => ([]: list(operation), {...storage, 
-        bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name}), storage.bloggers)})
+        bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name: Some (name)}), storage.bloggers)})
+  }
+}
+
+let delete = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
+  // finds the blogger's info
+  switch(Big_map.find_opt(Tezos.sender, storage.bloggers)){
+    | None => failwith("Unknown blogger"): return
+    | Some (blogger) => 
+      // checks if address is linked to IPFS hash
+      if(Set.mem(ipfs_hash, blogger.posts_set)){
+        // updates storage
+        ([]: list(operation), {...storage,
+          last_posts: Set.remove(ipfs_hash, storage.last_posts),
+          all_posts: Big_map.remove(ipfs_hash, storage.all_posts),
+          bloggers: Big_map.update(Tezos.sender, 
+            Some ({...blogger, posts_set: Set.remove(ipfs_hash, blogger.posts_set)}), 
+            storage.bloggers)});
+      } else {
+        failwith("You are not allowed to remove this post!"): return;
+      }
   }
 }
 
@@ -117,6 +142,7 @@ let main = ((param, storage): (action, storage)): return => {
     | Post (ipfs_hash) => post ((ipfs_hash, storage))
     | Tip (blogger) => tip ((blogger, storage))
     | UpdateBlogger (name) => updateBlogger ((name, storage))
+    | Delete (ipfs_hash) => delete ((ipfs_hash, storage))
     | Withdraw => withdraw (storage)
   }
 }
