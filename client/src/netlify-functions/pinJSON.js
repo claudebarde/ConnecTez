@@ -38,7 +38,8 @@ exports.handler = async (event, context) => {
           keyvalues: {
             author: req.author,
             origin: "tezos-ipfs-blog",
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            tags: JSON.stringify(req.tags)
           }
         },
         pinataContent: {

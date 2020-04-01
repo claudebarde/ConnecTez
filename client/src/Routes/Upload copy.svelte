@@ -1,11 +1,12 @@
 <script>
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import snarkdown from "snarkdown";
   import { push } from "svelte-spa-router";
   import store from "../store/store";
   import Loader from "../components/Loader.svelte";
-  import MarkdownEditor from "../components/MardownEditor.svelte";
 
+  let preview = false;
   let title = "";
   let post = "";
   let IPFSHash = undefined;
@@ -14,6 +15,7 @@
   let savePost = undefined; // "uploadConfirm" | "waitingForIPFSHash" | "waitingForBlockchain" | "confirmed" | "error"
   let selectIcon = false;
   let selectedIcon = undefined;
+  let contentIsTooBig = false;
   const availableIcons = [
     "box",
     "clock",
@@ -35,8 +37,30 @@
   let currentTag = "";
   let tags = [];
 
+  const byteLength = str => {
+    // returns the byte length of an utf8 string
+    var s = str.length;
+    for (let i = str.length - 1; i >= 0; i--) {
+      const code = str.charCodeAt(i);
+      if (code > 0x7f && code <= 0x7ff) s++;
+      else if (code > 0x7ff && code <= 0xffff) s += 2;
+      if (code >= 0xdc00 && code <= 0xdfff) i--; //trail surrogate
+    }
+    if (s / 1024 < 1) {
+      return s + " B";
+    } else {
+      if (Math.round(s / 1024) >= 10) {
+        contentIsTooBig = true;
+      } else {
+        contentIsTooBig = false;
+      }
+
+      return Math.round(s / 1024) + " kB";
+    }
+  };
+
   const writePost = event => {
-    post = event.detail;
+    post = event.target.value;
   };
 
   const addTag = () => {
@@ -128,7 +152,16 @@
     margin: 10px;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-between;
+  }
+
+  .upload-textarea {
+    height: 400px;
+  }
+
+  .upload-markdown {
+    height: 400px;
+    overflow: auto;
   }
 
   .confirm-buttons {
@@ -423,8 +456,31 @@
             Selected icon: "{selectedIcon}"
           </p>
         {/if}
-        <MarkdownEditor {post} on:write={writePost} />
+        <p class="is-size-7" style="padding:10px 0px">
+          Use Markdown to style your post
+        </p>
+        {#if preview}
+          <div class="upload-markdown has-text-left content">
+            {@html snarkdown(post)}
+          </div>
+        {:else}
+          <textarea
+            class="textarea upload-textarea"
+            class:is-danger={contentIsTooBig}
+            placeholder="Write your post here"
+            bind:value={post}
+            on:input={writePost} />
+          <div
+            class="has-text-right is-size-7"
+            class:has-text-danger={contentIsTooBig}
+            style="padding:5px">
+            {byteLength(post)}
+          </div>
+        {/if}
         <div class="upload-buttons">
+          <button class="button is-light" on:click={() => (preview = !preview)}>
+            {#if preview}Edit{:else}Preview{/if}
+          </button>
           {#if !!title && !!post}
             <button
               class="button is-link is-light"

@@ -6,7 +6,11 @@ const initial_storage = {
   bloggers_tips: [],
   last_posts: [],
   all_posts: [],
-  admin: alice.pkh
+  admin: alice.pkh,
+  updateNameFee: 500000,
+  bloggers_reserved_names: [],
+  paused: false,
+  revenue: 0
 };
 
 module.exports = async deployer => {

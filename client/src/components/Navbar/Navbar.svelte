@@ -68,30 +68,37 @@
     }
     refreshStorageInterval = setInterval(async () => {
       const newStorage = await $store.contractInstance.storage();
-      try {
-        // checks if new posts were added
-        if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
-          let newValues = newStorage.last_posts.filter(
-            el => !$store.storage.last_posts.includes(el)
-          );
-          console.log(
-            "New post!",
-            newValues.length > 0 ? newValues[0] : newValues
-          );
+      // there must be existing posts to check if new posts are available or new tips came
+      if (newStorage.last_posts.length > 0) {
+        try {
+          // checks if new posts were added
+          if (
+            newStorage.last_posts.length !== $store.storage.last_posts.length
+          ) {
+            let newValues = newStorage.last_posts.filter(
+              el => !$store.storage.last_posts.includes(el)
+            );
+            console.log(
+              "New post!",
+              newValues.length > 0 ? newValues[0] : newValues
+            );
+          }
+          store.updateStorage(newStorage);
+        } catch (error) {
+          //console.log(error);
         }
-        store.updateStorage(newStorage);
-      } catch (error) {
-        //console.log(error);
-      }
-      try {
-        // checks if new tips were sent
-        const newTips = await newStorage.bloggers_tips.get($store.userAddress);
-        if (newTips && newTips.toNumber() !== $store.userTips) {
-          console.log("New tip!", newTips.toNumber());
-          store.updateUserTips(newTips.toNumber());
+        try {
+          // checks if new tips were sent
+          const newTips = await newStorage.bloggers_tips.get(
+            $store.userAddress
+          );
+          if (newTips && newTips.toNumber() !== $store.userTips) {
+            console.log("New tip!", newTips.toNumber());
+            store.updateUserTips(newTips.toNumber());
+          }
+        } catch (error) {
+          //console.log(error);
         }
-      } catch (error) {
-        //console.log(error);
       }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
@@ -153,6 +160,21 @@
     margin-left: 10px;
   }
 
+  .logo img:first-child {
+    max-height: 48px;
+    max-width: 48px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+  }
+  .logo img:last-child {
+    max-height: 28px;
+    max-width: 28px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+
   .balance {
     padding-right: 10px;
   }
@@ -198,8 +220,17 @@
   role="navigation"
   aria-label="main navigation">
   <div class="navbar-brand">
+    <div class="navbar-item logo image is-48x48">
+      <img
+        src="ipfs-logo.png"
+        alt="logo"
+        in:fly={{ x: -200, delay: 1000, duration: 700 }} />
+      <img
+        src="tezos.png"
+        alt="logo"
+        in:fly={{ x: 200, delay: 1400, duration: 700 }} />
+    </div>
     <a class="navbar-item" href="#/">
-      <img src="ipfs-tezos.png" alt="logo" />
       <span class="logo-title">Tezos-IPFS Blog</span>
     </a>
 

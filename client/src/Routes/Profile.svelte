@@ -1,10 +1,10 @@
 <script>
   import { afterUpdate } from "svelte";
-  import { fade, fly } from "svelte/transition";
+  import { fade, fly, slide } from "svelte/transition";
   import moment from "moment";
   import store from "../store/store.js";
 
-  let profile;
+  let generalInfo, profile;
   let loading = true;
   let deletePostModal = false;
   let hashToDelete = undefined;
@@ -72,13 +72,15 @@
       try {
         const op = await $store.contractInstance.methods
           .updateBlogger(userName)
-          .send();
+          .send({ amount: $store.storage.updateNameFee, mutez: true });
         await op.confirmation(1);
         profile = { ...profile, name: userName };
         updatingUserName = false;
         userName = "";
       } catch (error) {
         console.log(error);
+        updatingUserName = false;
+        userName = "";
       }
     }
   };
@@ -87,6 +89,7 @@
     if ($store.storage && $store.userAddress && loading) {
       try {
         const info = await $store.storage.bloggers.get($store.userAddress);
+        generalInfo = { ...info };
         // adds info to IPFS hashes
         profile = {
           ...info,
@@ -185,118 +188,127 @@
     <div class="card-content">
       <h1 class="title is-size-4">Profile</h1>
       {#if profile}
-        <table class="table profile">
-          <tbody>
-            <tr>
-              <td>Name</td>
-              {#if profile.name !== null}
-                <td>
-                  <div class="columns">
-                    <div class="column is-half">{profile.name}</div>
-                    <div class="column is-half">
+        <div class="columns">
+          <div class="column is-two-fifth">Name</div>
+          <div class="column is-three-fifths">
+            {#if profile.name !== null}
+              <div class="columns">
+                <div class="column is-half">{profile.name}</div>
+                <div class="column is-half">
+                  <button
+                    class="button is-small is-light is-info"
+                    on:click={() => {
+                      userName = profile.name;
+                      profile = { ...profile, name: null };
+                      addNameInputOpen = true;
+                    }}>
+                    Update
+                  </button>
+                </div>
+              </div>
+            {:else if addNameInputOpen}
+              <div transition:slide={{ duration: 400 }}>
+                <div class="field has-addons">
+                  <div
+                    class="control is-small"
+                    style="width:50%"
+                    class:is-loading={updatingUserName}>
+                    <input
+                      class="input is-small"
+                      type="text"
+                      placeholder="Choose your display name"
+                      bind:value={userName}
+                      disabled={userName.length >= 20 || updatingUserName} />
+                  </div>
+                  <div class="control">
+                    {#if updatingUserName}
+                      <button class="button is-light is-info is-small" disabled>
+                        Please wait
+                      </button>
+                    {:else}
                       <button
-                        class="button is-small is-light is-info"
-                        on:click={() => {
-                          profile = { ...profile, name: null };
-                          addNameInputOpen = true;
-                        }}>
+                        class="button is-light is-info is-small"
+                        on:click={updateName}>
                         Update
                       </button>
-                    </div>
+                      <button
+                        class="button is-light is-danger is-small"
+                        on:click={() => {
+                          addNameInputOpen = false;
+                          profile = { ...profile, name: generalInfo.name };
+                        }}>
+                        Cancel
+                      </button>
+                    {/if}
                   </div>
-                </td>
-              {:else}
-                <td>
-                  {#if addNameInputOpen}
-                    <div class="field has-addons">
-                      <div
-                        class="control is-small"
-                        style="width:50%"
-                        class:is-loading={updatingUserName}>
-                        <input
-                          class="input is-small"
-                          type="text"
-                          placeholder="Choose your display name"
-                          bind:value={userName}
-                          disabled={userName.length >= 20 || updatingUserName} />
-                      </div>
-                      <div class="control">
-                        {#if updatingUserName}
-                          <button
-                            class="button is-light is-info is-small"
-                            disabled>
-                            Please wait
-                          </button>
-                        {:else}
-                          <button
-                            class="button is-light is-info is-small"
-                            on:click={updateName}>
-                            Update
-                          </button>
-                        {/if}
-                      </div>
-                    </div>
-                  {:else}
-                    <button
-                      class="button is-small is-light is-info"
-                      on:click={() => (addNameInputOpen = true)}>
-                      Add your name
-                    </button>
-                  {/if}
-                </td>
-              {/if}
-            </tr>
-            <tr>
-              <td>Total Tips</td>
-              <td>ꜩ {profile.total_tips.toNumber() / 1000000}</td>
-            </tr>
-            <tr>
-              <td>Current tips</td>
-              <td>ꜩ {$store.userTips / 1000000}</td>
-            </tr>
-            <tr>
-              <td>Blog posts</td>
-              <td>
-                {#if profile.posts_set.length === 0}
-                  <div in:fade={{ delay: 400 }}>No post yet</div>
-                {:else}
-                  {#each profile.posts_set as post}
-                    <div
-                      class="columns is-mobile"
-                      out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
-                      <div class="column is-two-fifths">
-                        <a href={`/#/post/${post.ipfsHash}`}>
-                          {post.ipfsHash.slice(0, 10)}...
-                        </a>
-                      </div>
-                      <div class="column is-two-fifths">
-                        <span class="is-size-7">
-                          {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
-                        </span>
-                      </div>
-                      <div class="column is-one-fifth">
-                        {#if waitingForRemoval === post.ipfsHash}
-                          <button class="button is-danger is-loading is-small">
-                            Loading
-                          </button>
-                        {:else}
-                          <img
-                            class="menu-icon"
-                            src="menu-icons/trash.svg"
-                            alt="delete"
-                            on:click={() => {
-                              hashToDelete = post.ipfsHash;
-                              deletePostModal = true;
-                            }} />
-                        {/if}
-                      </div>
-                    </div>
-                  {/each}
-                {/if}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </div>
+                <div class="is-size-7">
+                  A fee of ꜩ {$store.storage.updateNameFee / 1000000} will be
+                  charged to reserve your unique blogger name.
+                </div>
+              </div>
+            {:else}
+              <button
+                class="button is-small is-light is-info"
+                on:click={() => (addNameInputOpen = true)}>
+                Add your name
+              </button>
+            {/if}
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column is-two-fifth">Total Tips</div>
+          <div class="column is-three-fifths">
+            ꜩ {profile.total_tips.toNumber() / 1000000}
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column is-two-fifth">Current Tips</div>
+          <div class="column is-three-fifths">
+            ꜩ {$store.userTips / 1000000}
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column is-two-fifth">Blog posts</div>
+          <div class="column is-three-fifths">
+            {#if profile.posts_set.length === 0}
+              <div in:fade={{ delay: 400 }}>No post yet</div>
+            {:else}
+              {#each profile.posts_set as post}
+                <div
+                  class="columns is-mobile"
+                  out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
+                  <div class="column is-two-fifths">
+                    <a href={`/#/post/${post.ipfsHash}`}>
+                      {post.ipfsHash.slice(0, 10)}...
+                    </a>
+                  </div>
+                  <div class="column is-two-fifths">
+                    <span class="is-size-7">
+                      {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
+                    </span>
+                  </div>
+                  <div class="column is-one-fifth">
+                    {#if waitingForRemoval === post.ipfsHash}
+                      <button class="button is-danger is-loading is-small">
+                        Loading
+                      </button>
+                    {:else}
+                      <img
+                        class="menu-icon"
+                        src="menu-icons/trash.svg"
+                        alt="delete"
+                        on:click={() => {
+                          hashToDelete = post.ipfsHash;
+                          deletePostModal = true;
+                        }} />
+                    {/if}
+                  </div>
+                </div>
+              {/each}
+            {/if}
+          </div>
+        </div>
       {/if}
     </div>
   </div>

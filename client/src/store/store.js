@@ -8,7 +8,7 @@ const store = () => {
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    contractAddress: "KT1KMpPcNWe7gje8eX1M11z93GBhn4wBPyWo",
+    contractAddress: "KT1T2fFhiYHwNRQGqXhXe8mmtc5VL2uSBwYr",
     contractInstance: undefined,
     storage: undefined
   });

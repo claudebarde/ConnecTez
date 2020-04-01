@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { fly } from "svelte/transition";
   import snarkdown from "snarkdown";
   import moment from "moment";
@@ -9,22 +9,27 @@
   export let ipfsHash;
 
   let post, author;
+  let updated = false;
 
   onMount(async () => {
     const postIPFS = await fetch(
       `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
     );
     post = await postIPFS.json();
+  });
+
+  afterUpdate(async () => {
     // checks if blogger registered his/her name
-    if ($store.storage && $store.userAddress) {
+    if ($store.storage && post && !updated) {
       try {
-        const info = await $store.storage.bloggers.get($store.userAddress);
+        const info = await $store.storage.bloggers.get(post.author);
         if (info.name) {
           author = info.name;
         } else {
           author = store.shortenAddress(post.author);
         }
       } catch (error) {
+        author = store.shortenAddress(post.author);
         console.log(error);
       }
     }

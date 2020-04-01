@@ -5,10 +5,11 @@
   import moment from "moment";
   import store from "../store/store.js";
   import TippingBox from "../components/TippingBox.svelte";
+  import Avatar from "../components/Avatar.svelte";
 
   export let params;
   let loading = true;
-  let post;
+  let post, author;
   let openTipModal = false;
 
   afterUpdate(async () => {
@@ -31,6 +32,18 @@
         console.log(error);
         post = "error";
         loading = false;
+      }
+      // checks if author registered a name
+      try {
+        const info = await $store.storage.bloggers.get(post.author);
+        if (info.name) {
+          author = info.name;
+        } else {
+          author = store.shortenAddress(post.author);
+        }
+      } catch (error) {
+        author = store.shortenAddress(post.author);
+        console.log(error);
       }
     } else if (!params.ipfsHash) {
       post = "error";
@@ -115,7 +128,11 @@
           <div class="media-content">
             <p class="title is-2">{post.title}</p>
             <p class="subtitle is-5">
-              From {store.shortenAddress(post.author)}
+              From {author}
+              <Avatar seed={post.author} />
+            </p>
+            <p class="is-size-7 has-text-left">
+              Posted on {moment(post.timestamp).format('MMM Do Y - h:mm A')}
             </p>
           </div>
           <div class="media-right">
@@ -145,9 +162,6 @@
               <span class="tag is-size-7 is-info is-light">#{tag}</span>
             {/each}
           {/if}
-        </div>
-        <div class="is-size-7 has-text-right">
-          Posted on {moment(post.timestamp).format('MMM Do Y - h:mm A')}
         </div>
       </div>
     </div>
