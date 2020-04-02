@@ -12,6 +12,7 @@
   let addNameInputOpen = false;
   let userName = "";
   let updatingUserName = false;
+  let noProfile = false;
 
   const confirmDelete = async () => {
     if (hashToDelete) {
@@ -98,27 +99,20 @@
         loading = false;
       } catch (error) {
         console.log(error);
+        noProfile = true;
+        loading = false;
       }
     }
   });
 </script>
 
 <style>
-  main {
-    height: 100vh;
-    background-color: #f7f8f9;
-  }
-
   .profile-container {
-    padding-top: 80px;
-    height: 100vh;
-    width: 50%;
+    padding-top: 60px;
+    height: 100%;
+    width: 60%;
     margin: 0 auto;
     background-color: #ffffff;
-  }
-
-  .profile {
-    width: 100%;
   }
 
   .menu-icon {
@@ -187,7 +181,7 @@
   <div class="card profile-container">
     <div class="card-content">
       <h1 class="title is-size-4">Profile</h1>
-      {#if profile}
+      {#if profile && !noProfile}
         <div class="columns">
           <div class="column is-two-fifth">Name</div>
           <div class="column is-three-fifths">
@@ -309,6 +303,8 @@
             {/if}
           </div>
         </div>
+      {:else if noProfile}
+        <div>Unable to find information about this profile</div>
       {/if}
     </div>
   </div>

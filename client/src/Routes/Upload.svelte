@@ -40,11 +40,10 @@
   };
 
   const addTag = () => {
-    const tag = currentTag.trim().replace(/ +/g, "-");
-    if (tag.length > 0 && tags.length < 3) {
-      const newTags = new Set(tags);
-      newTags.add(tag);
-      tags = [...newTags];
+    if (currentTag.length > 0 && tags.length < 3) {
+      const newTags = new Set([...tags, ...currentTag.trim().split(/ +/g)]);
+      //newTags.add(...tag.trim().split(/ +/g));
+      tags = [...newTags].slice(0, 3);
       currentTag = "";
     }
   };
@@ -111,15 +110,10 @@
 </script>
 
 <style>
-  main {
-    background-color: #f7f8f9;
-    min-height: 100%;
-  }
-
   .upload-container {
-    padding-top: 80px;
-    height: 100vh;
-    width: 50%;
+    padding-top: 60px;
+    height: 100%;
+    width: 60%;
     margin: 0 auto;
     background-color: #ffffff;
   }
@@ -379,6 +373,11 @@
             </button>
           </div>
         </div>
+        {#if selectedIcon}
+          <p class="is-size-7 has-text-right" style="padding:0px 0px 10px 0px">
+            Selected icon: "{selectedIcon}"
+          </p>
+        {/if}
         <div class="columns is-vcentered is-mobile">
           <div class="column is-two-thirds">
             <div class="field is-grouped is-grouped-multiline">
@@ -399,7 +398,7 @@
               {:else}No tag{/each}
             </div>
           </div>
-          <div class="column">
+          <div class="column is-one-third">
             <div class="field has-addons">
               <div class="control">
                 <input
@@ -418,11 +417,6 @@
             </div>
           </div>
         </div>
-        {#if selectedIcon}
-          <p class="is-size-7" style="padding:10px 0px">
-            Selected icon: "{selectedIcon}"
-          </p>
-        {/if}
         <MarkdownEditor {post} on:write={writePost} />
         <div class="upload-buttons">
           {#if !!title && !!post}

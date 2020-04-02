@@ -8,14 +8,19 @@
 
   export let ipfsHash;
 
-  let post, author;
+  let post, author, error;
   let updated = false;
 
   onMount(async () => {
-    const postIPFS = await fetch(
-      `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
-    );
-    post = await postIPFS.json();
+    try {
+      const postIPFS = await fetch(
+        `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
+      );
+      post = await postIPFS.json();
+    } catch (error) {
+      console.log(error);
+      error = true;
+    }
   });
 
   afterUpdate(async () => {
@@ -78,11 +83,19 @@
     </div>
   </div>
 {:else}
-  <div class="card">
-    <div class="card-content">
-      <div class="content">
-        <p>Fetching data from the IPFS...</p>
+  {#if error}
+    <div class="notification is-danger">
+      This content is unavailable at the moment.
+      <br />
+      Please try again later.
+    </div>
+  {:else}
+    <div class="card">
+      <div class="card-content">
+        <div class="content">
+          <p>Fetching data from the IPFS...</p>
+        </div>
       </div>
     </div>
-  </div>
+  {/if}
 {/if}

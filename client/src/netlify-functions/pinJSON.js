@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
             author: req.author,
             origin: "tezos-ipfs-blog",
             timestamp: Date.now(),
-            tags: JSON.stringify(req.tags)
+            tags: JSON.stringify(req.tags.slice(0, 3))
           }
         },
         pinataContent: {
@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
           content: req.content,
           author: req.author,
           icon: req.icon,
-          tags: req.tags,
+          tags: req.tags.slice(0, 3),
           timestamp: Date.now()
         }
       },

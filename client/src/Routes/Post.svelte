@@ -54,7 +54,6 @@
 <style>
   main {
     padding: 80px 30px;
-    background-color: #f7f8f9;
     min-height: 100vh;
   }
 

@@ -8,6 +8,17 @@
 
   let refreshStorageInterval;
   let isSidebarVisible = false;
+  let scrollY;
+
+  $: if (document.getElementById("navbar") && scrollY > 0) {
+    const navbar = document.getElementById("navbar");
+    navbar.style.backgroundColor = "white";
+    navbar.classList.add("has-shadow");
+  } else if (document.getElementById("navbar") && scrollY == 0) {
+    const navbar = document.getElementById("navbar");
+    navbar.style.backgroundColor = "#f7fafc";
+    navbar.classList.remove("has-shadow");
+  }
 
   const initWallet = async () => {
     try {
@@ -40,6 +51,9 @@
   };
 
   onMount(async () => {
+    /*window.addEventListener("scroll", function(e) {
+      console.log(window.scrollY);
+    });*/
     // sets RPC
     Tezos.setProvider({
       rpc:
@@ -100,6 +114,10 @@
           //console.log(error);
         }
       }
+      // updates smart contract status
+      if ($store.storage.paused !== newStorage.paused) {
+        store.updateStorage({ ...$store.storage, paused: newStorage.paused });
+      }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
       or: [
@@ -146,6 +164,11 @@
 </script>
 
 <style>
+  #navbar {
+    background-color: #f7fafc;
+    transition: 0.4s;
+  }
+
   a {
     color: inherit;
     text-decoration: none;
@@ -173,10 +196,6 @@
     position: absolute;
     top: 10px;
     left: 10px;
-  }
-
-  .balance {
-    padding-right: 10px;
   }
 
   .navbar-navigation {
@@ -213,10 +232,36 @@
   .sidebar .menu-icon {
     width: 16px;
   }
+
+  .contract-paused-notification {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    z-index: 100;
+  }
+
+  @media only screen and (max-width: 1023px) {
+    .logo img:first-child {
+      max-height: 36px;
+      max-width: 36px;
+      position: absolute;
+      top: 6px;
+      left: 6px;
+    }
+    .logo img:last-child {
+      max-height: 20px;
+      max-width: 20px;
+      position: absolute;
+      top: 14px;
+      left: 14px;
+    }
+  }
 </style>
 
+<svelte:window bind:scrollY />
 <nav
-  class="navbar is-fixed-top has-shadow is-spaced"
+  id="navbar"
+  class="navbar is-fixed-top is-spaced"
   role="navigation"
   aria-label="main navigation">
   <div class="navbar-brand">
@@ -274,12 +319,12 @@
     <div class="navbar-end">
       <div class="navbar-item">
         {#if $store.userBalance}
-          <span class="balance is-size-7">
-            ꜩ {$store.userBalance.toNumber() / 1000000}
-          </span>
-          <button class="button is-success is-light">
-            {store.shortenAddress($store.userAddress)}
-          </button>
+          <div class="tags has-addons">
+            <span class="tag">ꜩ {$store.userBalance.toNumber() / 1000000}</span>
+            <span class="tag is-success is-light">
+              {store.shortenAddress($store.userAddress)}
+            </span>
+          </div>
         {:else}
           <button class="button is-info is-light" on:click={initWallet}>
             Connect wallet
@@ -337,5 +382,21 @@
         {/if}
       </ul>
     </div>
+  </div>
+{/if}
+{#if $store.storage && $store.storage.paused}
+  <div class="notification is-danger contract-paused-notification">
+    Please be aware that the contract has been put on
+    <strong>pause</strong>
+    <br />
+    for the time being and
+    <strong>no transaction can be processed</strong>
+    .
+    <br />
+    This is most probably due to the smart contract undergoing works.
+    <br />
+    Please come back later to check the status.
+    <br />
+    Thank you for your understanding.
   </div>
 {/if}

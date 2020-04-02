@@ -2,13 +2,11 @@ import { writable } from "svelte/store";
 
 const store = () => {
   const { subscribe, set, update } = writable({
-    //userAddress: "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-    //userBalance: 20,
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    contractAddress: "KT1T2fFhiYHwNRQGqXhXe8mmtc5VL2uSBwYr",
+    contractAddress: "KT1KqpKskq8QavHvaFPGepz76WLEkLqwYTSJ",
     contractInstance: undefined,
     storage: undefined
   });

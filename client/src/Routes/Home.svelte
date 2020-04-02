@@ -5,9 +5,8 @@
 
 <style>
   main {
-    padding: 80px;
-    min-height: 100vh;
-    background-color: #f7f8f9;
+    padding: 60px;
+    overflow: auto;
   }
 
   @media only screen and (max-width: 1023px) {
