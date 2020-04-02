@@ -141,6 +141,10 @@
     cursor: pointer;
   }
 
+  .selected-icon {
+    margin: 0 auto;
+  }
+
   @media only screen and (max-width: 1023px) {
     .upload-container {
       padding-top: 30px;
@@ -357,27 +361,33 @@
     <div class="card upload-container">
       <div class="card-content">
         <h1 class="title">Write a new blog post</h1>
-        <div class="field has-addons">
-          <div class="control" style="width: 100%">
-            <input
-              class="input"
-              type="text"
-              placeholder="Post title"
-              bind:value={title} />
-          </div>
-          <div class="control">
-            <button
-              class="button is-light is-info"
-              on:click={() => (selectIcon = true)}>
-              Select Icon
-            </button>
+        <div class="columns is-gapless">
+          {#if selectedIcon}
+            <div class="column is-1">
+              <div class="selected-icon image is-32x32">
+                <img src={`icons/${selectedIcon}-64.png`} alt="selected-icon" />
+              </div>
+            </div>
+          {/if}
+          <div class={`column ${selectedIcon ? 'is-11' : 'is-12'}`}>
+            <div class="field has-addons">
+              <div class="control" style="width: 100%">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Post title"
+                  bind:value={title} />
+              </div>
+              <div class="control">
+                <button
+                  class="button is-light is-info"
+                  on:click={() => (selectIcon = true)}>
+                  Select Icon
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        {#if selectedIcon}
-          <p class="is-size-7 has-text-right" style="padding:0px 0px 10px 0px">
-            Selected icon: "{selectedIcon}"
-          </p>
-        {/if}
         <div class="columns is-vcentered is-mobile">
           <div class="column is-two-thirds">
             <div class="field is-grouped is-grouped-multiline">

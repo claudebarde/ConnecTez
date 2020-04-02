@@ -8,14 +8,12 @@
 
   let refreshStorageInterval;
   let isSidebarVisible = false;
-  let scrollY;
+  let scrollY, navbar;
 
   $: if (document.getElementById("navbar") && scrollY > 0) {
-    const navbar = document.getElementById("navbar");
     navbar.style.backgroundColor = "white";
     navbar.classList.add("has-shadow");
   } else if (document.getElementById("navbar") && scrollY == 0) {
-    const navbar = document.getElementById("navbar");
     navbar.style.backgroundColor = "#f7fafc";
     navbar.classList.remove("has-shadow");
   }
@@ -51,9 +49,7 @@
   };
 
   onMount(async () => {
-    /*window.addEventListener("scroll", function(e) {
-      console.log(window.scrollY);
-    });*/
+    navbar = document.getElementById("navbar");
     // sets RPC
     Tezos.setProvider({
       rpc:
