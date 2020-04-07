@@ -24,9 +24,9 @@
         confirmed = false;
         txHash = undefined;
       }, 4000);
-    } catch (error) {
+    } catch (err) {
       error = true;
-      console.log(error);
+      console.log(err);
     }
   };
 </script>

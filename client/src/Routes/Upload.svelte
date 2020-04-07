@@ -456,7 +456,7 @@
     </div>
   </main>
 {:else}
-  <section class="hero is-medium is-light is-bold is-fullheight-with-navbar">
+  <section class="hero is-medium is-bold is-fullheight">
     <div class="hero-body">
       <div class="container">
         <h1 class="title">Write a new blog post</h1>

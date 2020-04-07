@@ -148,18 +148,20 @@
               {post.title}
             </div>
             <div class="subtitle is-size-5-desktop is-size-6-touch">
-              <div
-                class="tip-image-container"
-                on:click={() => (openTipModal = !openTipModal)}>
-                <img
-                  class="tip-image tezos-coin"
-                  src="tezos-coin.png"
-                  alt="tezos-coin" />
-                <img
-                  class="tip-image tezos-hand"
-                  src="tezos-hand.png"
-                  alt="tezos-hand" />
-              </div>
+              {#if $store.userAddress !== post.author}
+                <div
+                  class="tip-image-container"
+                  on:click={() => (openTipModal = !openTipModal)}>
+                  <img
+                    class="tip-image tezos-coin"
+                    src="tezos-coin.png"
+                    alt="tezos-coin" />
+                  <img
+                    class="tip-image tezos-hand"
+                    src="tezos-hand.png"
+                    alt="tezos-hand" />
+                </div>
+              {/if}
               From {author}
               <Avatar seed={post.author} />
               {#if tips}

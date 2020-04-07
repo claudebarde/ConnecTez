@@ -31,6 +31,10 @@
       // gets user's balance
       const balance = await Tezos.tz.getBalance(address);
       store.updateUserBalance(balance);
+      // saves the address in local storage for autoconnection on the next visit
+      if (window.localStorage) {
+        window.localStorage.setItem("previousAddress", address);
+      }
     } catch (error) {
       console.log("error fetching the address or balance:", error);
     }
@@ -70,16 +74,20 @@
     // fetches contract storage
     const storage = await contract.storage();
     store.updateStorage(storage);
-    // updates address and balance
-    try {
-      const address = await window.tezbridge.request({ method: "get_source" });
-      store.updateUserAddress(address);
-      const balance = await Tezos.tz.getBalance(address);
-      store.updateUserBalance(balance);
-      //console.log(await storage.bloggers.get(address));
-    } catch (error) {
-      store.updateUserAddress(undefined);
-      store.updateUserBalance(undefined);
+    // autoconnects users who connected their wallet previously
+    if (window.localStorage && window.localStorage.getItem("previousAddress")) {
+      try {
+        const address = await window.tezbridge.request({
+          method: "get_source"
+        });
+        store.updateUserAddress(address);
+        const balance = await Tezos.tz.getBalance(address);
+        store.updateUserBalance(balance);
+        //console.log(await storage.bloggers.get(address));
+      } catch (error) {
+        store.updateUserAddress(undefined);
+        store.updateUserBalance(undefined);
+      }
     }
     refreshStorageInterval = setInterval(async () => {
       const newStorage = await $store.contractInstance.storage();
@@ -102,27 +110,23 @@
         } catch (error) {
           //console.log(error);
         }
-        try {
-          // checks if new tips were sent
-          const newTips = await newStorage.bloggers_tips.get(
-            $store.userAddress
-          );
-          if (newTips && newTips.toNumber() !== $store.userTips) {
-            console.log("New tip!", newTips.toNumber());
-            store.updateUserTips(newTips.toNumber());
+        if ($store.userAddress) {
+          try {
+            // checks if new tips were sent
+            const newTips = await newStorage.bloggers_tips.get(
+              $store.userAddress
+            );
+            if (newTips && newTips.toNumber() !== $store.userTips) {
+              store.updateUserTips(newTips.toNumber());
+            }
+          } catch (error) {
+            //console.log(error);
           }
-        } catch (error) {
-          //console.log(error);
         }
       }
       // updates smart contract status
       if ($store.storage.paused !== newStorage.paused) {
         store.updateStorage({ ...$store.storage, paused: newStorage.paused });
-      }
-      // recalculates user's displayed balance
-      if ($store.userAddress) {
-        const balance = await Tezos.tz.getBalance($store.userAddress);
-        store.updateUserBalance(balance);
       }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({

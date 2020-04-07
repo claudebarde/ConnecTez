@@ -7,32 +7,35 @@ const store = () => {
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    contractAddress: "KT1Be3jViuAUVoW7RZKN1SgRFkMxXY4AwF5f",
+    contractAddress: "KT1UPn6mWS2F25GS4PVs1UfB1df89HmxExED",
     contractInstance: undefined,
-    storage: undefined
+    storage: undefined,
   });
 
   return {
     subscribe,
-    setTezosProvider: Tezos => {
-      update(currentStore => ({ ...currentStore, TezosProvider: Tezos }));
+    setTezosProvider: (Tezos) => {
+      update((currentStore) => ({ ...currentStore, TezosProvider: Tezos }));
     },
-    updateUserAddress: address => {
-      update(currentStore => ({ ...currentStore, userAddress: address }));
+    updateUserAddress: (address) => {
+      update((currentStore) => ({ ...currentStore, userAddress: address }));
     },
-    updateUserBalance: balance => {
-      update(currentStore => ({ ...currentStore, userBalance: balance }));
+    updateUserBalance: (balance) => {
+      update((currentStore) => ({ ...currentStore, userBalance: balance }));
     },
-    updateUserTips: tips => {
-      update(currentStore => ({ ...currentStore, userTips: tips }));
+    updateUserTips: (tips) => {
+      update((currentStore) => ({ ...currentStore, userTips: tips }));
     },
-    updateContractInstance: instance => {
-      update(currentStore => ({ ...currentStore, contractInstance: instance }));
+    updateContractInstance: (instance) => {
+      update((currentStore) => ({
+        ...currentStore,
+        contractInstance: instance,
+      }));
     },
-    updateStorage: storage => {
-      update(currentStore => ({ ...currentStore, storage }));
+    updateStorage: (storage) => {
+      update((currentStore) => ({ ...currentStore, storage }));
     },
-    toggleDarkMode: currentStatus => {
+    toggleDarkMode: (currentStatus) => {
       // toggles html background color
       let bgColor, cardContentColor, cardContentFontColor;
       if (currentStatus === "on") {
@@ -48,7 +51,7 @@ const store = () => {
       }
       document.querySelector("html").style.backgroundColor = bgColor;
 
-      document.querySelectorAll(".card-content").forEach(el => {
+      document.querySelectorAll(".card-content").forEach((el) => {
         el.style.backgroundColor = cardContentColor;
         el.style.color = cardContentFontColor;
       });
@@ -57,11 +60,11 @@ const store = () => {
         .querySelectorAll(
           ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label"
         )
-        .forEach(el => (el.style.color = cardContentFontColor));
+        .forEach((el) => (el.style.color = cardContentFontColor));
 
       document
         .querySelectorAll(".tip-image")
-        .forEach(el =>
+        .forEach((el) =>
           currentStatus === "on"
             ? (el.style.filter = "invert(0%)")
             : (el.style.filter = "invert(100%)")
@@ -69,15 +72,15 @@ const store = () => {
 
       document
         .querySelectorAll(".navbar-item")
-        .forEach(el => (el.style.color = cardContentFontColor));
+        .forEach((el) => (el.style.color = cardContentFontColor));
 
-      update(currentStore => ({
+      update((currentStore) => ({
         ...currentStore,
-        darkMode: !currentStore.darkMode
+        darkMode: !currentStore.darkMode,
       }));
     },
-    shortenAddress: addr =>
-      addr.slice(0, 6) + "..." + addr.slice(addr.length - 6)
+    shortenAddress: (addr) =>
+      addr.slice(0, 6) + "..." + addr.slice(addr.length - 6),
   };
 };
 
