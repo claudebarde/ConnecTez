@@ -26,6 +26,7 @@
   afterUpdate(async () => {
     // checks if blogger registered his/her name
     if ($store.storage && post && !updated) {
+      // fetches blogger's name
       try {
         const info = await $store.storage.bloggers.get(post.author);
         if (info.name) {
@@ -33,6 +34,7 @@
         } else {
           author = store.shortenAddress(post.author);
         }
+        updated = true;
       } catch (error) {
         author = store.shortenAddress(post.author);
         console.log(error);

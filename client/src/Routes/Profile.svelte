@@ -67,6 +67,11 @@
       })
     );
 
+  const formatUserName = event => {
+    let user = event.target.value.replace(/ /g, "-");
+    userName = user;
+  };
+
   const updateName = async () => {
     if (userName) {
       updatingUserName = true;
@@ -74,7 +79,7 @@
         const op = await $store.contractInstance.methods
           .updateBlogger(userName)
           .send({
-            amount: $store.storage.updateNameFee.toNumber() / 1000000,
+            amount: $store.storage.updateNameFee.toNumber(),
             mutez: true
           });
         await op.confirmation(1);
@@ -110,8 +115,11 @@
 </script>
 
 <style>
+  main {
+    padding-top: 80px;
+  }
+
   .profile-container {
-    padding-top: 60px;
     height: 100%;
     width: 60%;
     margin: 0 auto;
@@ -136,8 +144,11 @@
   }
 
   @media only screen and (max-width: 1023px) {
+    main {
+      padding-top: 20px;
+    }
+
     .profile-container {
-      padding-top: 30px;
       width: 90%;
     }
   }
@@ -185,7 +196,7 @@
     <div class="card-content">
       <h1 class="title is-size-4">Profile</h1>
       {#if profile && !noProfile}
-        <div class="columns">
+        <div class="columns is-mobile">
           <div class="column is-two-fifth">Name</div>
           <div class="column is-three-fifths">
             {#if profile.name !== null}
@@ -205,7 +216,7 @@
               </div>
             {:else if addNameInputOpen}
               <div transition:slide={{ duration: 400 }}>
-                <div class="field has-addons">
+                <div class="field has-addons is-hidden-touch">
                   <div
                     class="control is-small"
                     style="width:50%"
@@ -214,8 +225,9 @@
                       class="input is-small"
                       type="text"
                       placeholder="Choose your display name"
-                      bind:value={userName}
-                      disabled={userName.length >= 20 || updatingUserName} />
+                      value={userName}
+                      on:input={formatUserName}
+                      disabled={updatingUserName} />
                   </div>
                   <div class="control">
                     {#if updatingUserName}
@@ -239,6 +251,41 @@
                     {/if}
                   </div>
                 </div>
+                <div class="is-hidden-desktop">
+                  <div
+                    class="control is-small"
+                    style="width:100%"
+                    class:is-loading={updatingUserName}>
+                    <input
+                      class="input is-small"
+                      type="text"
+                      placeholder="Choose your display name"
+                      value={userName}
+                      on:input={formatUserName}
+                      disabled={updatingUserName} />
+                  </div>
+                  {#if updatingUserName}
+                    <button class="button is-light is-info is-small" disabled>
+                      Please wait
+                    </button>
+                  {:else}
+                    <div class="buttons" style="padding:10px">
+                      <button
+                        class="button is-light is-info is-small"
+                        on:click={updateName}>
+                        Update
+                      </button>
+                      <button
+                        class="button is-light is-danger is-small"
+                        on:click={() => {
+                          addNameInputOpen = false;
+                          profile = { ...profile, name: generalInfo.name };
+                        }}>
+                        Cancel
+                      </button>
+                    </div>
+                  {/if}
+                </div>
                 <div class="is-size-7">
                   A fee of ꜩ {$store.storage.updateNameFee / 1000000} will be
                   charged to reserve your unique blogger name.
@@ -253,13 +300,13 @@
             {/if}
           </div>
         </div>
-        <div class="columns">
+        <div class="columns is-mobile">
           <div class="column is-two-fifth">Total Tips</div>
           <div class="column is-three-fifths">
             ꜩ {profile.total_tips.toNumber() / 1000000}
           </div>
         </div>
-        <div class="columns">
+        <div class="columns is-mobile">
           <div class="column is-two-fifth">Current Tips</div>
           <div class="column is-three-fifths">
             ꜩ {$store.userTips / 1000000}

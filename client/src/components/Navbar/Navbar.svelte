@@ -213,15 +213,25 @@
     border-radius: 10px;
   }
 
+  .sidebar-light {
+    background-color: #f7f8f9;
+    -webkit-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+    -moz-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+    box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
+  }
+
+  .sidebar-dark {
+    background-color: #333;
+    -webkit-box-shadow: 2px 0px 5px 0px rgba(255, 255, 255, 1);
+    -moz-box-shadow: 2px 0px 5px 0px rgba(255, 255, 255, 1);
+    box-shadow: 2px 0px 5px 0px rgba(255, 255, 255, 1);
+  }
+
   .sidebar {
     position: fixed;
     min-height: 100vh;
     width: 180px;
-    background-color: #f7f8f9;
     z-index: 100;
-    -webkit-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
-    -moz-box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
-    box-shadow: 7px -1px 9px -4px rgba(186, 184, 186, 1);
     padding: 10px;
   }
 
@@ -235,8 +245,16 @@
     padding-left: 10px;
   }
 
+  .sidebar-dark .menu-custom-list {
+    color: white;
+  }
+
   .sidebar .menu-icon {
     width: 16px;
+  }
+
+  .sidebar-dark .menu-icon:not(.dark-mode-icon) {
+    filter: invert(100%);
   }
 
   .contract-paused-notification {
@@ -295,11 +313,18 @@
       class:is-active={isSidebarVisible}
       aria-label="menu"
       aria-expanded="false"
-      data-target="navbarBasicExample"
-      on:click={() => (isSidebarVisible = !isSidebarVisible)}>
-      <span aria-hidden="true" />
-      <span aria-hidden="true" />
-      <span aria-hidden="true" />
+      on:click={() => {
+        isSidebarVisible = !isSidebarVisible;
+      }}>
+      <span
+        aria-hidden="true"
+        style={$store.darkMode ? 'background-color:white' : ''} />
+      <span
+        aria-hidden="true"
+        style={$store.darkMode ? 'background-color:white' : ''} />
+      <span
+        aria-hidden="true"
+        style={$store.darkMode ? 'background-color:white' : ''} />
     </div>
   </div>
   <div class="navbar-menu">
@@ -348,6 +373,10 @@
               </span>
             </div>
           {/if}
+        {:else if $store.darkMode}
+          <button class="button is-info" on:click={initWallet}>
+            Connect wallet
+          </button>
         {:else}
           <button class="button is-info is-light" on:click={initWallet}>
             Connect wallet
@@ -378,7 +407,7 @@
 </nav>
 {#if isSidebarVisible}
   <div
-    class="sidebar is-hidden-desktop"
+    class={`sidebar is-hidden-desktop ${$store.darkMode ? 'sidebar-dark' : 'sidebar-light'}`}
     transition:fly={{ x: -100, duration: 300 }}>
     <div class="menu-custom">
       <p class="menu-custom-label">Menu</p>
@@ -421,6 +450,25 @@
             <img src="menu-icons/gift.svg" alt="gift" class="menu-icon" />
             Withdraw ꜩ{$store.userTips / 1000000}
           </li>
+        {/if}
+        {#if $location.includes('/post/')}
+          {#if $store.darkMode}
+            <li on:click={() => store.toggleDarkMode('on')}>
+              <img
+                class="menu-icon dark-mode-icon"
+                src="menu-icons/sun.svg"
+                alt="dark-mode-off" />
+              Dark Mode
+            </li>
+          {:else}
+            <li on:click={() => store.toggleDarkMode('off')}>
+              <img
+                class="menu-icon dark-mode-icon"
+                src="menu-icons/moon.svg"
+                alt="dark-mode-on" />
+              Dark Mode
+            </li>
+          {/if}
         {/if}
       </ul>
     </div>

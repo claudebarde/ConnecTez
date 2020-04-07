@@ -17,15 +17,15 @@ type bloggers_list = big_map(address, tez);
 type bloggers = big_map(address, blogger);
 
 type storage = {
-    bloggers: bloggers,
-    bloggers_tips: bloggers_list, // keeps track of current amount of tips
-    all_posts: posts_map,
-    last_posts: set (ipfs_hash),
-    bloggers_reserved_names: set (string),
-    admin: address,
-    updateNameFee: tez,
-    paused: bool,
-    revenue: tez
+  bloggers: bloggers,
+  bloggers_tips: bloggers_list, // keeps track of current amount of tips
+  all_posts: posts_map,
+  last_posts: set (ipfs_hash),
+  bloggers_reserved_names: set (string),
+  admin: address,
+  updateNameFee: tez,
+  paused: bool,
+  revenue: tez
 }
 
 type delete_record = {ipfs_hash: ipfs_hash, blogger_addr: address};
@@ -87,25 +87,30 @@ let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
 
 let tip = ((blogger_address, storage): (address, storage)): return => {
   if(storage.paused == false){
-    let new_bloggers_tips: bloggers_list = 
-      switch (Big_map.find_opt(blogger_address, storage.bloggers_tips)) {
-        | None => failwith ("Unable to find blogger"): bloggers_list;
-        | Some (blogger_tips) => 
+    // bloggers cannot tip themselves
+    if(blogger_address != Tezos.source){
+      let new_bloggers_tips: bloggers_list = 
+        switch (Big_map.find_opt(blogger_address, storage.bloggers_tips)) {
+          | None => failwith ("Unable to find blogger"): bloggers_list;
+          | Some (blogger_tips) => 
+              Big_map.update(blogger_address, 
+                              Some (blogger_tips + Tezos.amount), 
+                              storage.bloggers_tips);
+        };
+
+      let new_bloggers: bloggers = 
+        switch(Big_map.find_opt(blogger_address, storage.bloggers)){
+          | None => failwith ("Unable to find blogger"): bloggers;
+          | Some (blogger) => 
             Big_map.update(blogger_address, 
-                            Some (blogger_tips + Tezos.amount), 
-                            storage.bloggers_tips);
-      };
+                            Some ({...blogger, total_tips: Tezos.amount + blogger.total_tips}),
+                            storage.bloggers);
+        };
 
-    let new_bloggers: bloggers = 
-      switch(Big_map.find_opt(blogger_address, storage.bloggers)){
-        | None => failwith ("Unable to find blogger"): bloggers;
-        | Some (blogger) => 
-          Big_map.update(blogger_address, 
-                          Some ({...blogger, total_tips: Tezos.amount + blogger.total_tips}),
-                          storage.bloggers);
-      };
-
-    ([]: list(operation), {...storage, bloggers_tips: new_bloggers_tips, bloggers: new_bloggers});
+      ([]: list(operation), {...storage, bloggers_tips: new_bloggers_tips, bloggers: new_bloggers});
+    } else {
+      failwith("You cannot tip yourself!"): return;
+    }
   } else {
     failwith("The contract has been paused!"): return;
   }

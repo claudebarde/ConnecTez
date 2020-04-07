@@ -6,10 +6,12 @@
   import store from "../store/store.js";
   import TippingBox from "../components/TippingBox.svelte";
   import Avatar from "../components/Avatar.svelte";
+  import Loader from "../components/Loader.svelte";
+  import Rating from "../components/Rating.svelte";
 
   export let params;
   let loading = true;
-  let post, author;
+  let post, author, tips;
   let openTipModal = false;
 
   afterUpdate(async () => {
@@ -41,6 +43,7 @@
         } else {
           author = store.shortenAddress(post.author);
         }
+        tips = info.total_tips.toNumber();
       } catch (error) {
         author = store.shortenAddress(post.author);
         console.log(error);
@@ -64,6 +67,7 @@
   }
 
   .tip-image-container {
+    float: right;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -89,7 +93,8 @@
 
   @media only screen and (max-width: 1023px) {
     main {
-      padding: 30px;
+      padding: 0px;
+      padding-top: 20px;
     }
     .post,
     .error {
@@ -101,7 +106,21 @@
 
 <main>
   {#if post === undefined}
-    Loading...
+    <div class="media">
+      <div class="media-left">
+        <p class="image is-64x64">
+          <Loader color="#f7fafc" size={{ width: '64px', height: '64px' }} />
+        </p>
+      </div>
+      <div class="media-content">
+        <p>
+          <strong>Loading posts from the IPFS...</strong>
+        </p>
+        <p>
+          Loading content from the IPFS can take a few seconds, please wait.
+        </p>
+      </div>
+    </div>
   {:else if post === 'error'}
     <article class="message is-danger error">
       <div class="message-header">
@@ -117,7 +136,7 @@
           <TippingBox blogger={post.author} />
         {/if}
         <div class="media">
-          <figure class="media-left">
+          <figure class="media-left is-hidden-touch">
             <p class="image is-96x96">
               <img
                 src={post.icon ? `icons/${post.icon}-64.png` : 'icons/scroll-64.png'}
@@ -125,28 +144,31 @@
             </p>
           </figure>
           <div class="media-content">
-            <p class="title is-2">{post.title}</p>
-            <p class="subtitle is-5">
+            <div class="title is-size-2-desktop is-size-3-touch">
+              {post.title}
+            </div>
+            <div class="subtitle is-size-5-desktop is-size-6-touch">
+              <div
+                class="tip-image-container"
+                on:click={() => (openTipModal = !openTipModal)}>
+                <img
+                  class="tip-image tezos-coin"
+                  src="tezos-coin.png"
+                  alt="tezos-coin" />
+                <img
+                  class="tip-image tezos-hand"
+                  src="tezos-hand.png"
+                  alt="tezos-hand" />
+              </div>
               From {author}
               <Avatar seed={post.author} />
-            </p>
+              {#if tips}
+                <Rating {tips} />
+              {/if}
+            </div>
             <p class="is-size-7 has-text-left">
               Posted on {moment(post.timestamp).format('MMM Do Y - h:mm A')}
             </p>
-          </div>
-          <div class="media-right">
-            <div
-              class="tip-image-container"
-              on:click={() => (openTipModal = !openTipModal)}>
-              <img
-                class="tip-image tezos-coin"
-                src="tezos-coin.png"
-                alt="tezos-coin" />
-              <img
-                class="tip-image tezos-hand"
-                src="tezos-hand.png"
-                alt="tezos-hand" />
-            </div>
           </div>
         </div>
         <br />

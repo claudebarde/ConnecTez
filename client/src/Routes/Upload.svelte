@@ -110,8 +110,12 @@
 </script>
 
 <style>
+  main {
+    padding-top: 80px;
+  }
+
   .upload-container {
-    padding-top: 60px;
+    padding-top: 20px;
     height: 100%;
     width: 60%;
     margin: 0 auto;
@@ -146,11 +150,20 @@
   }
 
   @media only screen and (max-width: 1023px) {
+    main {
+      padding-top: 30px;
+    }
+
     .upload-container {
       padding-top: 30px;
       width: 90%;
       height: auto;
       min-height: 100%;
+    }
+
+    .reverse-columns {
+      flex-direction: column-reverse;
+      display: flex;
     }
   }
 </style>
@@ -388,7 +401,7 @@
             </div>
           </div>
         </div>
-        <div class="columns is-vcentered is-mobile">
+        <div class="columns is-vcentered reverse-columns">
           <div class="column is-two-thirds">
             <div class="field is-grouped is-grouped-multiline">
               {#each tags as tag}

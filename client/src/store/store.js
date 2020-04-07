@@ -47,13 +47,16 @@ const store = () => {
         cardContentFontColor = "white";
       }
       document.querySelector("html").style.backgroundColor = bgColor;
-      for (let item of document.getElementsByClassName("card-content")) {
-        item.style.backgroundColor = cardContentColor;
-        item.style.color = cardContentFontColor;
-      }
+
+      document.querySelectorAll(".card-content").forEach(el => {
+        el.style.backgroundColor = cardContentColor;
+        el.style.color = cardContentFontColor;
+      });
 
       document
-        .querySelectorAll(".title, .subtitle, h1, h2, h3, h4, h5")
+        .querySelectorAll(
+          ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label"
+        )
         .forEach(el => (el.style.color = cardContentFontColor));
 
       document
