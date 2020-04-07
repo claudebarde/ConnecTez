@@ -8,7 +8,7 @@ type post = {
 
 type blogger = {
   posts_set: set (ipfs_hash),
-  total_tips: tez,
+  total_tips: tez, // keeps track of total amount of tips since the beginning
   name: option (string)
 }
 
@@ -18,7 +18,7 @@ type bloggers = big_map(address, blogger);
 
 type storage = {
     bloggers: bloggers,
-    bloggers_tips: bloggers_list,
+    bloggers_tips: bloggers_list, // keeps track of current amount of tips
     all_posts: posts_map,
     last_posts: set (ipfs_hash),
     bloggers_reserved_names: set (string),
@@ -116,7 +116,7 @@ let updateBlogger = ((name, storage): (string, storage)): return => {
     // checks if name is not reserved
     if(Set.mem(name, storage.bloggers_reserved_names) == false){
       // checks if right fee has been sent
-      if(Tezos.amount >= storage.updateNameFee){
+      if(Tezos.amount == storage.updateNameFee){
         switch(Big_map.find_opt(Tezos.sender, storage.bloggers)) {
           | None => failwith ("Unknown blogger"): return
           | Some (blogger) => ([]: list(operation), {...storage, 

@@ -73,7 +73,10 @@
       try {
         const op = await $store.contractInstance.methods
           .updateBlogger(userName)
-          .send({ amount: $store.storage.updateNameFee, mutez: true });
+          .send({
+            amount: $store.storage.updateNameFee.toNumber() / 1000000,
+            mutez: true
+          });
         await op.confirmation(1);
         profile = { ...profile, name: userName };
         updatingUserName = false;

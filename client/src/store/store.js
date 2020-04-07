@@ -2,11 +2,12 @@ import { writable } from "svelte/store";
 
 const store = () => {
   const { subscribe, set, update } = writable({
+    darkMode: false,
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    contractAddress: "KT1KqpKskq8QavHvaFPGepz76WLEkLqwYTSJ",
+    contractAddress: "KT1Be3jViuAUVoW7RZKN1SgRFkMxXY4AwF5f",
     contractInstance: undefined,
     storage: undefined
   });
@@ -30,6 +31,47 @@ const store = () => {
     },
     updateStorage: storage => {
       update(currentStore => ({ ...currentStore, storage }));
+    },
+    toggleDarkMode: currentStatus => {
+      // toggles html background color
+      let bgColor, cardContentColor, cardContentFontColor;
+      if (currentStatus === "on") {
+        // turns off dark mode
+        bgColor = "#f7fafc";
+        cardContentColor = "transparent";
+        cardContentFontColor = "#333";
+      } else {
+        // turns on darkmode
+        bgColor = "#333";
+        cardContentColor = "#333";
+        cardContentFontColor = "white";
+      }
+      document.querySelector("html").style.backgroundColor = bgColor;
+      for (let item of document.getElementsByClassName("card-content")) {
+        item.style.backgroundColor = cardContentColor;
+        item.style.color = cardContentFontColor;
+      }
+
+      document
+        .querySelectorAll(".title, .subtitle, h1, h2, h3, h4, h5")
+        .forEach(el => (el.style.color = cardContentFontColor));
+
+      document
+        .querySelectorAll(".tip-image")
+        .forEach(el =>
+          currentStatus === "on"
+            ? (el.style.filter = "invert(0%)")
+            : (el.style.filter = "invert(100%)")
+        );
+
+      document
+        .querySelectorAll(".navbar-item")
+        .forEach(el => (el.style.color = cardContentFontColor));
+
+      update(currentStore => ({
+        ...currentStore,
+        darkMode: !currentStore.darkMode
+      }));
     },
     shortenAddress: addr =>
       addr.slice(0, 6) + "..." + addr.slice(addr.length - 6)

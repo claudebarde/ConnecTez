@@ -5,9 +5,13 @@ body {
   height: 100%;
 }
 
+html {
+  background-color: #f7fafc;
+  transition: 0.4s;
+}
+
 body {
   color: #333;
-  background-color: #f7fafc;
   margin: 0;
   padding: 0;
   box-sizing: border-box;

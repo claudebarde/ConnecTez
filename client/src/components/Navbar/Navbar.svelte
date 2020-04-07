@@ -3,7 +3,7 @@
   import { fly } from "svelte/transition";
   import { Tezos } from "@taquito/taquito";
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
-  import { push } from "svelte-spa-router";
+  import { push, location } from "svelte-spa-router";
   import store from "../../store/store";
 
   let refreshStorageInterval;
@@ -11,10 +11,15 @@
   let scrollY, navbar;
 
   $: if (document.getElementById("navbar") && scrollY > 0) {
-    navbar.style.backgroundColor = "white";
-    navbar.classList.add("has-shadow");
+    if ($store.darkMode === false) {
+      navbar.style.backgroundColor = "white";
+      navbar.classList.add("has-shadow");
+    } else {
+      navbar.style.backgroundColor = "#333";
+      navbar.classList.remove("has-shadow");
+    }
   } else if (document.getElementById("navbar") && scrollY == 0) {
-    navbar.style.backgroundColor = "#f7fafc";
+    navbar.style.backgroundColor = "transparent";
     navbar.classList.remove("has-shadow");
   }
 
@@ -113,6 +118,11 @@
       // updates smart contract status
       if ($store.storage.paused !== newStorage.paused) {
         store.updateStorage({ ...$store.storage, paused: newStorage.paused });
+      }
+      // recalculates user's displayed balance
+      if ($store.userAddress) {
+        const balance = await Tezos.tz.getBalance($store.userAddress);
+        store.updateUserBalance(balance);
       }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
@@ -236,6 +246,10 @@
     z-index: 100;
   }
 
+  .dark-mode-icon {
+    cursor: pointer;
+  }
+
   @media only screen and (max-width: 1023px) {
     .logo img:first-child {
       max-height: 36px;
@@ -315,18 +329,50 @@
     <div class="navbar-end">
       <div class="navbar-item">
         {#if $store.userBalance}
-          <div class="tags has-addons">
-            <span class="tag">ꜩ {$store.userBalance.toNumber() / 1000000}</span>
-            <span class="tag is-success is-light">
-              {store.shortenAddress($store.userAddress)}
-            </span>
-          </div>
+          {#if $store.darkMode}
+            <div class="tags has-addons">
+              <span class="tag is-light">
+                ꜩ {$store.userBalance.toNumber() / 1000000}
+              </span>
+              <span class="tag is-success">
+                {store.shortenAddress($store.userAddress)}
+              </span>
+            </div>
+          {:else}
+            <div class="tags has-addons">
+              <span class="tag">
+                ꜩ {$store.userBalance.toNumber() / 1000000}
+              </span>
+              <span class="tag is-success is-light">
+                {store.shortenAddress($store.userAddress)}
+              </span>
+            </div>
+          {/if}
         {:else}
           <button class="button is-info is-light" on:click={initWallet}>
             Connect wallet
           </button>
         {/if}
       </div>
+      {#if $location.includes('/post/')}
+        <div class="navbar-item">
+          {#if $store.darkMode}
+            <img
+              class="dark-mode-icon image is-16x16"
+              src="menu-icons/sun.svg"
+              alt="dark-mode-off"
+              on:click={() => store.toggleDarkMode('on')} />
+          {:else}
+            <img
+              class="dark-mode-icon image is-16x16"
+              src="menu-icons/moon.svg"
+              alt="dark-mode-on"
+              on:click={() => store.toggleDarkMode('off')} />
+          {/if}
+        </div>
+      {:else}
+        <div class="navbar-item image is-16x16" />
+      {/if}
     </div>
   </div>
 </nav>

@@ -19,11 +19,6 @@
       txHash = op.hash;
       await op.confirmation(1);
       confirmed = true;
-      // updates user's balance
-      const balance = await $store.TezosProvider.tz.getBalance(
-        $store.userAddress
-      );
-      store.updateUserBalance(balance);
       // turns state back to default after 4 seconds
       setTimeout(() => {
         confirmed = false;

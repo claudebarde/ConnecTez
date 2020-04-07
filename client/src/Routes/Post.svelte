@@ -158,7 +158,11 @@
             No tags
           {:else}
             {#each post.tags as tag}
-              <span class="tag is-size-7 is-info is-light">#{tag}</span>
+              {#if $store.darkMode}
+                <span class="tag is-size-7 is-info">#{tag}</span>
+              {:else}
+                <span class="tag is-size-7 is-info is-light">#{tag}</span>
+              {/if}
             {/each}
           {/if}
         </div>
