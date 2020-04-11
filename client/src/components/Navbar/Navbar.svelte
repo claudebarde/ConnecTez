@@ -60,11 +60,12 @@
   onMount(async () => {
     navbar = document.getElementById("navbar");
     // sets RPC
+    // "https://api.tez.ie/rpc/mainnet"
     Tezos.setProvider({
       rpc:
         process.env.NODE_ENV === "development"
           ? "http://localhost:8732"
-          : "https://api.tez.ie/rpc/mainnet",
+          : "https://carthagenet.SmartPy.io",
       signer: new TezBridgeSigner()
     });
     store.setTezosProvider(Tezos);
