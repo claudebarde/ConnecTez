@@ -7,9 +7,10 @@ const store = () => {
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    contractAddress: "KT1UPn6mWS2F25GS4PVs1UfB1df89HmxExED",
+    contractAddress: "KT1Kkf3chaabWmEwb8U5NX66m6gbJtxqCoic",
     contractInstance: undefined,
     storage: undefined,
+    favoriteList: null,
   });
 
   return {
@@ -34,6 +35,9 @@ const store = () => {
     },
     updateStorage: (storage) => {
       update((currentStore) => ({ ...currentStore, storage }));
+    },
+    updateFavoriteList: (list) => {
+      update((currentStore) => ({ ...currentStore, favoriteList: list }));
     },
     toggleDarkMode: (currentStatus) => {
       // toggles html background color

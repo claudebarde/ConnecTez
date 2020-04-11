@@ -3,6 +3,7 @@
   import { slide } from "svelte/transition";
   import snarkdown from "snarkdown";
   import moment from "moment";
+  import { push } from "svelte-spa-router";
   import store from "../store/store.js";
   import TippingBox from "../components/TippingBox.svelte";
   import Avatar from "../components/Avatar.svelte";
@@ -91,6 +92,14 @@
     margin-top: 15px;
   }
 
+  .author-link {
+    cursor: pointer;
+  }
+  .author-link:hover {
+    font-style: italic;
+    padding-right: 1px;
+  }
+
   @media only screen and (max-width: 1023px) {
     main {
       padding: 0px;
@@ -137,7 +146,9 @@
         {/if}
         <div class="media">
           <figure class="media-left is-hidden-touch">
-            <p class="image is-96x96">
+            <p
+              class="image is-96x96"
+              style="border-radius:10px;background-color: white">
               <img
                 src={post.icon ? `icons/${post.icon}-64.png` : 'icons/scroll-64.png'}
                 alt="icon" />
@@ -162,7 +173,12 @@
                     alt="tezos-hand" />
                 </div>
               {/if}
-              From {author}
+              From
+              <span
+                on:click={() => push(`#/blogger/${post.author}`)}
+                class="author-link">
+                {author}
+              </span>
               <Avatar seed={post.author} />
               {#if tips}
                 <Rating {tips} />

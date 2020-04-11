@@ -89,10 +89,16 @@
         store.updateUserBalance(undefined);
       }
     }
+    // copies favorite list from local storage
+    if (window.localStorage) {
+      store.updateFavoriteList(
+        JSON.parse(window.localStorage.getItem("favoriteList"))
+      );
+    }
     refreshStorageInterval = setInterval(async () => {
       const newStorage = await $store.contractInstance.storage();
       // there must be existing posts to check if new posts are available or new tips came
-      if (newStorage.last_posts.length > 0) {
+      if (newStorage.last_posts.length > $store.storage.last_posts.length) {
         try {
           // checks if new posts were added
           if (
@@ -110,18 +116,18 @@
         } catch (error) {
           //console.log(error);
         }
-        if ($store.userAddress) {
-          try {
-            // checks if new tips were sent
-            const newTips = await newStorage.bloggers_tips.get(
-              $store.userAddress
-            );
-            if (newTips && newTips.toNumber() !== $store.userTips) {
-              store.updateUserTips(newTips.toNumber());
-            }
-          } catch (error) {
-            //console.log(error);
+      }
+      // checks if new tips were sent
+      if ($store.userAddress) {
+        try {
+          const newTips = await newStorage.bloggers_tips.get(
+            $store.userAddress
+          );
+          if (newTips && newTips.toNumber() !== $store.userTips) {
+            store.updateUserTips(newTips.toNumber());
           }
+        } catch (error) {
+          //console.log(error);
         }
       }
       // updates smart contract status
@@ -308,7 +314,7 @@
         in:fly={{ x: 200, delay: 1400, duration: 700 }} />
     </div>
     <a class="navbar-item" href="#/">
-      <span class="logo-title">Tezos-IPFS Blog</span>
+      <span class="logo-title">TezBlog</span>
     </a>
 
     <div
@@ -457,7 +463,11 @@
         {/if}
         {#if $location.includes('/post/')}
           {#if $store.darkMode}
-            <li on:click={() => store.toggleDarkMode('on')}>
+            <li
+              on:click={() => {
+                isSidebarVisible = false;
+                store.toggleDarkMode('on');
+              }}>
               <img
                 class="menu-icon dark-mode-icon"
                 src="menu-icons/sun.svg"
@@ -465,7 +475,11 @@
               Dark Mode
             </li>
           {:else}
-            <li on:click={() => store.toggleDarkMode('off')}>
+            <li
+              on:click={() => {
+                isSidebarVisible = false;
+                store.toggleDarkMode('off');
+              }}>
               <img
                 class="menu-icon dark-mode-icon"
                 src="menu-icons/moon.svg"

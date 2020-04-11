@@ -2,6 +2,7 @@
   import { afterUpdate } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
   import moment from "moment";
+  import { push } from "svelte-spa-router";
   import store from "../store/store.js";
 
   let generalInfo, profile;
@@ -13,6 +14,7 @@
   let userName = "";
   let updatingUserName = false;
   let noProfile = false;
+  let displayFavoriteList = false;
 
   const confirmDelete = async () => {
     if (hashToDelete) {
@@ -312,6 +314,49 @@
             ꜩ {$store.userTips / 1000000}
           </div>
         </div>
+        {#if $store.favoriteList && $store.favoriteList.length > 0}
+          <div class="columns is-mobile">
+            <div class="column is-two-fifth">Favorite bloggers</div>
+            <div class="column is-three-fifths">
+              <div class="dropdown" class:is-active={displayFavoriteList}>
+                <div class="dropdown-trigger">
+                  <button
+                    class="button is-info is-light is-small"
+                    aria-haspopup="true"
+                    aria-controls="dropdown-menu"
+                    on:click={() => (displayFavoriteList = !displayFavoriteList)}>
+                    <span>Favorite list</span>
+                    <span class="icon is-small">
+                      <img
+                        src="menu-icons/chevron-down.svg"
+                        alt="chevron down" />
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" role="menu">
+                  <div class="dropdown-content">
+                    {#each $store.favoriteList as favorite}
+                      <a
+                        href="#"
+                        class="dropdown-item"
+                        on:click|preventDefault={() => push(`#/blogger/${favorite}`)}>
+                        {#await $store.storage.bloggers.get(favorite)}
+                          Loading...
+                        {:then blogger}
+                          {#if blogger.name}
+                            {blogger.name}
+                          {:else}{store.shortenAddress(favorite)}{/if}
+                        {:catch error}
+                          {store.shortenAddress(favorite)}
+                        {/await}
+                      </a>
+                    {/each}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
         <div class="columns">
           <div class="column is-two-fifth">Blog posts</div>
           <div class="column is-three-fifths">
