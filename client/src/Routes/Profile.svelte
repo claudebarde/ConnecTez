@@ -109,7 +109,8 @@
         // adds info to IPFS hashes
         profile = {
           ...info,
-          posts_set: await getPostInfo(info.posts_set)
+          posts_set: await getPostInfo(info.posts_set),
+          name: !info.name ? null : info.name
         };
         loading = false;
       } catch (error) {
@@ -404,7 +405,7 @@
           </div>
         </div>
       {:else if noProfile}
-        <div>Unable to find information about this profile</div>
+        <div>Write a post to see your account information!</div>
       {/if}
     </div>
   </div>

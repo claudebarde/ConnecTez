@@ -58,7 +58,6 @@
   };
 
   onMount(async () => {
-    console.log($store.contractAddress);
     navbar = document.getElementById("navbar");
     // sets RPC
     Tezos.setProvider({

@@ -7,8 +7,10 @@ const store = () => {
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
-    //contractAddress: "KT1Kkf3chaabWmEwb8U5NX66m6gbJtxqCoic",
-    contractAddress: process.env.CONTRACT_ADDRESS,
+    contractAddress:
+      process.env.NODE_ENV === "development"
+        ? "KT1PsZqRyHak5QRzTKoV3DGBR1K2bw5nZFSE"
+        : "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC",
     contractInstance: undefined,
     storage: undefined,
     favoriteList: null,

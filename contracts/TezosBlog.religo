@@ -9,7 +9,7 @@ type post = {
 type blogger = {
   posts_set: set (ipfs_hash),
   total_tips: tez, // keeps track of total amount of tips since the beginning
-  name: option (string)
+  name: string
 }
 
 type posts_map = big_map(ipfs_hash, post);
@@ -57,7 +57,7 @@ let post = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
           let blogger : blogger = {
             posts_set: Set.add(ipfs_hash, Set.empty: set (ipfs_hash)),
             total_tips: 0mutez, 
-            name: None: option (string)
+            name: ""
           };
           /* return */
           ([]: list(operation), {...storage, 
@@ -125,8 +125,8 @@ let updateBlogger = ((name, storage): (string, storage)): return => {
         switch(Big_map.find_opt(Tezos.sender, storage.bloggers)) {
           | None => failwith ("Unknown blogger"): return
           | Some (blogger) => ([]: list(operation), {...storage, 
-              bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name: Some (name)}), storage.bloggers),
-              bloggers_reserved_names: Set.add(name, storage.bloggers_reserved_names),
+              bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name: name}), storage.bloggers),
+              bloggers_reserved_names: Set.add(name, Set.remove(blogger.name, storage.bloggers_reserved_names)),
               revenue: storage.revenue + Tezos.amount})
         }
       } else {
