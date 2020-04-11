@@ -88,6 +88,11 @@
         profile = { ...profile, name: userName };
         updatingUserName = false;
         userName = "";
+        // updates balance
+        const balance = await $store.TezosProvider.tz.getBalance(
+          $store.userAddress
+        );
+        store.updateUserBalance(balance);
       } catch (error) {
         console.log(error);
         updatingUserName = false;
