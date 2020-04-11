@@ -5,6 +5,7 @@
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
   import { push, location } from "svelte-spa-router";
   import store from "../../store/store";
+  import config from "../../config.js";
 
   let refreshStorageInterval;
   let isSidebarVisible = false;
@@ -59,15 +60,22 @@
 
   onMount(async () => {
     navbar = document.getElementById("navbar");
-    // sets RPC
-    // "https://api.tez.ie/rpc/mainnet"
-    Tezos.setProvider({
-      rpc:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:8732"
-          : "https://carthagenet.SmartPy.io",
-      signer: new TezBridgeSigner()
-    });
+    if (config.DEV_ENV === "local") {
+      Tezos.setProvider({
+        rpc: "http://localhost:8732",
+        signer: new TezBridgeSigner()
+      });
+    } else if (config.DEV_ENV === "carthage") {
+      Tezos.setProvider({
+        rpc: "https://carthagenet.SmartPy.io",
+        signer: new TezBridgeSigner()
+      });
+    } else if (config.DEV_ENV === "main") {
+      Tezos.setProvider({
+        rpc: "",
+        signer: new TezBridgeSigner()
+      });
+    }
     store.setTezosProvider(Tezos);
     // creates contract instance
     const contract = await Tezos.contract.at($store.contractAddress);
@@ -96,6 +104,15 @@
         JSON.parse(window.localStorage.getItem("favoriteList"))
       );
     }
+    // checks if the user is a blogger
+    if ($store.userAddress) {
+      try {
+        const blogger = await storage.bloggers.get($store.userAddress);
+        store.updateIsBlogger(true);
+      } catch (error) {
+        store.updateIsBlogger(false);
+      }
+    }
     refreshStorageInterval = setInterval(async () => {
       const newStorage = await $store.contractInstance.storage();
       // there must be existing posts to check if new posts are available or new tips came
@@ -119,7 +136,8 @@
         }
       }
       // checks if new tips were sent
-      if ($store.userAddress) {
+      if ($store.userAddress && $store.isBlogger) {
+        // checks if tips have changed
         try {
           const newTips = await newStorage.bloggers_tips.get(
             $store.userAddress
@@ -129,6 +147,15 @@
           }
         } catch (error) {
           //console.log(error);
+        }
+      }
+      if ($store.userAddress) {
+        // checks if balance has changed
+        const balance = await $store.TezosProvider.tz.getBalance(
+          $store.userAddress
+        );
+        if (balance.toNumber() !== $store.userBalance.toNumber()) {
+          store.updateUserBalance(balance);
         }
       }
       // updates smart contract status

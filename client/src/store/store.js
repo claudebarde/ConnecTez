@@ -1,19 +1,24 @@
 import { writable } from "svelte/store";
+import config from "../config";
 
 const store = () => {
   const { subscribe, set, update } = writable({
+    DEV_ENV: config.DEV_ENV,
     darkMode: false,
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
     contractAddress:
-      process.env.NODE_ENV === "development"
+      config.DEV_ENV === "local"
         ? "KT1PsZqRyHak5QRzTKoV3DGBR1K2bw5nZFSE"
-        : "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC",
+        : config.DEV_ENV === "carthage"
+        ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
+        : "",
     contractInstance: undefined,
     storage: undefined,
     favoriteList: null,
+    isBlogger: false,
   });
 
   return {
@@ -41,6 +46,9 @@ const store = () => {
     },
     updateFavoriteList: (list) => {
       update((currentStore) => ({ ...currentStore, favoriteList: list }));
+    },
+    updateIsBlogger: (status) => {
+      update((currentStore) => ({ ...currentStore, isBlogger: status }));
     },
     toggleDarkMode: (currentStatus) => {
       // toggles html background color
