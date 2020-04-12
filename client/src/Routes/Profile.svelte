@@ -198,7 +198,9 @@
   <div class="card profile-container">
     <div class="card-content">
       <h1 class="title is-size-4">Profile</h1>
-      {#if profile && !noProfile}
+      {#if loading}
+        <p>Loading your profile information from the blockchain...</p>
+      {:else if profile && !noProfile}
         <div class="columns is-mobile">
           <div class="column is-two-fifth">Name</div>
           <div class="column is-three-fifths">

@@ -38,9 +38,9 @@
           <h3 class="subtitle">Where the Tezos blockchain meets the IPFS</h3>
           <div class="container">
             TezBlog is a blogging platform that allows you to create and manage
-            fully decentralized blog posts that are hosted on the IPFS network
-            using the Markdown formatting syntax, to read content posted by
-            other users and to receive tips from your readers!
+            fully decentralized blog posts using the Markdown formatting syntax
+            that are hosted on the IPFS network, to read content posted by other
+            users and to receive tips from your readers!
             <br />
             <br />
             The content of the posts is hosted on the IPFS while the IPFS hash

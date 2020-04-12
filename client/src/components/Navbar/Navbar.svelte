@@ -10,6 +10,7 @@
   let refreshStorageInterval;
   let isSidebarVisible = false;
   let scrollY, navbar;
+  let carthageNotification = true;
 
   $: if (document.getElementById("navbar") && scrollY > 0) {
     if ($store.darkMode === false) {
@@ -295,8 +296,9 @@
     filter: invert(100%);
   }
 
-  .contract-paused-notification {
-    position: absolute;
+  .contract-paused-notification,
+  .contract-carthagenet-notification {
+    position: fixed;
     bottom: 10px;
     right: 20px;
     z-index: 100;
@@ -320,6 +322,14 @@
       position: absolute;
       top: 14px;
       left: 14px;
+    }
+
+    .contract-paused-notification,
+    .contract-carthagenet-notification {
+      position: fixed;
+      bottom: 0px;
+      right: 0px;
+      z-index: 100;
     }
   }
 </style>
@@ -521,7 +531,11 @@
   </div>
 {/if}
 {#if $store.storage && $store.storage.paused}
-  <div class="notification is-danger contract-paused-notification">
+  <div
+    class="notification is-danger contract-paused-notification"
+    out:fly={{ x: 700, duration: 500 }}>
+    >
+    <button class="delete" />
     Please be aware that the contract has been put on
     <strong>pause</strong>
     <br />
@@ -534,5 +548,34 @@
     Please come back later to check the status.
     <br />
     Thank you for your understanding.
+  </div>
+{/if}
+{#if config.DEV_ENV === 'carthage' && carthageNotification}
+  <div
+    class="notification is-warning contract-carthagenet-notification"
+    in:fly={{ x: 700, duration: 500, delay: 1000 }}
+    out:fly={{ x: 700, duration: 500 }}>
+    <button class="delete" on:click={() => (carthageNotification = false)} />
+    Please be aware that the contract is deployed on
+    <br />
+    <strong>Carthage test network</strong>
+    .
+    <br />
+    Everything you create, post or update will be
+    <strong>deleted</strong>
+    when
+    <br />
+    the contract will be deployed on Tezos mainnet.
+    <br />
+    If you want to try the dapp, go to
+    <a
+      href="https://faucet.tzalpha.net/"
+      target="_blank"
+      rel="noopener noreferrer">
+      this faucet
+    </a>
+    , get a key
+    <br />
+    and create a post :)
   </div>
 {/if}

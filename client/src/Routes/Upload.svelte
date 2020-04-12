@@ -5,6 +5,7 @@
   import store from "../store/store";
   import Loader from "../components/Loader.svelte";
   import MarkdownEditor from "../components/MardownEditor.svelte";
+  import config from "../config.js";
 
   let title = "";
   let post = "";
@@ -63,6 +64,7 @@
             content: post,
             author: $store.userAddress,
             icon: selectedIcon || "scroll",
+            network: config.DEV_ENV,
             tags
           }),
           method: "POST"

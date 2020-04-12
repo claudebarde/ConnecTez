@@ -70,7 +70,9 @@
           on:click={() => push(`/post/${ipfsHash}`)}
           style="cursor:pointer">
           <p class="title is-5">{post.title}</p>
-          <p class="subtitle is-6">From {author}</p>
+          <p class="subtitle is-6">
+            {!author ? 'loading...' : 'From ' + author}
+          </p>
         </div>
       </div>
 
