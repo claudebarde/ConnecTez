@@ -44,13 +44,16 @@
           </h3>
           <div class="container">
             ConnecTez is a blogging platform that allows you to create and
-            manage fully decentralized blog posts using the Markdown formatting
-            syntax that are hosted on the IPFS network, to read content posted
-            by other users and to receive tips from your readers!
+            manage fully decentralized blog posts, to read content posted by
+            other users and to receive tips from your readers!
             <br />
             <br />
             The content of the posts is hosted on the IPFS while the IPFS hash
             identifying your unique posts is stored on the Tezos blockchain.
+            <br />
+            <br />
+            All you have to do is connect your wallet, sit back and create your
+            blog posts :)
           </div>
         </div>
         <div class="column is-half illustration">
