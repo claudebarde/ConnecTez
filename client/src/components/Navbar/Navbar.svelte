@@ -165,7 +165,7 @@
           store.updateStorage({ ...$store.storage, paused: newStorage.paused });
         }
       } catch (error) {
-        console.log("Unable to fetch the storage");
+        //console.log("Unable to fetch the storage");
       }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
