@@ -17,14 +17,10 @@
     Promise.all(
       posts.map(async hash => {
         const post = await $store.storage.all_posts.get(hash);
-        if (post.author === $store.userAddress) {
-          return Promise.resolve({
-            ipfsHash: hash,
-            timestamp: post.timestamp
-          });
-        } else {
-          return Promise.reject("Addresses do not match");
-        }
+        return Promise.resolve({
+          ipfsHash: hash,
+          timestamp: post.timestamp
+        });
       })
     );
 
