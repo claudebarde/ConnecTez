@@ -5,6 +5,7 @@
   import moment from "moment";
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
+  import config from "../config.js";
 
   export let ipfsHash;
 
@@ -16,7 +17,14 @@
       const postIPFS = await fetch(
         `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
       );
-      post = await postIPFS.json();
+      const pendingPost = await postIPFS.json();
+      // checks if post has required properties
+      config.postProps.forEach(prop => {
+        if (!pendingPost.hasOwnProperty(prop)) {
+          throw new Error("missing property");
+        }
+      });
+      post = { ...pendingPost };
     } catch (error) {
       console.log(error);
       error = true;

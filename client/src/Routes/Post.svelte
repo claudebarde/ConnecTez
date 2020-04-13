@@ -9,6 +9,7 @@
   import Avatar from "../components/Avatar.svelte";
   import Loader from "../components/Loader.svelte";
   import Rating from "../components/Rating.svelte";
+  import config from "../config.js";
 
   export let params;
   let loading = true;
@@ -29,7 +30,14 @@
         const postIPFS = await fetch(
           `https://gateway.pinata.cloud/ipfs/${params.ipfsHash}`
         );
-        post = await postIPFS.json();
+        const pendingPost = await postIPFS.json();
+        // checks if post has required properties
+        config.postProps.forEach(prop => {
+          if (!pendingPost.hasOwnProperty(prop)) {
+            throw new Error("missing property");
+          }
+        });
+        post = { ...pendingPost };
         loading = false;
       } catch (error) {
         console.log(error);

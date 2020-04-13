@@ -396,6 +396,25 @@
           Profile
         </div>
       {/if}
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">Links</a>
+        <div class="navbar-dropdown">
+          <a
+            href="https://github.com/claudebarde/ConnecTez"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="navbar-item">
+            Github Repo
+          </a>
+          <a
+            href="https://you.better-call.dev/carthagenet/KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC/operations"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="navbar-item">
+            Smart Contract
+          </a>
+        </div>
+      </div>
       {#if $store.userTips && $store.userTips > 0}
         <div class="navbar-item navbar-navigation" on:click={withdrawTips}>
           Withdraw ꜩ{$store.userTips / 1000000}
