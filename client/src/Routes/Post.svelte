@@ -197,7 +197,7 @@
               <span
                 on:click={() => push(`#/blogger/${post.author}`)}
                 class="author-link">
-                {author}
+                {!author ? store.shortenAddress(post.author) : author}
               </span>
               <Avatar seed={post.author} />
               {#if tips}
