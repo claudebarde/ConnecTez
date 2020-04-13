@@ -29,6 +29,23 @@
     try {
       // gets user's address
       const address = await window.tezbridge.request({ method: "get_source" });
+      /*let address;
+      if (config.DEV_ENV === "local") {
+        address = await window.tezbridge.request({
+          method: "set_host",
+          host: "http://localhost:8732"
+        });
+      } else if (config.DEV_ENV === "carthage") {
+        address = await window.tezbridge.request({
+          method: "set_host",
+          host: "https://carthagenet.SmartPy.io"
+        });
+      } else if (config.DEV_ENV === "main") {
+        address = await window.tezbridge.request({
+          method: "set_host",
+          host: "https://mainnet.tezrpc.me"
+        });
+      }*/
       store.updateUserAddress(address);
       // gets user's balance
       const balance = await Tezos.tz.getBalance(address);

@@ -67,7 +67,7 @@
   </div>
   {#if $store.storage !== undefined}
     <div class="columns is-multiline">
-      {#each $store.storage.last_posts.reverse().slice(0, 30) as ipfsHash}
+      {#each $store.storage.last_posts.slice(0, 30) as ipfsHash}
         <div class="column is-one-third">
           <BlogCard {ipfsHash} />
         </div>
