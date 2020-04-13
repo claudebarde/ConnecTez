@@ -356,7 +356,7 @@
         in:fly={{ x: 200, delay: 1400, duration: 700 }} />
     </div>
     <a class="navbar-item" href="#/">
-      <span class="logo-title">TezBlog</span>
+      <span class="logo-title">ConnecTez</span>
     </a>
 
     <div

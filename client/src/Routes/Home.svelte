@@ -8,6 +8,8 @@
   main {
     padding: 60px;
     overflow: auto;
+    width: 80%;
+    margin: 0 auto;
   }
 
   .landing {
@@ -25,6 +27,8 @@
   @media only screen and (max-width: 1023px) {
     main {
       padding: 30px;
+      width: 100%;
+      margin: 0;
     }
   }
 </style>
@@ -33,22 +37,23 @@
   <div class="card landing">
     <div class="card-content">
       <div class="columns">
-        <div class="column is-two-fifth">
-          <h1 class="title">Welcome to Tezblog!</h1>
-          <h3 class="subtitle">Where the Tezos blockchain meets the IPFS</h3>
+        <div class="column is-half">
+          <h1 class="title is-3">Welcome to ConnecTez!</h1>
+          <h3 class="subtitle is-spaced">
+            Where the Tezos blockchain meets the IPFS
+          </h3>
           <div class="container">
-            TezBlog is a blogging platform that allows you to create and manage
-            fully decentralized blog posts using the Markdown formatting syntax
-            that are hosted on the IPFS network, to read content posted by other
-            users and to receive tips from your readers!
+            ConnecTez is a blogging platform that allows you to create and
+            manage fully decentralized blog posts using the Markdown formatting
+            syntax that are hosted on the IPFS network, to read content posted
+            by other users and to receive tips from your readers!
             <br />
             <br />
             The content of the posts is hosted on the IPFS while the IPFS hash
             identifying your unique posts is stored on the Tezos blockchain.
           </div>
         </div>
-        <div class="column is-one-fifth is-hidden-touch" />
-        <div class="column is-two-fifth illustration">
+        <div class="column is-half illustration">
           <img
             src="undraw_blogging_vpvv.svg"
             alt="blogging-illustration"
