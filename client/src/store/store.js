@@ -73,7 +73,7 @@ const store = () => {
 
       document
         .querySelectorAll(
-          ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label, strong"
+          ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label, strong, em"
         )
         .forEach((el) => (el.style.color = cardContentFontColor));
 

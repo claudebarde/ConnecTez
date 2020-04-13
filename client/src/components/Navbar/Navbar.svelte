@@ -115,53 +115,57 @@
       }
     }
     refreshStorageInterval = setInterval(async () => {
-      const newStorage = await $store.contractInstance.storage();
-      // there must be existing posts to check if new posts are available or new tips came
-      if (newStorage.last_posts.length > $store.storage.last_posts.length) {
-        try {
-          // checks if new posts were added
-          if (
-            newStorage.last_posts.length !== $store.storage.last_posts.length
-          ) {
-            let newValues = newStorage.last_posts.filter(
-              el => !$store.storage.last_posts.includes(el)
-            );
-            console.log(
-              "New post!",
-              newValues.length > 0 ? newValues[0] : newValues
-            );
+      try {
+        const newStorage = await $store.contractInstance.storage();
+        // there must be existing posts to check if new posts are available or new tips came
+        if (newStorage.last_posts.length > $store.storage.last_posts.length) {
+          try {
+            // checks if new posts were added
+            if (
+              newStorage.last_posts.length !== $store.storage.last_posts.length
+            ) {
+              let newValues = newStorage.last_posts.filter(
+                el => !$store.storage.last_posts.includes(el)
+              );
+              console.log(
+                "New post!",
+                newValues.length > 0 ? newValues[0] : newValues
+              );
+            }
+            store.updateStorage(newStorage);
+          } catch (error) {
+            //console.log(error);
           }
-          store.updateStorage(newStorage);
-        } catch (error) {
-          //console.log(error);
         }
-      }
-      // checks if new tips were sent
-      if ($store.userAddress && $store.isBlogger) {
-        // checks if tips have changed
-        try {
-          const newTips = await newStorage.bloggers_tips.get(
+        // checks if new tips were sent
+        if ($store.userAddress && $store.isBlogger) {
+          // checks if tips have changed
+          try {
+            const newTips = await newStorage.bloggers_tips.get(
+              $store.userAddress
+            );
+            if (newTips && newTips.toNumber() !== $store.userTips) {
+              store.updateUserTips(newTips.toNumber());
+            }
+          } catch (error) {
+            //console.log(error);
+          }
+        }
+        if ($store.userAddress) {
+          // checks if balance has changed
+          const balance = await $store.TezosProvider.tz.getBalance(
             $store.userAddress
           );
-          if (newTips && newTips.toNumber() !== $store.userTips) {
-            store.updateUserTips(newTips.toNumber());
+          if (balance.toNumber() !== $store.userBalance.toNumber()) {
+            store.updateUserBalance(balance);
           }
-        } catch (error) {
-          //console.log(error);
         }
-      }
-      if ($store.userAddress) {
-        // checks if balance has changed
-        const balance = await $store.TezosProvider.tz.getBalance(
-          $store.userAddress
-        );
-        if (balance.toNumber() !== $store.userBalance.toNumber()) {
-          store.updateUserBalance(balance);
+        // updates smart contract status
+        if ($store.storage.paused !== newStorage.paused) {
+          store.updateStorage({ ...$store.storage, paused: newStorage.paused });
         }
-      }
-      // updates smart contract status
-      if ($store.storage.paused !== newStorage.paused) {
-        store.updateStorage({ ...$store.storage, paused: newStorage.paused });
+      } catch (error) {
+        console.log("Unable to fetch the storage");
       }
     }, 5000);
     /*const sub = Tezos.stream.subscribeOperation({
@@ -574,7 +578,7 @@
       rel="noopener noreferrer">
       this faucet
     </a>
-    , get a key
+    , get a free key
     <br />
     and create a post :)
   </div>
