@@ -72,6 +72,7 @@ const store = () => {
       });
 
       document
+        .getElementById("post-content")
         .querySelectorAll(
           ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label, strong, em"
         )

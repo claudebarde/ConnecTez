@@ -44,18 +44,20 @@
         post = "error";
         loading = false;
       }
-      // checks if author registered a name
-      try {
-        const info = await $store.storage.bloggers.get(post.author);
-        if (info.name) {
-          author = info.name;
-        } else {
+      if (post) {
+        // checks if author registered a name
+        try {
+          const info = await $store.storage.bloggers.get(post.author);
+          if (info.name) {
+            author = info.name;
+          } else {
+            author = store.shortenAddress(post.author);
+          }
+          tips = info.total_tips.toNumber();
+        } catch (error) {
           author = store.shortenAddress(post.author);
+          console.log(error);
         }
-        tips = info.total_tips.toNumber();
-      } catch (error) {
-        author = store.shortenAddress(post.author);
-        console.log(error);
       }
     } else if (!params.ipfsHash) {
       post = "error";
@@ -108,6 +110,11 @@
     padding-right: 1px;
   }
 
+  .loading {
+    width: 50%;
+    margin: 0 auto;
+  }
+
   @media only screen and (max-width: 1023px) {
     main {
       padding: 0px;
@@ -118,12 +125,17 @@
       width: 90%;
       margin: 0 auto;
     }
+
+    .loading {
+      width: 100%;
+      margin: 0;
+    }
   }
 </style>
 
-<main>
+<main id="post-content">
   {#if post === undefined}
-    <div class="media">
+    <div class="media loading">
       <div class="media-left">
         <p class="image is-64x64">
           <Loader color="#f7fafc" size={{ width: '64px', height: '64px' }} />
