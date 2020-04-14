@@ -106,8 +106,7 @@
     cursor: pointer;
   }
   .author-link:hover {
-    font-style: italic;
-    padding-right: 1px;
+    text-decoration: underline;
   }
 
   .loading {

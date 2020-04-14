@@ -78,6 +78,12 @@
 
   onMount(async () => {
     navbar = document.getElementById("navbar");
+
+    /*const fetchPosts =
+      "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
+    const data = await fetch(fetchPosts, { method: "GET" });
+    console.log(await data.json());*/
+
     if (config.DEV_ENV === "local") {
       Tezos.setProvider({
         rpc: "http://localhost:8732",
@@ -146,7 +152,8 @@
               );
               console.log(
                 "New post!",
-                newValues.length > 0 ? newValues[0] : newValues
+                newValues.length > 0 ? newValues[0] : newValues,
+                newStorage.last_posts
               );
             }
             store.updateStorage(newStorage);
