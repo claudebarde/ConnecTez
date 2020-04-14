@@ -78,12 +78,6 @@
 
   onMount(async () => {
     navbar = document.getElementById("navbar");
-
-    /*const fetchPosts =
-      "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
-    const data = await fetch(fetchPosts, { method: "GET" });
-    console.log(await data.json());*/
-
     if (config.DEV_ENV === "local") {
       Tezos.setProvider({
         rpc: "http://localhost:8732",
@@ -106,7 +100,6 @@
     store.updateContractInstance(contract);
     // fetches contract storage
     const storage = await contract.storage();
-    store.updateStorage(storage);
     // autoconnects users who connected their wallet previously
     if (window.localStorage && window.localStorage.getItem("previousAddress")) {
       try {
@@ -137,6 +130,27 @@
         store.updateIsBlogger(false);
       }
     }
+
+    const urlToFetchPosts =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:34567/fetchPosts"
+        : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
+    const data = await fetch(urlToFetchPosts, {
+      body: JSON.stringify({
+        posts: storage.last_posts.slice(0, 30),
+        network: config.DEV_ENV
+      }),
+      method: "POST"
+    });
+    const results = await data.json();
+    const sortedResults = results
+      .sort((a, b) =>
+        a.metadata.keyvalues.timestamp > b.metadata.keyvalues.timestamp ? -1 : 1
+      )
+      .map(entry => entry.ipfs_pin_hash);
+
+    store.updateStorage({ ...storage, last_posts: sortedResults });
+
     refreshStorageInterval = setInterval(async () => {
       try {
         const newStorage = await $store.contractInstance.storage();
@@ -152,11 +166,14 @@
               );
               console.log(
                 "New post!",
-                newValues.length > 0 ? newValues[0] : newValues,
-                newStorage.last_posts
+                newValues.length > 0 ? newValues[0] : newValues
               );
+
+              store.updateStorage({
+                ...$store.storage,
+                last_posts: [...newStorage.last_posts]
+              });
             }
-            store.updateStorage(newStorage);
           } catch (error) {
             //console.log(error);
           }

@@ -44,7 +44,7 @@
         post = "error";
         loading = false;
       }
-      if (post) {
+      if (post && post !== "error") {
         // checks if author registered a name
         try {
           const info = await $store.storage.bloggers.get(post.author);
@@ -155,7 +155,10 @@
         <p>Error message</p>
         <button class="delete" aria-label="delete" />
       </div>
-      <div class="message-body">No blog post is associated to this value!</div>
+      <div class="message-body">
+        <p>No blog post is associated to this value!</p>
+        <p>The post may have been removed or unpinned.</p>
+      </div>
     </article>
   {:else}
     <div class="card post" in:slide={{ duration: 800 }}>

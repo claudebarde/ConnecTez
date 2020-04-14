@@ -42,7 +42,13 @@
 
   const addTag = () => {
     if (currentTag.length > 0 && tags.length < 3) {
-      const newTags = new Set([...tags, ...currentTag.trim().split(/ +/g)]);
+      const newTags = new Set([
+        ...tags,
+        ...currentTag
+          .trim()
+          .toLowerCase()
+          .split(/ +/g)
+      ]);
       //newTags.add(...tag.trim().split(/ +/g));
       tags = [...newTags].slice(0, 3);
       currentTag = "";
