@@ -60,6 +60,10 @@
   .date {
     padding-top: 20px;
   }
+
+  .tags-list {
+    padding-top: 10px;
+  }
 </style>
 
 {#if post}
@@ -87,6 +91,9 @@
       <div class="content">
         <div class="post-overview">
           {@html snarkdown(post.content || 'Unavailable')}
+        </div>
+        <div class="tags-list is-size-7 has-text-grey-light">
+          {#each post.tags as tag}#{tag.toLowerCase()}&nbsp;{/each}
         </div>
         <div class="date is-size-7">
           {moment(post.timestamp).format('MMM Do Y - h:mm A')}

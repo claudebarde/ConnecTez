@@ -109,7 +109,6 @@
         store.updateUserAddress(address);
         const balance = await Tezos.tz.getBalance(address);
         store.updateUserBalance(balance);
-        //console.log(await storage.bloggers.get(address));
       } catch (error) {
         store.updateUserAddress(undefined);
         store.updateUserBalance(undefined);
@@ -131,23 +130,30 @@
       }
     }
 
-    const urlToFetchPosts =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:34567/fetchPosts"
-        : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
-    const data = await fetch(urlToFetchPosts, {
-      body: JSON.stringify({
-        posts: storage.last_posts.slice(0, 30),
-        network: config.DEV_ENV
-      }),
-      method: "POST"
-    });
-    const results = await data.json();
-    const sortedResults = results
-      .sort((a, b) =>
-        a.metadata.keyvalues.timestamp > b.metadata.keyvalues.timestamp ? -1 : 1
-      )
-      .map(entry => entry.ipfs_pin_hash);
+    let sortedResults = storage.last_posts;
+    try {
+      const urlToFetchPosts =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:34567/fetchPosts"
+          : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
+      const data = await fetch(urlToFetchPosts, {
+        body: JSON.stringify({
+          posts: storage.last_posts.slice(0, 30),
+          network: config.DEV_ENV
+        }),
+        method: "POST"
+      });
+      const results = await data.json();
+      sortedResults = results
+        .sort((a, b) =>
+          a.metadata.keyvalues.timestamp > b.metadata.keyvalues.timestamp
+            ? -1
+            : 1
+        )
+        .map(entry => entry.ipfs_pin_hash);
+    } catch (error) {
+      console.log(error);
+    }
 
     store.updateStorage({ ...storage, last_posts: sortedResults });
 
@@ -474,6 +480,11 @@
               <span class="tag is-success">
                 {store.shortenAddress($store.userAddress)}
               </span>
+              {#if config.DEV_ENV === 'local'}
+                <span class="tag is-warning">local</span>
+              {:else if config.DEV_ENV === 'carthage'}
+                <span class="tag is-warning">carthage</span>
+              {/if}
             </div>
           {:else}
             <div class="tags has-addons">
@@ -483,6 +494,11 @@
               <span class="tag is-success is-light">
                 {store.shortenAddress($store.userAddress)}
               </span>
+              {#if config.DEV_ENV === 'local'}
+                <span class="tag is-warning is-light">local</span>
+              {:else if config.DEV_ENV === 'carthage'}
+                <span class="tag is-warning is-light">carthage</span>
+              {/if}
             </div>
           {/if}
         {:else if $store.darkMode}
