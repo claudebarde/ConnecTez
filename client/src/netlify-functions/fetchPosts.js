@@ -4,8 +4,7 @@ exports.handler = async (event, context) => {
   const url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[keyvalues]={"origin":{"value":"tzblgipfs-carthage","op":"like"}}`;
 
   try {
-    const response = await axios.get({
-      url,
+    const response = await axios.get(url, {
       headers: {
         pinata_api_key: process.env.PINATA_API_KEY,
         pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
