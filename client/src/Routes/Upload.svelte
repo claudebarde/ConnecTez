@@ -101,18 +101,15 @@
       } else {
         errorMessage = error;
       }
-      // if transaction was rejected
-      if (error === "rejected") {
-        const UNPINJSON =
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:34567/unpinJSON"
-            : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
-        const response = await fetch(UNPINJSON, {
-          body: JSON.stringify({ hash: IPFSHash }),
-          method: "POST"
-        });
-        console.log(response);
-      }
+      const UNPINJSON =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:34567/unpinJSON"
+          : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
+      const response = await fetch(UNPINJSON, {
+        body: JSON.stringify({ hash: IPFSHash }),
+        method: "POST"
+      });
+      console.log(response);
     }
   };
 </script>

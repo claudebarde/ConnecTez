@@ -151,6 +151,7 @@
             : 1
         )
         .map(entry => entry.ipfs_pin_hash);
+      //sortedResults = [...sortedResults, ...sortedResults];
     } catch (error) {
       console.log(error);
     }

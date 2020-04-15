@@ -1,6 +1,8 @@
 import { writable } from "svelte/store";
 import config from "../config";
 
+const chunk_size = 4;
+
 const store = () => {
   const { subscribe, set, update } = writable({
     DEV_ENV: config.DEV_ENV,
@@ -97,6 +99,11 @@ const store = () => {
     },
     shortenAddress: (addr) =>
       addr.slice(0, 6) + "..." + addr.slice(addr.length - 6),
+    chunkPostsList: (array) =>
+      Array(Math.ceil(array.length / chunk_size))
+        .fill()
+        .map((_, index) => index * chunk_size)
+        .map((begin) => array.slice(begin, begin + chunk_size)),
   };
 };
 

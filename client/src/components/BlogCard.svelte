@@ -7,7 +7,7 @@
   import store from "../store/store.js";
   import config from "../config.js";
 
-  export let ipfsHash;
+  export let ipfsHash, maxHeight;
 
   let post, author, error;
   let updated = false;
@@ -53,8 +53,8 @@
 
 <style>
   .post-overview {
-    max-height: 100px;
     overflow: hidden;
+    width: 100%;
   }
 
   .date {
@@ -67,7 +67,10 @@
 </style>
 
 {#if post}
-  <div class="card" in:fly={{ y: 300, delay: 200, duration: 400 }}>
+  <div
+    class="card"
+    in:fly={{ y: 300, delay: 200, duration: Math.random() * (1000 - 500) + 500 }}
+    style="width:100%">
     <div class="card-content">
       <div class="media">
         <figure class="media-left">
@@ -89,7 +92,7 @@
       </div>
 
       <div class="content">
-        <div class="post-overview">
+        <div class="post-overview" style={`height:${maxHeight}px`}>
           {@html snarkdown(post.content || 'Unavailable')}
         </div>
         <div class="tags-list is-size-7 has-text-grey-light">
@@ -107,14 +110,6 @@
       This content is unavailable at the moment.
       <br />
       Please try again later.
-    </div>
-  {:else}
-    <div class="card">
-      <div class="card-content">
-        <div class="content">
-          <p>Fetching data from the IPFS...</p>
-        </div>
-      </div>
     </div>
   {/if}
 {/if}

@@ -66,15 +66,125 @@
     </div>
   </div>
   {#if $store.storage !== undefined}
-    <div class="columns is-multiline">
+    {#each store.chunkPostsList($store.storage.last_posts.slice(0, 30)) as chunk, index}
+      {#if chunk.length === 4}
+        {#if index % 2 === 0}
+          <div class="tile is-ancestor">
+            <div class="tile is-4 is-vertical">
+              <div class="tile is-parent">
+                <div class="tile is-child is-hidden-touch" style="display:flex">
+                  <BlogCard maxHeight={400} ipfsHash={chunk[0]} />
+                </div>
+                <div
+                  class="tile is-child is-hidden-desktop"
+                  style="display:flex">
+                  <BlogCard maxHeight={100} ipfsHash={chunk[0]} />
+                </div>
+              </div>
+            </div>
+            <div class="tile is-8 is-vertical">
+              <div class="tile">
+                <div class="tile is-parent">
+                  <div class="tile is-child" style="display:flex">
+                    <BlogCard maxHeight={100} ipfsHash={chunk[1]} />
+                  </div>
+                </div>
+                <div class="tile is-parent">
+                  <div class="tile is-child" style="display:flex">
+                    <BlogCard maxHeight={100} ipfsHash={chunk[2]} />
+                  </div>
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard maxHeight={100} ipfsHash={chunk[3]} />
+                </div>
+              </div>
+            </div>
+          </div>
+        {:else}
+          <div class="tile is-ancestor">
+            <div class="tile is-8 is-vertical">
+              <div class="tile">
+                <div class="tile is-parent">
+                  <div class="tile is-child" style="display:flex">
+                    <BlogCard maxHeight={100} ipfsHash={chunk[1]} />
+                  </div>
+                </div>
+                <div class="tile is-parent">
+                  <div class="tile is-child" style="display:flex">
+                    <BlogCard maxHeight={100} ipfsHash={chunk[2]} />
+                  </div>
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard maxHeight={100} ipfsHash={chunk[3]} />
+                </div>
+              </div>
+            </div>
+            <div class="tile is-4 is-vertical">
+              <div class="tile is-parent">
+                <div class="tile is-child" style="display:flex">
+                  <BlogCard maxHeight={400} ipfsHash={chunk[0]} />
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
+      {:else if chunk.length === 3}
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[0]} />
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[1]} />
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[2]} />
+            </div>
+          </div>
+        </div>
+      {:else if chunk.length === 2}
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[0]} />
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[1]} />
+            </div>
+          </div>
+        </div>
+      {:else}
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <div class="tile is-child">
+              <BlogCard maxHeight={100} ipfsHash={chunk[0]} />
+            </div>
+          </div>
+        </div>
+      {/if}
+    {:else}
+      <h1 class="title is-4 has-text-centered">Not post yet!</h1>
+    {/each}
+
+    <!--<div class="columns is-multiline">
       {#each $store.storage.last_posts.slice(0, 30) as ipfsHash, index (ipfsHash)}
         <div class="column is-one-third">
-          <BlogCard {ipfsHash} />
+          <BlogCard maxHeight={true} {ipfsHash} />
         </div>
       {:else}
         <h1 class="title is-4 has-text-centered">Not post yet!</h1>
       {/each}
-    </div>
+    </div>-->
   {:else if $store.storage === undefined}
     <div class="media">
       <div class="media-left">
