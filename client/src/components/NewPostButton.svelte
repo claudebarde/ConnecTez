@@ -43,10 +43,14 @@
 </script>
 
 {#if lastPostDelay}
-  <button class="button is-warning is-light" disabled>
-    Please wait {timeLeft} {timeLeft === 1 ? timeUnit.slice(-1) : timeUnit}
-    before uploading a new post
-  </button>
+  <article class="message is-warning is-small">
+    <div class="message-body">
+      Creating a good blog post takes some time :)
+      <br />
+      Please wait {timeLeft} {timeLeft === 1 ? timeUnit.slice(-1) : timeUnit}
+      before uploading a new post
+    </div>
+  </article>
 {:else}
   <button class="button is-link is-light" on:click={() => dispatch('upload')}>
     Upload

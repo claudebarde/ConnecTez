@@ -19,15 +19,23 @@ const rightByteLength = (str) => {
 
 exports.handler = async (event, context) => {
   try {
+    const req = JSON.parse(event.body);
     // checks if user did not pin a post in the last 15 minutes
-    /*const lastPinUrl = `https://api.pinata.cloud/data/pinList?pinStart=${new Date(
+    const lastPinUrl = `https://api.pinata.cloud/data/pinList?status=pinned&pinStart=${new Date(
       Date.now() - 15 * 60 * 1000
     ).toISOString()}&metadata[name]=${
       req.network
-    }&metadata[keyvalues]={author:{value:"${req.author}",op:"eq"}}`;*/
+    }&metadata[keyvalues]={"author":{"value":"${req.author}","op":"eq"}}`;
+    console.log(lastPinUrl);
+    const lastPinResponse = await axios.get(lastPinUrl, {
+      headers: {
+        pinata_api_key: process.env.PINATA_API_KEY,
+        pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
+      },
+    });
+    if (lastPinResponse.data.count > 0) throw new Error("post delay");
     // pins posts
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
-    const req = JSON.parse(event.body);
     // if string is too long
     if (!rightByteLength(req.content)) throw new Error("Content is too large!");
 

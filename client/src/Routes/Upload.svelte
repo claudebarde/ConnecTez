@@ -70,8 +70,11 @@
     if (!$store.userAddress && $store.userBalance.toNumber() < 100000) return;
     // cannot make another post before waiting 15 minutes
     if (window.localStorage) {
-      const lastPost = window.localStorage.getItem("lastPost");
-      if (Date.now() < lastPost * 15 * 60 * 1000) return;
+      const lastPost = parseInt(window.localStorage.getItem("lastPost"));
+      if (Date.now() < lastPost + 15 * 60 * 1000) {
+        console.log("too soon");
+        return;
+      }
     }
 
     const PINJSON =
