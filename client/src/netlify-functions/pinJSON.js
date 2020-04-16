@@ -19,6 +19,13 @@ const rightByteLength = (str) => {
 
 exports.handler = async (event, context) => {
   try {
+    // checks if user did not pin a post in the last 15 minutes
+    /*const lastPinUrl = `https://api.pinata.cloud/data/pinList?pinStart=${new Date(
+      Date.now() - 15 * 60 * 1000
+    ).toISOString()}&metadata[name]=${
+      req.network
+    }&metadata[keyvalues]={author:{value:"${req.author}",op:"eq"}}`;*/
+    // pins posts
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
     const req = JSON.parse(event.body);
     // if string is too long

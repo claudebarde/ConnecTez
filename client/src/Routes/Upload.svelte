@@ -39,6 +39,13 @@
   let currentTag = "";
   let tags = [];
 
+  const checkPostStatus = event => {
+    if (savePost === "waitingForBlockchain" || post.length > 0) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  };
+
   const writePost = event => {
     post = event.detail;
   };
@@ -115,15 +122,17 @@
       } else {
         errorMessage = error;
       }
-      const UNPINJSON =
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:34567/unpinJSON"
-          : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
-      const response = await fetch(UNPINJSON, {
-        body: JSON.stringify({ hash: IPFSHash }),
-        method: "POST"
-      });
-      console.log(response);
+      if (IPFSHash) {
+        const UNPINJSON =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:34567/unpinJSON"
+            : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
+        const response = await fetch(UNPINJSON, {
+          body: JSON.stringify({ hash: IPFSHash }),
+          method: "POST"
+        });
+        console.log(response);
+      }
     }
   };
 
@@ -210,6 +219,7 @@
   }
 </style>
 
+<svelte:window on:beforeunload={checkPostStatus} />
 {#if $store.userAddress}
   <!-- MODAL TO CONFIRM UPLOAD TO IPFS -->
   {#if savePost === 'uploadConfirm'}
