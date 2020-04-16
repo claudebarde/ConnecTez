@@ -1,10 +1,11 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { push } from "svelte-spa-router";
   import store from "../store/store";
   import Loader from "../components/Loader.svelte";
   import MarkdownEditor from "../components/MardownEditor.svelte";
+  import NewPostButton from "../components/NewPostButton.svelte";
   import config from "../config.js";
 
   let title = "";
@@ -15,6 +16,8 @@
   let savePost = undefined; // "uploadConfirm" | "waitingForIPFSHash" | "waitingForBlockchain" | "confirmed" | "error"
   let selectIcon = false;
   let selectedIcon = undefined;
+  let lastPostDelay,
+    lastPostInterval = undefined;
   const availableIcons = [
     "box",
     "clock",
@@ -56,6 +59,14 @@
   };
 
   const confirmUpload = async () => {
+    // must have sufficient balance to pay for gas
+    if (!$store.userAddress && $store.userBalance.toNumber() < 100000) return;
+    // cannot make another post before waiting 15 minutes
+    if (window.localStorage) {
+      const lastPost = window.localStorage.getItem("lastPost");
+      if (Date.now() < lastPost * 15 * 60 * 1000) return;
+    }
+
     const PINJSON =
       process.env.NODE_ENV === "development"
         ? "http://localhost:34567/pinJSON"
@@ -86,6 +97,9 @@
             .send();
           txHash = op.hash;
           await op.confirmation(1);
+          if (window.localStorage) {
+            window.localStorage.setItem("lastPost", Date.now());
+          }
           savePost = "confirmed";
         } else {
           throw new Error("No IPFS hash received");
@@ -112,6 +126,29 @@
       console.log(response);
     }
   };
+
+  onMount(() => {
+    if (window.localStorage) {
+      const lastPost = parseInt(window.localStorage.getItem("lastPost"));
+      if (Date.now() < lastPost + 15 * 60 * 1000) {
+        lastPostDelay = false;
+        lastPostInterval = setInterval(
+          () =>
+            (lastPostDelay =
+              Date.now() >
+              parseInt(window.localStorage.getItem("lastPost")) +
+                15 * 60 * 1000),
+          5000
+        );
+      } else {
+        lastPostDelay = true;
+      }
+    }
+  });
+
+  onDestroy(() => {
+    clearInterval(lastPostInterval);
+  });
 </script>
 
 <style>
@@ -448,11 +485,7 @@
         <MarkdownEditor {post} on:write={writePost} />
         <div class="upload-buttons">
           {#if !!title && !!post}
-            <button
-              class="button is-link is-light"
-              on:click={() => (savePost = 'uploadConfirm')}>
-              Upload
-            </button>
+            <NewPostButton on:upload={() => (savePost = 'uploadConfirm')} />
           {:else}
             <button class="button is-warning is-light" disabled>Upload</button>
           {/if}
