@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import moment from "moment";
+  import store from "../store/store.js";
 
   const dispatch = createEventDispatcher();
   let lastPostDelay, lastPost, lastPostInterval, timeLeft, timeUnit;
@@ -43,16 +44,24 @@
 </script>
 
 {#if lastPostDelay}
-  <article class="message is-warning is-small">
+  <div class="message is-warning is-small">
     <div class="message-body">
       Creating a good blog post takes some time :)
       <br />
       Please wait {timeLeft} {timeLeft === 1 ? timeUnit.slice(-1) : timeUnit}
       before uploading a new post
     </div>
-  </article>
+  </div>
 {:else}
-  <button class="button is-link is-light" on:click={() => dispatch('upload')}>
-    Upload
-  </button>
+  {#if $store.userBalance.toNumber() < 30000}
+    <div class="message is-warning is-small">
+      <div class="message-body">
+        You must have at least ꜩ 0.03 in your wallet to create a new post.
+      </div>
+    </div>
+  {:else}
+    <button class="button is-link is-light" on:click={() => dispatch('upload')}>
+      Upload
+    </button>
+  {/if}
 {/if}
