@@ -135,7 +135,7 @@
       const urlToFetchPosts =
         process.env.NODE_ENV === "development"
           ? "http://localhost:34567/fetchPosts"
-          : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/fetchPosts";
+          : "https://connectez.cc/.netlify/functions/fetchPosts";
       const data = await fetch(urlToFetchPosts, {
         body: JSON.stringify({
           posts: storage.last_posts.slice(0, 30),
