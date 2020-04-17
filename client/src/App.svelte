@@ -21,7 +21,7 @@
   let previousRoute = undefined;
 
   const routeLoaded = event => {
-    console.log("previousRoute");
+    console.log(previousRoute);
     if (previousRoute === "Post") {
       store.toggleDarkMode("off");
     }
