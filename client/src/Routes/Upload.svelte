@@ -80,7 +80,7 @@
     const PINJSON =
       process.env.NODE_ENV === "development"
         ? "http://localhost:34567/pinJSON"
-        : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/pinJSON";
+        : "https://connectez.cc/.netlify/functions/pinJSON";
     try {
       // checks if title and post is provided
       if (!!title.trim() && !!post.trim()) {
@@ -129,7 +129,7 @@
         const UNPINJSON =
           process.env.NODE_ENV === "development"
             ? "http://localhost:34567/unpinJSON"
-            : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
+            : "https://connectez.cc/.netlify/functions/unpinJSON";
         const response = await fetch(UNPINJSON, {
           body: JSON.stringify({ hash: IPFSHash }),
           method: "POST"
