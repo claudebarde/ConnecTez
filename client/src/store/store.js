@@ -68,6 +68,7 @@ const store = () => {
         cardContentColor = lessDark;
         cardContentFontColor = "white";
       }
+
       document.querySelector("html").style.backgroundColor = bgColor;
 
       document.querySelectorAll(".card-content").forEach((el) => {
