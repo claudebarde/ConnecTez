@@ -17,7 +17,7 @@
       navbar.style.backgroundColor = "white";
       navbar.classList.add("has-shadow");
     } else {
-      navbar.style.backgroundColor = "#333";
+      navbar.style.backgroundColor = "#2d3748";
       navbar.classList.remove("has-shadow");
     }
   } else if (document.getElementById("navbar") && scrollY == 0) {
@@ -295,11 +295,14 @@
     left: 10px;
   }
 
+  .navbar-item-custom {
+    cursor: pointer;
+  }
+
   .navbar-navigation {
     transition: 0.3s;
   }
   .navbar-navigation:hover {
-    cursor: pointer;
     background-color: #f7f8f9;
     border-radius: 10px;
   }
@@ -358,6 +361,19 @@
 
   .dark-mode-icon {
     cursor: pointer;
+  }
+
+  .dark-dropdown {
+    background-color: #4a5568;
+    color: white;
+  }
+
+  .dark-navbar-link:hover {
+    background-color: #4a5568 !important;
+  }
+
+  .dark-links-item:hover {
+    background-color: #4a5568 !important;
   }
 
   @media only screen and (max-width: 1023px) {
@@ -429,36 +445,48 @@
   </div>
   <div class="navbar-menu">
     <div class="navbar-start">
-      <div class="navbar-item navbar-navigation" on:click={() => push('/')}>
+      <div
+        class="navbar-item navbar-item-custom"
+        class:navbar-navigation={!$store.darkMode}
+        on:click={() => push('/')}>
         Home
       </div>
       <div
-        class="navbar-item navbar-navigation"
+        class="navbar-item navbar-item-custom"
+        class:navbar-navigation={!$store.darkMode}
         on:click={() => push('/upload')}>
         Upload
       </div>
       {#if $store.userAddress}
         <div
-          class="navbar-item navbar-navigation"
+          class="navbar-item navbar-item-custom"
+          class:navbar-navigation={!$store.darkMode}
           on:click={() => push('/profile')}>
           Profile
         </div>
       {/if}
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">Links</a>
-        <div class="navbar-dropdown">
+      <div class="navbar-item navbar-item-custom has-dropdown is-hoverable">
+        <a
+          class="navbar-link"
+          class:dark-navbar-link={$store.darkMode}
+          style={$store.darkMode ? 'background-color: transparent;' : ''}>
+          Links
+        </a>
+        <div class="navbar-dropdown" class:dark-dropdown={$store.darkMode}>
           <a
             href="https://github.com/claudebarde/ConnecTez"
             target="_blank"
             rel="noopener noreferrer"
-            class="navbar-item">
+            class="navbar-item"
+            class:dark-links-item={$store.darkMode}>
             Github Repo
           </a>
           <a
             href="https://you.better-call.dev/carthagenet/KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC/operations"
             target="_blank"
             rel="noopener noreferrer"
-            class="navbar-item">
+            class="navbar-item"
+            class:dark-links-item={$store.darkMode}>
             Smart Contract
           </a>
         </div>
@@ -519,13 +547,13 @@
               class="dark-mode-icon image is-16x16"
               src="menu-icons/sun.svg"
               alt="dark-mode-off"
-              on:click={() => store.toggleDarkMode('on')} />
+              on:click={() => store.toggleDarkMode('off')} />
           {:else}
             <img
               class="dark-mode-icon image is-16x16"
               src="menu-icons/moon.svg"
               alt="dark-mode-on"
-              on:click={() => store.toggleDarkMode('off')} />
+              on:click={() => store.toggleDarkMode('on')} />
           {/if}
         </div>
       {:else}

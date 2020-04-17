@@ -52,18 +52,20 @@ const store = () => {
     updateIsBlogger: (status) => {
       update((currentStore) => ({ ...currentStore, isBlogger: status }));
     },
-    toggleDarkMode: (currentStatus) => {
+    toggleDarkMode: (status) => {
+      const dark = "#2d3748";
+      const lessDark = "#4a5568";
       // toggles html background color
       let bgColor, cardContentColor, cardContentFontColor;
-      if (currentStatus === "on") {
+      if (status === "off") {
         // turns off dark mode
         bgColor = "#f7fafc";
         cardContentColor = "transparent";
         cardContentFontColor = "#333";
       } else {
         // turns on darkmode
-        bgColor = "#333";
-        cardContentColor = "#333";
+        bgColor = dark;
+        cardContentColor = lessDark;
         cardContentFontColor = "white";
       }
       document.querySelector("html").style.backgroundColor = bgColor;
@@ -73,17 +75,19 @@ const store = () => {
         el.style.color = cardContentFontColor;
       });
 
-      document
-        .getElementById("post-content")
-        .querySelectorAll(
-          ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label, strong, em"
-        )
-        .forEach((el) => (el.style.color = cardContentFontColor));
+      if (document.getElementById("post-content")) {
+        document
+          .getElementById("post-content")
+          .querySelectorAll(
+            ".title, .subtitle, h1, h2, h3, h4, h5, .menu-custom-label, strong, em"
+          )
+          .forEach((el) => (el.style.color = cardContentFontColor));
+      }
 
       document
         .querySelectorAll(".tip-image")
         .forEach((el) =>
-          currentStatus === "on"
+          status === "on"
             ? (el.style.filter = "invert(0%)")
             : (el.style.filter = "invert(100%)")
         );
@@ -94,7 +98,7 @@ const store = () => {
 
       update((currentStore) => ({
         ...currentStore,
-        darkMode: !currentStore.darkMode,
+        darkMode: status === "on" ? true : false,
       }));
     },
     shortenAddress: (addr) =>

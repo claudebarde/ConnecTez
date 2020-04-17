@@ -7,6 +7,7 @@
   import Blogger from "./Routes/Blogger.svelte";
   import NotFound from "./Routes/NotFound.svelte";
   import Navbar from "./components/Navbar/Navbar.svelte";
+  import store from "./store/store.js";
 
   const routes = {
     "/": Home,
@@ -16,7 +17,16 @@
     "/blogger/:address": Blogger,
     "*": NotFound
   };
+
+  let previousRoute = undefined;
+
+  const routeLoaded = event => {
+    if (previousRoute === "Post") {
+      store.toggleDarkMode("off");
+    }
+    previousRoute = event.detail.name;
+  };
 </script>
 
 <Navbar />
-<Router {routes} />
+<Router {routes} on:routeLoaded={routeLoaded} />
