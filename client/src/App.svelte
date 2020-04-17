@@ -18,14 +18,13 @@
     "*": NotFound
   };
 
-  let previousRoute = undefined;
+  let previousLocation = undefined;
 
   const routeLoaded = event => {
-    console.log(event);
-    if (previousRoute === "Post") {
+    if (previousLocation && previousLocation.includes("/post/")) {
       store.toggleDarkMode("off");
     }
-    previousRoute = event.detail.name;
+    previousLocation = event.detail.location;
   };
 </script>
 
