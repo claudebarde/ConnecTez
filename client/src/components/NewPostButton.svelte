@@ -48,7 +48,7 @@
     <div class="message-body">
       Creating a good blog post takes some time :)
       <br />
-      Please wait {timeLeft} {timeLeft === 1 ? timeUnit.slice(-1) : timeUnit}
+      Please wait {timeLeft} {timeLeft === 1 ? timeUnit.slice(0, -1) : timeUnit}
       before uploading a new post
     </div>
   </div>

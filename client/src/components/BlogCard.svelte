@@ -7,7 +7,7 @@
   import store from "../store/store.js";
   import config from "../config.js";
 
-  export let ipfsHash, maxHeight;
+  export let ipfsHash, maxHeight, type;
 
   let post, author, error;
   let updated = false;
@@ -64,11 +64,18 @@
   .tags-list {
     padding-top: 10px;
   }
+
+  .highlight {
+    border: none;
+    border-left: solid 6px white;
+    border-image: linear-gradient(#dd6b20, #fbd38d) 0 100%;
+  }
 </style>
 
 {#if post}
   <div
     class="card"
+    class:highlight={type === 'highlight'}
     in:fly={{ y: 300, delay: 200, duration: Math.random() * (1000 - 500) + 500 }}
     style="width:100%">
     <div class="card-content">

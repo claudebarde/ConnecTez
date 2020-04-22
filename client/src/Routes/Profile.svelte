@@ -86,6 +86,7 @@
           });
         await op.confirmation(1);
         profile = { ...profile, name: userName };
+        store.updateUserName(userName);
         updatingUserName = false;
         userName = "";
       } catch (error) {
@@ -157,6 +158,9 @@
   }
 </style>
 
+<svelte:head>
+  <title>Profile - ConnecTez</title>
+</svelte:head>
 <!-- MODAL TO CONFIRM POST REMOVAL -->
 {#if deletePostModal}
   <div class="modal is-active">

@@ -90,8 +90,10 @@
             title,
             content: post,
             author: $store.userAddress,
+            username: $store.userName || "",
             icon: selectedIcon || "scroll",
             network: config.DEV_ENV,
+            type: "post",
             tags
           }),
           method: "POST"
@@ -110,6 +112,11 @@
           if (window.localStorage) {
             window.localStorage.setItem("lastPost", Date.now());
           }
+          // inserts new post into local storage
+          store.updateStorage({
+            ...$store.storage,
+            last_posts: [IPFSHash, ...$store.storage.last_posts]
+          });
           savePost = "confirmed";
         } else {
           throw new Error("No IPFS hash received");
@@ -222,6 +229,9 @@
   }
 </style>
 
+<svelte:head>
+  <title>ConnecTez</title>
+</svelte:head>
 <svelte:window on:beforeunload={checkPostStatus} />
 {#if $store.userAddress}
   <!-- MODAL TO CONFIRM UPLOAD TO IPFS -->

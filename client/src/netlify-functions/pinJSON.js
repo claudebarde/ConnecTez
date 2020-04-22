@@ -48,15 +48,19 @@ exports.handler = async (event, context) => {
             "tzblgipfs-" +
             req.network +
             "-" +
+            req.type +
+            "-" +
             Math.round(Math.random() * 36 ** 12).toString(36) +
             Date.now().toString().slice(-5),
           keyvalues: {
             author: req.author,
+            username: req.username,
             origin: "tezos-ipfs-blog",
             timestamp: Date.now(),
             tags: JSON.stringify(
               req.tags.slice(0, 3).map((tag) => tag.toLowerCase())
             ),
+            type: req.type,
           },
         },
         pinataContent: {

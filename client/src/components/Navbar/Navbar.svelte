@@ -125,12 +125,16 @@
       try {
         const blogger = await storage.bloggers.get($store.userAddress);
         store.updateIsBlogger(true);
+        if (blogger.name && blogger.name.length > 0) {
+          store.updateUserName(blogger.name);
+        }
       } catch (error) {
         store.updateIsBlogger(false);
       }
     }
 
     let sortedResults = storage.last_posts;
+    // sends posts to Pinata to check if they exist and sorts them
     try {
       const urlToFetchPosts =
         process.env.NODE_ENV === "development"
@@ -155,6 +159,14 @@
     } catch (error) {
       console.log(error);
     }
+    // removes highlights from last_posts list
+    // TODO: QUICK FIX UNTIL NEW CONTRACT IS DEPLOYED "if storage.highlights"
+    if (storage.highlights) {
+      const promotedIPFShashes = storage.highlights.map(post => post.ipfs_hash);
+      sortedResults = sortedResults.filter(
+        ipfsHash => !promotedIPFShashes.includes(ipfsHash)
+      );
+    }
 
     store.updateStorage({ ...storage, last_posts: sortedResults });
 
@@ -162,19 +174,18 @@
       try {
         const newStorage = await $store.contractInstance.storage();
         // there must be existing posts to check if new posts are available or new tips came
-        if (newStorage.last_posts.length > $store.storage.last_posts.length) {
+        if (newStorage.last_posts.length !== $store.storage.last_posts.length) {
           try {
-            // checks if new posts were added
-            if (
-              newStorage.last_posts.length !== $store.storage.last_posts.length
-            ) {
-              let newValues = newStorage.last_posts.filter(
-                el => !$store.storage.last_posts.includes(el)
-              );
-              console.log(
-                "New post!",
-                newValues.length > 0 ? newValues[0] : newValues
-              );
+            const promotedIPFShashes = newStorage.highlights.map(
+              post => post.ipfs_hash
+            );
+            let newValues = newStorage.last_posts.filter(
+              el =>
+                !$store.storage.last_posts.includes(el) &&
+                !promotedIPFShashes.includes(el)
+            );
+            if (newValues.length > 0) {
+              console.log("New post!", newValues);
 
               store.updateStorage({
                 ...$store.storage,
@@ -207,6 +218,13 @@
           if (balance.toNumber() !== $store.userBalance.toNumber()) {
             store.updateUserBalance(balance);
           }
+        }
+        // checks if new highlights were added
+        if ($store.storage.highlights.length !== newStorage.highlights.length) {
+          store.updateStorage({
+            ...$store.storage,
+            highlights: newStorage.highlights
+          });
         }
         // updates smart contract status
         if ($store.storage.paused !== newStorage.paused) {

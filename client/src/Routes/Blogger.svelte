@@ -118,6 +118,9 @@
   }
 </style>
 
+<svelte:head>
+  <title>{profile && profile.name ? profile.name : address} - ConnecTez</title>
+</svelte:head>
 <main>
   <div class="card profile-container">
     <div class="card-content">

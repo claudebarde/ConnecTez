@@ -1,8 +1,6 @@
 import { writable } from "svelte/store";
 import config from "../config";
 
-const chunk_size = 4;
-
 const store = () => {
   const { subscribe, set, update } = writable({
     DEV_ENV: config.DEV_ENV,
@@ -10,10 +8,11 @@ const store = () => {
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
+    userName: undefined,
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1RofbbTsyKh34HXv1ZcUbvat1sKqjJoxpm"
+        ? "KT1NzBZZjosJrbX4AVnsmDegEAdhP3QLDW9L"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",
@@ -21,6 +20,7 @@ const store = () => {
     storage: undefined,
     favoriteList: null,
     isBlogger: false,
+    trendingTags: [],
   });
 
   return {
@@ -51,6 +51,12 @@ const store = () => {
     },
     updateIsBlogger: (status) => {
       update((currentStore) => ({ ...currentStore, isBlogger: status }));
+    },
+    updateUserName: (userName) => {
+      update((currentStore) => ({ ...currentStore, userName }));
+    },
+    updateTrendingTags: (tags) => {
+      update((currentStore) => ({ ...currentStore, trendingTags: tags }));
     },
     toggleDarkMode: (status) => {
       const dark = "#2d3748";
@@ -104,7 +110,7 @@ const store = () => {
     },
     shortenAddress: (addr) =>
       addr.slice(0, 6) + "..." + addr.slice(addr.length - 6),
-    chunkPostsList: (array) =>
+    chunkPostsList: (array, chunk_size) =>
       Array(Math.ceil(array.length / chunk_size))
         .fill()
         .map((_, index) => index * chunk_size)

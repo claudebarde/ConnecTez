@@ -4,11 +4,11 @@ exports.handler = async (event, context) => {
   const req = JSON.parse(event.body);
   let url;
   if (req.network === "local") {
-    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-local`;
+    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-local-post`;
   } else if (req.network === "carthage") {
-    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-carthage`;
+    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-carthage-post`;
   } else if (req.network === "main") {
-    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-main`;
+    url = `https://api.pinata.cloud/data/pinList?status=pinned&pageLimit=30&metadata[name]=tzblgipfs-main-post`;
   }
 
   try {

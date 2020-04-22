@@ -9,7 +9,9 @@ const initial_storage = {
   all_posts: [],
   admin: testnetKey, //alice.pkh,
   updateNameFee: 500000,
+  highlightFee: 1000000,
   bloggers_reserved_names: [],
+  highlights: [],
   paused: false,
   revenue: 0,
 };

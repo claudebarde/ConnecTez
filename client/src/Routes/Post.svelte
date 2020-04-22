@@ -1,6 +1,6 @@
 <script>
   import { afterUpdate } from "svelte";
-  import { slide } from "svelte/transition";
+  import { slide, fade, fly } from "svelte/transition";
   import snarkdown from "snarkdown";
   import moment from "moment";
   import { push } from "svelte-spa-router";
@@ -9,6 +9,7 @@
   import Avatar from "../components/Avatar.svelte";
   import Loader from "../components/Loader.svelte";
   import Rating from "../components/Rating.svelte";
+  import PromotePost from "../components/PromotePost.svelte";
   import config from "../config.js";
 
   export let params;
@@ -22,7 +23,10 @@
       try {
         if (
           $store.storage.last_posts.filter(el => el === params.ipfsHash)
-            .length === 0
+            .length === 0 &&
+          $store.storage.highlights.filter(
+            el => el.ipfs_hash === params.ipfsHash
+          ).length === 0
         ) {
           throw new Error("Unknown IPFS hash");
         }
@@ -132,6 +136,9 @@
   }
 </style>
 
+<svelte:head>
+  <title>{post ? `${post.title || 'Post'} - ConnecTez` : 'ConnecTez'}</title>
+</svelte:head>
 <main id="post-content">
   {#if post === undefined}
     <div class="media loading">
@@ -211,7 +218,11 @@
             </p>
           </div>
         </div>
-        <br />
+        <div class="columns">
+          <div class="column is-half is-offset-half has-text-right">
+            <PromotePost author={post.author} ipfsHash={params.ipfsHash} />
+          </div>
+        </div>
         <div class="content">
           {@html snarkdown(post.content)}
         </div>

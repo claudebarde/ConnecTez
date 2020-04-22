@@ -16,19 +16,29 @@ type posts_map = big_map(ipfs_hash, post);
 type bloggers_list = big_map(address, tez);
 type bloggers = big_map(address, blogger);
 
+type highlight = {
+  ipfs_hash: ipfs_hash,
+  startTime: timestamp,
+  endTime: timestamp,
+  creator: address
+};
+
 type storage = {
   bloggers: bloggers,
   bloggers_tips: bloggers_list, // keeps track of current amount of tips
   all_posts: posts_map,
   last_posts: set (ipfs_hash),
   bloggers_reserved_names: set (string),
+  highlights: list(highlight),
   admin: address,
   updateNameFee: tez,
+  highlightFee: tez, // per day
   paused: bool,
   revenue: tez
 }
 
 type delete_record = {ipfs_hash: ipfs_hash, blogger_addr: address};
+type new_highlight = {ipfs_hash: ipfs_hash, duration: nat}; // duration in days
 
 type return = (list(operation), storage);
 
@@ -37,6 +47,7 @@ type action =
     | Tip (address)
     | UpdateBlogger (string)
     | DeletePost (ipfs_hash)
+    | AddHighlight (new_highlight)
     | Withdraw
     | PauseContract
     | AdminDeletePost (delete_record)
@@ -118,22 +129,26 @@ let tip = ((blogger_address, storage): (address, storage)): return => {
 
 let updateBlogger = ((name, storage): (string, storage)): return => {
   if(storage.paused == false){
-    // checks if name is not reserved
-    if(Set.mem(name, storage.bloggers_reserved_names) == false){
-      // checks if right fee has been sent
-      if(Tezos.amount == storage.updateNameFee){
-        switch(Big_map.find_opt(Tezos.sender, storage.bloggers)) {
-          | None => failwith ("Unknown blogger"): return
-          | Some (blogger) => ([]: list(operation), {...storage, 
-              bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name: name}), storage.bloggers),
-              bloggers_reserved_names: Set.add(name, Set.remove(blogger.name, storage.bloggers_reserved_names)),
-              revenue: storage.revenue + Tezos.amount})
+    if(String.length(name) >= 4n){
+      // checks if name is not reserved
+      if(Set.mem(name, storage.bloggers_reserved_names) == false){
+        // checks if right fee has been sent
+        if(Tezos.amount == storage.updateNameFee){
+          switch(Big_map.find_opt(Tezos.sender, storage.bloggers)) {
+            | None => failwith ("Unknown blogger"): return
+            | Some (blogger) => ([]: list(operation), {...storage, 
+                bloggers: Big_map.update(Tezos.sender, Some ({...blogger, name: name}), storage.bloggers),
+                bloggers_reserved_names: Set.add(name, Set.remove(blogger.name, storage.bloggers_reserved_names)),
+                revenue: storage.revenue + Tezos.amount})
+          }
+        } else {
+          failwith("Wrong update fee provided"): return;
         }
       } else {
-        failwith("Wrong update fee provided"): return;
+        failwith("Name is already reserved!"): return;
       }
     } else {
-      failwith("Name is already reserved!"): return;
+      failwith("Name must be at least 3 characters long!"): return;
     }
   } else {
     failwith("The contract has been paused!"): return;
@@ -167,9 +182,31 @@ let deletePost = ((ipfs_hash, storage): (ipfs_hash, storage)): return => {
   }
 }
 
+let addHighlight = ((info, storage): (new_highlight, storage)): return => {
+  // checks if amount equals duration * fee
+  if(Tezos.amount == info.duration * storage.highlightFee){
+    // checks if provided IPFS hash exists in contract storage
+    switch (Big_map.find_opt(info.ipfs_hash, storage.all_posts)){
+      | Some (post) => {
+        // creates new highlight
+        let newHighlight = {
+          ipfs_hash: info.ipfs_hash,
+          startTime: Tezos.now,
+          endTime: Tezos.now + int(info.duration * 24n * 60n * 60n),
+          creator: Tezos.sender
+        };
+        ([]: list(operation), {...storage, highlights: [newHighlight, ...storage.highlights]});
+      }
+      | None => failwith("Unable to find IPFS hash in storage!"): return;
+    }
+  } else {
+    failwith("Wrong provided amount!"): return;
+  }
+}
+
 let withdraw = (storage: storage): return => {
   if(storage.paused == false){
-    switch (Map.find_opt(Tezos.sender, storage.bloggers_tips)){
+    switch (Big_map.find_opt(Tezos.sender, storage.bloggers_tips)){
       | None => failwith ("Unknown blogger"): return
       | Some (tips) => {
         let opt_address : option(contract(unit)) = Tezos.get_contract_opt(Tezos.sender);
@@ -231,6 +268,7 @@ let main = ((param, storage): (action, storage)): return => {
     | Tip (blogger) => tip ((blogger, storage))
     | UpdateBlogger (name) => updateBlogger ((name, storage))
     | DeletePost (ipfs_hash) => deletePost ((ipfs_hash, storage))
+    | AddHighlight (info) => addHighlight ((info, storage))
     | Withdraw => withdraw (storage)
     | PauseContract => adminPause (storage)
     | AdminDeletePost (param) => adminDeletePost ((param, storage))
