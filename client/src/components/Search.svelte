@@ -11,6 +11,12 @@
   let inputErrorMessage = "";
 
   const searchIPFShashes = async (type, value) => {
+    if (type === "username") {
+      searchForUsername = true;
+    } else {
+      searchForUsername = false;
+    }
+
     try {
       const url =
         process.env.NODE_ENV === "development"
@@ -28,12 +34,14 @@
         resultsReturned = true;
       } else {
         resultsReturned = false;
+        searchResults = [];
       }
     } catch (error) {
       console.log(error);
       resultsReturned = false;
       inputError = true;
       inputErrorMessage = error;
+      searchResults = [];
     }
   };
 
@@ -41,6 +49,7 @@
     input = event.target.value;
     inputError = false;
     inputErrorMessage = "";
+    resultsReturned = false;
     if (input.slice(0, 2) === "tz" && input.length > 3) {
       input = input.replace(/\s+/g, "");
       // user is looking for a blogger
@@ -77,6 +86,7 @@
       }
     } else {
       resultsReturned = false;
+      searchResults = [];
     }
   };
 </script>
