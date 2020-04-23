@@ -6,9 +6,12 @@
   import Loader from "../components/Loader.svelte";
   import MarkdownEditor from "../components/MardownEditor.svelte";
   import NewPostButton from "../components/NewPostButton.svelte";
+  import UserIcon from "../components/Icons/UserIcon.svelte";
+  import ImageIcon from "../components/Icons/ImageIcon.svelte";
   import config from "../config.js";
 
   let title = "";
+  let banner = {};
   let post = "";
   let IPFSHash = undefined;
   let txHash = undefined;
@@ -16,6 +19,9 @@
   let savePost = undefined; // "uploadConfirm" | "waitingForIPFSHash" | "waitingForBlockchain" | "confirmed" | "error"
   let selectIcon = false;
   let selectedIcon = undefined;
+  let selectBanner,
+    errorBannerLink,
+    loadingBanner = false;
   let lastPostDelay,
     lastPostInterval = undefined;
   const availableIcons = [
@@ -63,6 +69,50 @@
       tags = [...newTags].slice(0, 3);
       currentTag = "";
     }
+  };
+
+  const addBannerLink = async event => {
+    const link = event.target.value;
+    // checks if the link is correct
+    if (
+      /^https:\/\/unsplash\.com\/photos\/[a-zA-Z0-9]+$/.test(link) === true &&
+      !loadingBanner
+    ) {
+      errorBannerLink = false;
+      // extracts ID
+      const photoID = link.split("/photos/")[1];
+      // request photo URL from Unsplash API
+      loadingBanner = true;
+      try {
+        const url =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:34567/fetchUnsplashPhoto"
+            : "https://connectez.cc/.netlify/functions/fetchUnsplashPhoto";
+        const data = await fetch(url, {
+          body: JSON.stringify({
+            id: photoID
+          }),
+          method: "POST"
+        });
+        const results = await data.json();
+        banner.url = results.links.download;
+        banner.author = results.user.name;
+        banner.thumb = results.urls.thumb;
+        banner.link = link;
+        loadingBanner = false;
+      } catch (error) {
+        console.log(error);
+        loadingBanner = false;
+        banner = {};
+      }
+    } else {
+      errorBannerLink = true;
+      banner = {};
+    }
+  };
+
+  const addBanner = () => {
+    selectBanner = false;
   };
 
   const confirmUpload = async () => {
@@ -208,6 +258,14 @@
 
   .selected-icon {
     margin: 0 auto;
+  }
+
+  .button-icon {
+    opacity: 0.4;
+  }
+
+  .unsplash-select__div {
+    margin-bottom: 20px;
   }
 
   @media only screen and (max-width: 1023px) {
@@ -435,6 +493,66 @@
         on:click={() => (selectIcon = false)} />
     </div>
   {/if}
+  <!-- MODAL FOR BANNER SELECTION -->
+  {#if selectBanner}
+    <div class="modal is-active">
+      <div
+        class="modal-background"
+        in:fade={{ duration: 200 }}
+        out:fade={{ delay: 100, duration: 200 }} />
+      <div
+        class="modal-content"
+        in:fly={{ y: -200, duration: 400, delay: 100 }}
+        out:fly={{ y: -200, duration: 400, delay: 0 }}>
+        <div class="box unsplash-select">
+          <h1 class="title">Add a photo from Unsplash</h1>
+          <div class="unsplash-select__div">
+            Navigate to the link below, find a photo you like, click on "Share"
+            and copy-paste the provided link into the text field at the bottom
+            of this box.
+          </div>
+          <div class="unsplash-select__div">
+            <a
+              href="https://www.unsplash.com"
+              target="_blank"
+              rel="noopener noreferrer">
+              Open Unsplash
+            </a>
+          </div>
+          <div>
+            {#if banner.thumb}
+              <div class="unsplash-select__div">
+                <img src={banner.thumb} alt="banner thumbnail" />
+              </div>
+            {/if}
+            <div class="field has-addons">
+              <div class="control" style="width:100%">
+                <input
+                  class="input"
+                  class:is-danger={errorBannerLink}
+                  type="text"
+                  placeholder="Copy-paste link from Unsplash"
+                  on:input={addBannerLink} />
+              </div>
+              <div class="control">
+                <button
+                  class={`button ${!loadingBanner ? 'is-light is-info' : ''}`}
+                  class:is-loading={loadingBanner}
+                  disabled={!banner.url}
+                  on:click={addBanner}>
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        class="modal-close is-large"
+        aria-label="close"
+        on:click={() => (selectBanner = false)} />
+    </div>
+  {/if}
   <main>
     <div class="card upload-container">
       <div class="card-content">
@@ -460,7 +578,25 @@
                 <button
                   class="button is-light is-info"
                   on:click={() => (selectIcon = true)}>
-                  Select Icon
+                  <span class="icon is-small" style="width:1rem;height:1rem;">
+                    <UserIcon color="#1D72AA" />
+                  </span>
+                  <span>Select Icon</span>
+                </button>
+              </div>
+              <div class="control">
+                <button
+                  class="button is-light is-info"
+                  on:click={() => {
+                    selectBanner = true;
+                    banner = {};
+                    loadingBanner = false;
+                    errorBannerLink = false;
+                  }}>
+                  <span class="icon is-small" style="width:1rem;height:1rem;">
+                    <ImageIcon color="#1D72AA" />
+                  </span>
+                  <span>Add Banner</span>
                 </button>
               </div>
             </div>
@@ -505,7 +641,7 @@
             </div>
           </div>
         </div>
-        <MarkdownEditor {post} on:write={writePost} />
+        <MarkdownEditor {title} {post} {banner} on:write={writePost} />
         <div class="upload-buttons">
           {#if !!title && !!post}
             <NewPostButton on:upload={() => (savePost = 'uploadConfirm')} />

@@ -3,7 +3,7 @@
   import snarkdown from "snarkdown";
   import insertTextAtCursor from "insert-text-at-cursor";
 
-  export let post;
+  export let post, title, banner;
   const dispatch = createEventDispatcher();
   let contentIsTooBig = false;
   let preview = false;
@@ -132,7 +132,11 @@
 </div>
 {#if preview}
   <div class="upload-markdown has-text-left content">
-    {@html snarkdown(post)}
+    {#if banner.url}
+      {@html snarkdown('#' + title + '  \r\n' + `![banner](${banner.url})` + post)}
+    {:else}
+      {@html snarkdown('#' + title + '  \r\n' + post)}
+    {/if}
   </div>
 {:else}
   <textarea
