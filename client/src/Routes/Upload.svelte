@@ -10,7 +10,8 @@
   import ImageIcon from "../components/Icons/ImageIcon.svelte";
   import config from "../config.js";
 
-  let title = "";
+  let title,
+    subtitle = "";
   let banner = {};
   let post = "";
   let IPFSHash = undefined;
@@ -95,10 +96,9 @@
           method: "POST"
         });
         const results = await data.json();
-        banner.url = results.links.download;
+        banner.url = link;
         banner.author = results.user.name;
         banner.thumb = results.urls.thumb;
-        banner.link = link;
         loadingBanner = false;
       } catch (error) {
         console.log(error);
@@ -135,13 +135,18 @@
       // checks if title and post is provided
       if (!!title.trim() && !!post.trim()) {
         savePost = "waitingForIPFSHash";
+        // removes thumb property from banner object
+        if (banner.hasOwnProperty("thumb")) delete banner.thumb;
+
         const data = await fetch(PINJSON, {
           body: JSON.stringify({
             title,
+            subtitle,
             content: post,
             author: $store.userAddress,
             username: $store.userName || "",
-            icon: selectedIcon || "scroll",
+            icon: selectedIcon || "",
+            banner,
             network: config.DEV_ENV,
             type: "post",
             tags
@@ -266,6 +271,10 @@
 
   .unsplash-select__div {
     margin-bottom: 20px;
+  }
+
+  .prepost {
+    padding-bottom: 20px;
   }
 
   @media only screen and (max-width: 1023px) {
@@ -512,6 +521,10 @@
             of this box.
           </div>
           <div class="unsplash-select__div">
+            Please choose a rectangular picture in landscape orientation as it
+            will display more nicely in your post :)
+          </div>
+          <div class="unsplash-select__div">
             <a
               href="https://www.unsplash.com"
               target="_blank"
@@ -557,49 +570,59 @@
     <div class="card upload-container">
       <div class="card-content">
         <h1 class="title">Write a new blog post</h1>
-        <div class="columns is-gapless">
-          {#if selectedIcon}
-            <div class="column is-1">
-              <div class="selected-icon image is-32x32">
-                <img src={`icons/${selectedIcon}-64.png`} alt="selected-icon" />
+        <div class="prepost">
+          <div class="columns is-gapless is-vcentered">
+            {#if selectedIcon}
+              <div class="column is-1">
+                <div class="selected-icon image is-32x32">
+                  <img
+                    src={`icons/${selectedIcon}-64.png`}
+                    alt="selected-icon" />
+                </div>
               </div>
+            {/if}
+            <div class={`column ${selectedIcon ? 'is-11' : 'is-12'}`}>
+              <input
+                class="input is-large"
+                type="text"
+                placeholder="Write here the title of your post"
+                bind:value={title} />
             </div>
-          {/if}
-          <div class={`column ${selectedIcon ? 'is-11' : 'is-12'}`}>
-            <div class="field has-addons">
-              <div class="control" style="width: 100%">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="Post title"
-                  bind:value={title} />
-              </div>
-              <div class="control">
-                <button
-                  class="button is-light is-info"
-                  on:click={() => (selectIcon = true)}>
-                  <span class="icon is-small" style="width:1rem;height:1rem;">
-                    <UserIcon color="#1D72AA" />
-                  </span>
-                  <span>Select Icon</span>
-                </button>
-              </div>
-              <div class="control">
-                <button
-                  class="button is-light is-info"
-                  on:click={() => {
-                    selectBanner = true;
-                    banner = {};
-                    loadingBanner = false;
-                    errorBannerLink = false;
-                  }}>
-                  <span class="icon is-small" style="width:1rem;height:1rem;">
-                    <ImageIcon color="#1D72AA" />
-                  </span>
-                  <span>Add Banner</span>
-                </button>
-              </div>
-            </div>
+          </div>
+        </div>
+        <div class="prepost">
+          <input
+            class="input"
+            type="text"
+            placeholder="Write here the subtitle of your post"
+            bind:value={subtitle} />
+        </div>
+        <div class="columns">
+          <div class="column is-half">
+            <button
+              class="button is-light is-info is-fullwidth"
+              on:click={() => (selectIcon = true)}>
+              <span class="icon is-small" style="width:1rem;height:1rem;">
+                <UserIcon color="#1D72AA" />
+              </span>
+              <span>Select Icon</span>
+            </button>
+          </div>
+          <div class="column is-half">
+            <button
+              class="button is-light is-info is-fullwidth"
+              disabled={config.DEV_ENV === 'carthage'}
+              on:click={() => {
+                selectBanner = true;
+                banner = {};
+                loadingBanner = false;
+                errorBannerLink = false;
+              }}>
+              <span class="icon is-small" style="width:1rem;height:1rem;">
+                <ImageIcon color="#1D72AA" />
+              </span>
+              <span>Add Banner</span>
+            </button>
           </div>
         </div>
         <div class="columns is-vcentered reverse-columns">
@@ -641,7 +664,12 @@
             </div>
           </div>
         </div>
-        <MarkdownEditor {title} {post} {banner} on:write={writePost} />
+        <MarkdownEditor
+          {title}
+          {subtitle}
+          {post}
+          {banner}
+          on:write={writePost} />
         <div class="upload-buttons">
           {#if !!title && !!post}
             <NewPostButton on:upload={() => (savePost = 'uploadConfirm')} />

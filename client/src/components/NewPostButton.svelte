@@ -2,10 +2,11 @@
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import moment from "moment";
   import store from "../store/store.js";
+  import config from "../config.js";
 
   const dispatch = createEventDispatcher();
   let lastPostDelay, lastPost, lastPostInterval, timeLeft, timeUnit;
-  let interval = 15;
+  let interval = config.DEV_ENV === "local" ? 1 : 15;
 
   const calculateTimeLeft = () =>
     moment(lastPost + interval * 60 * 1000).diff(moment(Date.now()), timeUnit);

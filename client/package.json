@@ -25,7 +25,7 @@
     "axios": "^0.19.2",
     "insert-text-at-cursor": "^0.3.0",
     "moment": "^2.24.0",
-    "snarkdown": "^1.2.2",
+    "remarkable": "^2.0.0",
     "svelte-spa-router": "^2.1.0"
   }
 }

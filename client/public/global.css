@@ -3,6 +3,7 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
+  font-family: "Montserrat", Helvetica;
 }
 
 html {
@@ -15,6 +16,9 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* CSS STYLE FOR  TAGS INSIDE MARKDOWN PREVIEW */
+.upload-markdown h2 {
+  font-style: italic;
 }

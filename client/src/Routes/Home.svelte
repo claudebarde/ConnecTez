@@ -141,12 +141,12 @@
             <div class="tile is-4 is-vertical">
               <div class="tile is-parent">
                 <div class="tile is-child is-hidden-touch" style="display:flex">
-                  <BlogCard maxHeight={400} ipfsHash={chunk[0]} type="normal" />
+                  <BlogCard maxHeight={500} ipfsHash={chunk[0]} type="normal" />
                 </div>
                 <div
                   class="tile is-child is-hidden-desktop"
                   style="display:flex">
-                  <BlogCard maxHeight={100} ipfsHash={chunk[0]} type="normal" />
+                  <BlogCard maxHeight={200} ipfsHash={chunk[0]} type="normal" />
                 </div>
               </div>
             </div>
@@ -155,7 +155,7 @@
                 <div class="tile is-parent">
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
-                      maxHeight={100}
+                      maxHeight={200}
                       ipfsHash={chunk[1]}
                       type="normal" />
                   </div>
@@ -163,7 +163,7 @@
                 <div class="tile is-parent">
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
-                      maxHeight={100}
+                      maxHeight={200}
                       ipfsHash={chunk[2]}
                       type="normal" />
                   </div>
@@ -183,7 +183,7 @@
                 <div class="tile is-parent">
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
-                      maxHeight={100}
+                      maxHeight={200}
                       ipfsHash={chunk[1]}
                       type="normal" />
                   </div>
@@ -191,7 +191,7 @@
                 <div class="tile is-parent">
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
-                      maxHeight={100}
+                      maxHeight={200}
                       ipfsHash={chunk[2]}
                       type="normal" />
                   </div>
@@ -199,14 +199,14 @@
               </div>
               <div class="tile is-parent">
                 <div class="tile is-child">
-                  <BlogCard maxHeight={100} ipfsHash={chunk[3]} type="normal" />
+                  <BlogCard maxHeight={200} ipfsHash={chunk[3]} type="normal" />
                 </div>
               </div>
             </div>
             <div class="tile is-4 is-vertical">
               <div class="tile is-parent">
                 <div class="tile is-child" style="display:flex">
-                  <BlogCard maxHeight={400} ipfsHash={chunk[0]} type="normal" />
+                  <BlogCard maxHeight={500} ipfsHash={chunk[0]} type="normal" />
                 </div>
               </div>
             </div>
@@ -216,17 +216,17 @@
         <div class="tile is-ancestor">
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[0]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[0]} type="normal" />
             </div>
           </div>
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[1]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[1]} type="normal" />
             </div>
           </div>
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[2]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[2]} type="normal" />
             </div>
           </div>
         </div>
@@ -234,12 +234,12 @@
         <div class="tile is-ancestor">
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[0]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[0]} type="normal" />
             </div>
           </div>
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[1]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[1]} type="normal" />
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@
         <div class="tile is-ancestor">
           <div class="tile is-parent">
             <div class="tile is-child">
-              <BlogCard maxHeight={100} ipfsHash={chunk[0]} type="normal" />
+              <BlogCard maxHeight={200} ipfsHash={chunk[0]} type="normal" />
             </div>
           </div>
         </div>

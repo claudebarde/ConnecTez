@@ -1,13 +1,13 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
-  import snarkdown from "snarkdown";
+  import { createEventDispatcher, onMount, afterUpdate } from "svelte";
+  import { Remarkable } from "remarkable";
   import insertTextAtCursor from "insert-text-at-cursor";
 
-  export let post, title, banner;
+  export let post, title, subtitle, banner;
   const dispatch = createEventDispatcher();
   let contentIsTooBig = false;
   let preview = false;
-  let textareaRef;
+  let textareaRef, md;
 
   const byteLength = str => {
     // returns the byte length of an utf8 string
@@ -33,6 +33,12 @@
 
   onMount(() => {
     textareaRef = document.getElementById("editor");
+    md = new Remarkable();
+  });
+
+  afterUpdate(() => {
+    if (!title) title = "";
+    if (!subtitle) subtitle = "";
   });
 </script>
 
@@ -133,9 +139,9 @@
 {#if preview}
   <div class="upload-markdown has-text-left content">
     {#if banner.url}
-      {@html snarkdown('#' + title + '  \r\n' + `![banner](${banner.url})` + post)}
+      {@html md.render((title ? '# ' + title : '') + '  \r\n' + (subtitle ? '## ' + subtitle : '') + '  \r\n' + `![banner](${banner.url}/download)` + post)}
     {:else}
-      {@html snarkdown('#' + title + '  \r\n' + post)}
+      {@html md.render((title ? '# ' + title : '') + '  \r\n' + (subtitle ? '## ' + subtitle : '') + '  \r\n' + post)}
     {/if}
   </div>
 {:else}

@@ -33,7 +33,7 @@
       if (response.status === 200) {
         try {
           const op = await $store.contractInstance.methods
-            .delete(hashToDelete)
+            .deletePost(hashToDelete)
             .send();
           await op.confirmation(1);
           // updates profile

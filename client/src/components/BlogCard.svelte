@@ -1,7 +1,7 @@
 <script>
   import { onMount, afterUpdate } from "svelte";
   import { fly } from "svelte/transition";
-  import snarkdown from "snarkdown";
+  import { Remarkable } from "remarkable";
   import moment from "moment";
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
@@ -9,10 +9,12 @@
 
   export let ipfsHash, maxHeight, type;
 
+  let md = undefined;
   let post, author, error;
   let updated = false;
 
   onMount(async () => {
+    md = new Remarkable();
     try {
       const postIPFS = await fetch(
         `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
@@ -54,7 +56,19 @@
 <style>
   .post-overview {
     overflow: hidden;
+    position: relative;
     width: 100%;
+    margin-bottom: 60px;
+  }
+
+  .text-fading {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    background-image: linear-gradient(to bottom, transparent, white);
   }
 
   .date {
@@ -70,6 +84,11 @@
     border-left: solid 6px white;
     border-image: linear-gradient(#dd6b20, #fbd38d) 0 100%;
   }
+
+  .tags-date {
+    position: absolute;
+    bottom: 10px;
+  }
 </style>
 
 {#if post}
@@ -78,7 +97,14 @@
     class:highlight={type === 'highlight'}
     in:fly={{ y: 300, delay: 200, duration: Math.random() * (1000 - 500) + 500 }}
     style="width:100%">
-    <div class="card-content">
+    {#if post.banner && post.banner.hasOwnProperty('url')}
+      <div class="card-image">
+        <figure class="image is-5by4">
+          <img src={`${post.banner.url}/download`} alt="banner" />
+        </figure>
+      </div>
+    {/if}
+    <div class="card-content" style="height:100%;position:relative">
       <div class="media">
         <figure class="media-left">
           <p class="image is-64x64">
@@ -97,16 +123,20 @@
           </p>
         </div>
       </div>
-
       <div class="content">
         <div class="post-overview" style={`height:${maxHeight}px`}>
-          {@html snarkdown(post.content || 'Unavailable')}
+          <div>
+            {@html md.render(post.content || 'Unavailable')}
+          </div>
+          <div class="text-fading" style={`padding:${maxHeight / 2}px 0px`} />
         </div>
-        <div class="tags-list is-size-7 has-text-grey-light">
-          {#each post.tags as tag}#{tag.toLowerCase()}&nbsp;{/each}
-        </div>
-        <div class="date is-size-7">
-          {moment(post.timestamp).format('MMM Do Y - h:mm A')}
+        <div class="tags-date">
+          <div class="tags-list is-size-7 has-text-grey-light">
+            {#each post.tags as tag}#{tag.toLowerCase()}&nbsp;{/each}
+          </div>
+          <div class="date is-size-7">
+            {moment(post.timestamp).format('MMM Do Y - h:mm A')}
+          </div>
         </div>
       </div>
     </div>

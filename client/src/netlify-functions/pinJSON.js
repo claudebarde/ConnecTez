@@ -65,9 +65,11 @@ exports.handler = async (event, context) => {
         },
         pinataContent: {
           title: req.title,
+          subtitle: req.subtitle,
           content: req.content,
           author: req.author,
           icon: req.icon,
+          banner: req.banner,
           tags: req.tags.slice(0, 3).map((tag) => tag.toLowerCase()),
           timestamp: Date.now(),
         },

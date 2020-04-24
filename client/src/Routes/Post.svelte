@@ -1,7 +1,7 @@
 <script>
-  import { afterUpdate } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { slide, fade, fly } from "svelte/transition";
-  import snarkdown from "snarkdown";
+  import { Remarkable } from "remarkable";
   import moment from "moment";
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
@@ -14,8 +14,13 @@
 
   export let params;
   let loading = true;
+  let md = undefined;
   let post, author, tips;
   let openTipModal = false;
+
+  onMount(() => {
+    md = new Remarkable();
+  });
 
   afterUpdate(async () => {
     if (params.ipfsHash && $store.storage && loading) {
@@ -82,7 +87,7 @@
   }
 
   .tip-image-container {
-    float: right;
+    float: left;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -108,6 +113,7 @@
 
   .author-link {
     cursor: pointer;
+    font-weight: bold;
   }
   .author-link:hover {
     text-decoration: underline;
@@ -116,6 +122,24 @@
   .loading {
     width: 50%;
     margin: 0 auto;
+  }
+
+  .banner {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+
+  .banner-attribution {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .banner-attribution a {
+    color: white;
+    text-decoration: none;
   }
 
   @media only screen and (max-width: 1023px) {
@@ -173,21 +197,44 @@
         {#if openTipModal}
           <TippingBox blogger={post.author} />
         {/if}
-        <div class="media">
-          <figure class="media-left is-hidden-touch">
-            <p
-              class="image is-96x96"
-              style="border-radius:10px;background-color: white">
-              <img
-                src={post.icon ? `icons/${post.icon}-64.png` : 'icons/scroll-64.png'}
-                alt="icon" />
-            </p>
-          </figure>
-          <div class="media-content">
-            <div class="title is-size-2-desktop is-size-3-touch">
-              {post.title}
+        <div>
+          <h1 class="title is-2">{post.title}</h1>
+          {#if !!post.subtitle}
+            <h3
+              class={`subtitle is-4 is-italic ${$store.darkMode ? 'has-text-white-ter' : 'has-text-grey'}`}>
+              {post.subtitle}
+            </h3>
+          {/if}
+          {#if post.banner && post.banner.hasOwnProperty('url')}
+            <div class="banner">
+              <img src={`${post.banner.url}/download`} alt="banner" />
+              <div class="banner-attribution">
+                <a
+                  href={post.banner.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="is-size-7">
+                  Picture from Unsplash by {post.banner.author}
+                </a>
+              </div>
             </div>
-            <div class="subtitle is-size-5-desktop is-size-6-touch">
+          {/if}
+          <div class="columns is-mobile is-vcentered">
+            <div class="column is-2">
+              <Avatar seed={post.author} />
+            </div>
+            <div class="column is-8">
+              <p>
+                Posted by
+                <span
+                  on:click={() => push(`#/blogger/${post.author}`)}
+                  class="author-link is-bold">
+                  {!author ? store.shortenAddress(post.author) : author}
+                </span>
+              </p>
+              <p>On {moment(post.timestamp).format('MMM Do Y - h:mm A')}</p>
+            </div>
+            <div class="column is-2">
               {#if $store.userAddress !== post.author}
                 <div
                   class="tip-image-container"
@@ -202,20 +249,7 @@
                     alt="tezos-hand" />
                 </div>
               {/if}
-              From
-              <span
-                on:click={() => push(`#/blogger/${post.author}`)}
-                class="author-link">
-                {!author ? store.shortenAddress(post.author) : author}
-              </span>
-              <Avatar seed={post.author} />
-              {#if tips}
-                <Rating {tips} />
-              {/if}
             </div>
-            <p class="is-size-7 has-text-left">
-              Posted on {moment(post.timestamp).format('MMM Do Y - h:mm A')}
-            </p>
           </div>
         </div>
         <div class="columns">
@@ -224,7 +258,7 @@
           </div>
         </div>
         <div class="content">
-          {@html snarkdown(post.content)}
+          {@html md.render(post.content)}
         </div>
         <div class="tags">
           {#if !post.tags}
@@ -232,9 +266,11 @@
           {:else}
             {#each post.tags as tag}
               {#if $store.darkMode}
-                <span class="tag is-size-7 is-info">#{tag}</span>
+                <span class="tag is-size-7 is-info is-lowercase">#{tag}</span>
               {:else}
-                <span class="tag is-size-7 is-info is-light">#{tag}</span>
+                <span class="tag is-size-7 is-info is-light is-lowercase">
+                  #{tag}
+                </span>
               {/if}
             {/each}
           {/if}
