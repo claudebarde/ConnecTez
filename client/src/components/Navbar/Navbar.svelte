@@ -149,11 +149,7 @@
       });
       const results = await data.json();
       sortedResults = results
-        .sort((a, b) =>
-          a.metadata.keyvalues.timestamp > b.metadata.keyvalues.timestamp
-            ? -1
-            : 1
-        )
+        .sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1))
         .map(entry => entry.ipfs_pin_hash);
       //sortedResults = [...sortedResults, ...sortedResults];
     } catch (error) {

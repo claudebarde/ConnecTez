@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
       },
     });
 
-    const posts = response.data.rows.filter((entry) =>
+    const rawPosts = response.data.rows.filter((entry) =>
       req.posts.includes(entry.ipfs_pin_hash)
     );
     // removes posts that are not registered on the blockchain
@@ -41,6 +41,12 @@ exports.handler = async (event, context) => {
         }
       });
     }
+
+    const posts = rawPosts.map((el) => ({
+      ipfs_pin_hash: el.ipfs_pin_hash,
+      timestamp: el.metadata.keyvalues.timestamp,
+      id: el.metadata.name.replace(`tzblgipfs-${req.network}-post-`, ""),
+    }));
 
     return {
       statusCode: 200,

@@ -7,9 +7,13 @@ exports.handler = async (event, context) => {
   try {
     let url = `https://api.unsplash.com/photos/${req.id}/?client_id=${process.env.UNSPLASH_ACCESS_KEY}`;
 
-    //const response = await axios.get(url);
-    const response = {};
-    response.data = mockResponse;
+    let response;
+    if (req.network === "local") {
+      response = {};
+      response.data = mockResponse;
+    } else {
+      response = await axios.get(url);
+    }
 
     return {
       statusCode: 200,

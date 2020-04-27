@@ -10,6 +10,7 @@
   import Loader from "../components/Loader.svelte";
   import Rating from "../components/Rating.svelte";
   import PromotePost from "../components/PromotePost.svelte";
+  import PostComments from "../components/PostComments.svelte";
   import config from "../config.js";
 
   export let params;
@@ -40,6 +41,21 @@
           `https://gateway.pinata.cloud/ipfs/${params.ipfsHash}`
         );
         const pendingPost = await postIPFS.json();
+        /*
+         *  THIS CODE INJECTS POST ID TO MAKE IT WORK
+         *  WITH POSTS THAT WERE UPLOADED BEFORE THE ID WAS INCLUDED IN THE CONTENT
+         *  TODO: TO REMOVE WHEN DAPP IS DEPLOYED ON MAINNET
+         */
+        const idMatches = {
+          QmRQJjrX31vRxpZaUT263z4MYToVTRsJc5LKX82k1KZ91J: "c8ox5smh3ow044178",
+          QmbvUPziDJ6STBC55zz2VKwxsp1S4rn125pEUT62NDLMgc: "9xtjp5hgmc8028989",
+          QmXPEdHr2oYyNTRFRaYWbhDVSsXXQXyBFjzWFtG9mx868C: "ae5ax854i7k051430",
+          QmaGrrA7HUhpkizUj1FgZJonLSnAAaXq6VsTQjnrVc7AAG: "gq7o0fq4wew053305",
+          QmcmDv1LHGaZiwsj5nikBudjESh7jHaPj9hbfFRqGwKQMC: "d44rkyfyw28063601"
+        };
+        if (idMatches.hasOwnProperty(params.ipfsHash)) {
+          pendingPost.id = idMatches[params.ipfsHash];
+        }
         // checks if post has required properties
         config.postProps.forEach(prop => {
           if (!pendingPost.hasOwnProperty(prop)) {
@@ -173,7 +189,7 @@
       </div>
       <div class="media-content">
         <p>
-          <strong>Loading posts from the IPFS...</strong>
+          <strong>Loading post from the IPFS...</strong>
         </p>
         <p>
           Loading content from the IPFS can take a few seconds, please wait.
@@ -194,9 +210,6 @@
   {:else}
     <div class="card post" in:slide={{ duration: 800 }}>
       <div class="card-content">
-        {#if openTipModal}
-          <TippingBox blogger={post.author} />
-        {/if}
         <div>
           <h1 class="title is-2">{post.title}</h1>
           {#if !!post.subtitle}
@@ -219,7 +232,7 @@
               </div>
             </div>
           {/if}
-          <div class="columns is-mobile is-vcentered">
+          <div class="columns is-mobile is-vcentered" style="margin-top:10px">
             <div class="column is-2">
               <Avatar seed={post.author} />
             </div>
@@ -251,6 +264,9 @@
               {/if}
             </div>
           </div>
+          {#if openTipModal}
+            <TippingBox blogger={post.author} />
+          {/if}
         </div>
         <div class="columns">
           <div class="column is-half is-offset-half has-text-right">
@@ -275,6 +291,7 @@
             {/each}
           {/if}
         </div>
+        <PostComments id={post.id} />
       </div>
     </div>
   {/if}

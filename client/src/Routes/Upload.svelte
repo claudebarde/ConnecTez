@@ -76,7 +76,7 @@
     const link = event.target.value;
     // checks if the link is correct
     if (
-      /^https:\/\/unsplash\.com\/photos\/[a-zA-Z0-9]+$/.test(link) === true &&
+      /^https:\/\/unsplash\.com\/photos\/.*$/.test(link) === true &&
       !loadingBanner
     ) {
       errorBannerLink = false;
@@ -91,7 +91,8 @@
             : "https://connectez.cc/.netlify/functions/fetchUnsplashPhoto";
         const data = await fetch(url, {
           body: JSON.stringify({
-            id: photoID
+            id: photoID,
+            network: config.DEV_ENV
           }),
           method: "POST"
         });
@@ -167,11 +168,6 @@
           if (window.localStorage) {
             window.localStorage.setItem("lastPost", Date.now());
           }
-          // inserts new post into local storage
-          store.updateStorage({
-            ...$store.storage,
-            last_posts: [IPFSHash, ...$store.storage.last_posts]
-          });
           savePost = "confirmed";
         } else {
           throw new Error("No IPFS hash received");

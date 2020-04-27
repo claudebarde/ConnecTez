@@ -12,7 +12,7 @@ const store = () => {
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1WMyLYw6zm66b4farF19KGZ6v3cV1pknwt"
+        ? "KT1VAQ2eqssDyMrDzRTAvKZaLVLEgWmZmSdx"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",
@@ -94,7 +94,7 @@ const store = () => {
       document
         .querySelectorAll(".tip-image")
         .forEach((el) =>
-          status === "on"
+          status === "off"
             ? (el.style.filter = "invert(0%)")
             : (el.style.filter = "invert(100%)")
         );

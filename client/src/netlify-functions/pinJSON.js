@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { v4: uuidv4 } = require("uuid");
 
 const rightByteLength = (str) => {
   // returns the byte length of an utf8 string
@@ -39,19 +40,17 @@ exports.handler = async (event, context) => {
     // if string is too long
     if (!rightByteLength(req.content)) throw new Error("Content is too large!");
 
+    /*const postID =
+      Math.round(Math.random() * 36 ** 12).toString(36) +
+      Date.now().toString().slice(-6);*/
+    const postID = uuidv4();
+
     const response = await axios.post(
       url,
       {
         pinataOptions: { cidVersion: 0 },
         pinataMetadata: {
-          name:
-            "tzblgipfs-" +
-            req.network +
-            "-" +
-            req.type +
-            "-" +
-            Math.round(Math.random() * 36 ** 12).toString(36) +
-            Date.now().toString().slice(-5),
+          name: "tzblgipfs-" + req.network + "-" + req.type + "-" + postID,
           keyvalues: {
             author: req.author,
             username: req.username,
@@ -64,6 +63,7 @@ exports.handler = async (event, context) => {
           },
         },
         pinataContent: {
+          id: postID,
           title: req.title,
           subtitle: req.subtitle,
           content: req.content,

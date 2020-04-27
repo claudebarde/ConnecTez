@@ -2,7 +2,9 @@
   "name": "tezos-starter-kit",
   "version": "1.0.0",
   "description": "",
-  "dependencies": {},
+  "dependencies": {
+    "uuid": "^7.0.3"
+  },
   "devDependencies": {
     "@taquito/taquito": "^6.0.3-beta.0",
     "eztz.js": "git+https://github.com/TezTech/eztz.git",
