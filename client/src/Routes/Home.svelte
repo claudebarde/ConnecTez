@@ -30,6 +30,14 @@
     margin: -20px 0px 40px 0px;
   }
 
+  @media only screen and (min-width: 1024px) and (max-width: 1215px) {
+    main {
+      padding: 40px;
+      width: 90%;
+      margin: 0 auto;
+    }
+  }
+
   @media only screen and (max-width: 1023px) {
     main {
       padding: 30px;

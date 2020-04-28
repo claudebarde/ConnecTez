@@ -98,7 +98,10 @@
       {#if post.banner && post.banner.hasOwnProperty('url')}
         <div class="column is-5">
           <figure class="image is-5by4">
-            <img src={`${post.banner.url}/download`} alt="banner" />
+            <img
+              src={`${post.banner.url}/download`}
+              alt="banner"
+              class="slide-in-fwd-center" />
           </figure>
         </div>
       {/if}
@@ -120,10 +123,8 @@
                 <p class="title is-5">{post.title}</p>
                 <p class="subtitle is-6">
                   {!author ? 'loading...' : 'From ' + author}
+                  <Avatar seed={post.author} size="small" />
                 </p>
-              </div>
-              <div class="media-right">
-                <Avatar seed={post.author} />
               </div>
             </div>
             <div class="content">
@@ -157,7 +158,10 @@
       {#if post.banner && post.banner.hasOwnProperty('url')}
         <div class="card-image">
           <figure class="image is-5by4">
-            <img src={`${post.banner.url}/download`} alt="banner" />
+            <img
+              src={`${post.banner.url}/download`}
+              alt="banner"
+              class="slide-in-fwd-center" />
           </figure>
         </div>
       {/if}
@@ -177,7 +181,7 @@
             <p class="title is-5">{post.title}</p>
             <p class="subtitle is-6">
               {!author ? 'loading...' : 'From ' + author}
-              <!--<Avatar seed={post.author} size="small" />-->
+              <Avatar seed={post.author} size="small" />
             </p>
           </div>
         </div>

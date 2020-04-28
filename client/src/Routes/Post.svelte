@@ -18,6 +18,7 @@
   let md = undefined;
   let post, author, tips;
   let openTipModal = false;
+  let bannerLoading = true;
 
   onMount(() => {
     md = new Remarkable();
@@ -158,6 +159,41 @@
     text-decoration: none;
   }
 
+  .banner-loading {
+    height: 400px;
+    width: 100%;
+    text-align: center;
+    line-height: 310px;
+  }
+
+  @keyframes loading-banner {
+    0% {
+      opacity: 0.2;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.2;
+    }
+  }
+
+  .banner-loading span {
+    animation-name: loading-banner;
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+    font-size: 90px;
+  }
+
+  .banner-loading span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .banner-loading span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
   @media only screen and (max-width: 1023px) {
     main {
       padding: 0px;
@@ -220,7 +256,19 @@
           {/if}
           {#if post.banner && post.banner.hasOwnProperty('url')}
             <div class="banner">
-              <img src={`${post.banner.url}/download`} alt="banner" />
+              {#if bannerLoading}
+                <div class="banner-loading">
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </div>
+              {/if}
+              <img
+                src={`${post.banner.url}/download`}
+                class:slide-in-fwd-center={!bannerLoading}
+                style={bannerLoading ? 'display:none' : ''}
+                alt="banner"
+                on:load={() => (bannerLoading = false)} />
               <div class="banner-attribution">
                 <a
                   href={post.banner.url}
