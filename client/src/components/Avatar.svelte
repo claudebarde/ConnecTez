@@ -6,10 +6,10 @@
   export let seed;
   let svg;
 
-  onMount(() => {
-    let options = { width: 36, height: 36 };
+  onMount(async () => {
+    /*let options = { width: 36, height: 36 };
     let avatars = new Avatars(sprites, options);
-    svg = avatars.create(seed);
+    svg = avatars.create(seed);*/
   });
 </script>
 
@@ -18,8 +18,18 @@
     vertical-align: middle;
     margin-left: 20px;
   }
+
+  .img-avatar {
+    height: 66px;
+    width: 66px;
+    min-width: 66px;
+  }
 </style>
 
-<span class="identicon">
+<!--<span class="identicon">
   {@html svg}
-</span>
+</span>-->
+<img
+  src={`https://services.tzkt.io/v1/avatars/${seed}`}
+  alt="identicon"
+  class="img-avatar" />

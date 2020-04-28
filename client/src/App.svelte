@@ -28,5 +28,20 @@
   };
 </script>
 
+<style>
+  footer {
+    padding: 20px 0px;
+  }
+</style>
+
 <Navbar />
 <Router {routes} on:routeLoaded={routeLoaded} />
+<footer class="is-size-7 has-text-centered">
+  <p>🌮 All rights reserved 2020, Claude Barde 🌮</p>
+  <p>
+    The identicons are provided by
+    <a href="https://tzkt.io" target="_blank" rel="noopener noreferrer">
+      Baking Bad
+    </a>
+  </p>
+</footer>

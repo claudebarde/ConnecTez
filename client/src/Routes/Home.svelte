@@ -79,6 +79,7 @@
   </div>
   {#if $store.storage !== undefined}
     {#if $store.storage.highlights && $store.storage.highlights.length > 0}
+      <h1 class="title is-3 has-text-centered">Highlights</h1>
       <div class="column is-multiline highlights">
         {#each store.chunkPostsList($store.storage.highlights, 3) as chunk}
           {#if chunk.length === 3}
@@ -140,6 +141,7 @@
         </div>
       </div>
     </div>
+    <h1 class="title is-3 has-text-centered">Latest Blog Posts</h1>
     {#each store.chunkPostsList($store.storage.last_posts.slice(0, 30), 4) as chunk, index}
       {#if chunk.length === 4}
         {#if index % 2 === 0}
