@@ -3,7 +3,7 @@
   import sprites from "@dicebear/avatars-bottts-sprites";
   import { onMount } from "svelte";
 
-  export let seed;
+  export let seed, size;
   let svg;
 
   onMount(async () => {
@@ -24,6 +24,13 @@
     width: 66px;
     min-width: 66px;
   }
+
+  .img-avatar-small {
+    height: 40px;
+    width: 40px;
+    min-width: 40px;
+    vertical-align: middle;
+  }
 </style>
 
 <!--<span class="identicon">
@@ -32,4 +39,4 @@
 <img
   src={`https://services.tzkt.io/v1/avatars/${seed}`}
   alt="identicon"
-  class="img-avatar" />
+  class={size === 'small' ? 'img-avatar-small' : 'img-avatar'} />

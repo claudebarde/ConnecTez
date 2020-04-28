@@ -6,6 +6,7 @@
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
   import config from "../config.js";
+  import Avatar from "../components/Avatar.svelte";
 
   export let ipfsHash, maxHeight, type, orientation;
 
@@ -121,6 +122,9 @@
                   {!author ? 'loading...' : 'From ' + author}
                 </p>
               </div>
+              <div class="media-right">
+                <Avatar seed={post.author} />
+              </div>
             </div>
             <div class="content">
               <div class="post-overview" style={`height:${maxHeight}px`}>
@@ -173,6 +177,7 @@
             <p class="title is-5">{post.title}</p>
             <p class="subtitle is-6">
               {!author ? 'loading...' : 'From ' + author}
+              <!--<Avatar seed={post.author} size="small" />-->
             </p>
           </div>
         </div>
