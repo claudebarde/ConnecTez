@@ -230,43 +230,6 @@
         store.updateIsBlogger(false);
       }
     }
-    /*const sub = Tezos.stream.subscribeOperation({
-      or: [
-        {
-          and: [
-            { destination: $store.contractAddress },
-            { kind: "transaction" }
-          ]
-        }
-      ]
-    });
-    sub.on("data", data => {
-      // updates storage when new post is created
-      console.log("New data", data);
-      try {
-        if (data.parameters.entrypoint === "post") {
-          const ipfsHash = data.parameters.value.string;
-          store.updateStorage({
-            ...$store.storage,
-            last_posts: [
-              { ipfs_hash: ipfsHash, timestamp: "" },
-              ...$store.storage.last_posts
-            ]
-          });
-          console.log("New post:", ipfsHash);
-        } else if (data.parameters.entrypoint === "tip") {
-          console.log("New tip", data);
-          // updates user's tips balance if current user is the recipient
-          if (data.parameters.value.string === $store.userAddress) {
-            store.updateUserTips(
-              parseInt($store.userTips) + parseInt(data.amount)
-            );
-          }
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });*/
   });
 
   onDestroy(() => {
