@@ -159,41 +159,6 @@
     text-decoration: none;
   }
 
-  .banner-loading {
-    height: 400px;
-    width: 100%;
-    text-align: center;
-    line-height: 310px;
-  }
-
-  @keyframes loading-banner {
-    0% {
-      opacity: 0.2;
-    }
-    20% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.2;
-    }
-  }
-
-  .banner-loading span {
-    animation-name: loading-banner;
-    animation-duration: 1.4s;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
-    font-size: 90px;
-  }
-
-  .banner-loading span:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  .banner-loading span:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-
   @media only screen and (max-width: 1023px) {
     main {
       padding: 0px;
@@ -339,6 +304,7 @@
             {/each}
           {/if}
         </div>
+        <hr />
         <PostComments id={post.id} />
       </div>
     </div>

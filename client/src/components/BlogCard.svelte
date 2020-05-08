@@ -13,6 +13,7 @@
   let md = undefined;
   let post, author, error;
   let updated = false;
+  let bannerLoading = true;
 
   onMount(async () => {
     md = new Remarkable();
@@ -157,11 +158,20 @@
       style="width:100%">
       {#if post.banner && post.banner.hasOwnProperty('url')}
         <div class="card-image">
-          <figure class="image is-5by4">
+          <figure class={bannerLoading ? '' : 'image is-5by4'}>
+            {#if bannerLoading}
+              <div class="banner-loading">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+              </div>
+            {/if}
             <img
               src={`${post.banner.url}/download`}
+              class:slide-in-fwd-center={!bannerLoading}
+              style={bannerLoading ? 'display:none' : ''}
               alt="banner"
-              class="slide-in-fwd-center" />
+              on:load={() => (bannerLoading = false)} />
           </figure>
         </div>
       {/if}

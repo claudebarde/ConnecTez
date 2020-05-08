@@ -100,37 +100,11 @@
     store.updateContractInstance(contract);
     // fetches contract storage
     const storage = await contract.storage();
-    // autoconnects users who connected their wallet previously
-    if (window.localStorage && window.localStorage.getItem("previousAddress")) {
-      try {
-        const address = await window.tezbridge.request({
-          method: "get_source"
-        });
-        store.updateUserAddress(address);
-        const balance = await Tezos.tz.getBalance(address);
-        store.updateUserBalance(balance);
-      } catch (error) {
-        store.updateUserAddress(undefined);
-        store.updateUserBalance(undefined);
-      }
-    }
     // copies favorite list from local storage
     if (window.localStorage) {
       store.updateFavoriteList(
         JSON.parse(window.localStorage.getItem("favoriteList"))
       );
-    }
-    // checks if the user is a blogger
-    if ($store.userAddress) {
-      try {
-        const blogger = await storage.bloggers.get($store.userAddress);
-        store.updateIsBlogger(true);
-        if (blogger.name && blogger.name.length > 0) {
-          store.updateUserName(blogger.name);
-        }
-      } catch (error) {
-        store.updateIsBlogger(false);
-      }
     }
 
     let sortedResults = storage.last_posts;
@@ -230,6 +204,32 @@
         //console.log("Unable to fetch the storage");
       }
     }, 5000);
+    // autoconnects users who connected their wallet previously
+    if (window.localStorage && window.localStorage.getItem("previousAddress")) {
+      try {
+        const address = await window.tezbridge.request({
+          method: "get_source"
+        });
+        store.updateUserAddress(address);
+        const balance = await Tezos.tz.getBalance(address);
+        store.updateUserBalance(balance);
+      } catch (error) {
+        store.updateUserAddress(undefined);
+        store.updateUserBalance(undefined);
+      }
+    }
+    // checks if the user is a blogger
+    if ($store.userAddress) {
+      try {
+        const blogger = await storage.bloggers.get($store.userAddress);
+        store.updateIsBlogger(true);
+        if (blogger.name && blogger.name.length > 0) {
+          store.updateUserName(blogger.name);
+        }
+      } catch (error) {
+        store.updateIsBlogger(false);
+      }
+    }
     /*const sub = Tezos.stream.subscribeOperation({
       or: [
         {
