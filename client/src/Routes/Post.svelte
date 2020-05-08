@@ -22,6 +22,7 @@
 
   onMount(() => {
     md = new Remarkable();
+    window.scrollTo(0, 0);
   });
 
   afterUpdate(async () => {
