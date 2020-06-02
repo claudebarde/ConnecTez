@@ -12,14 +12,14 @@ const store = () => {
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1VAQ2eqssDyMrDzRTAvKZaLVLEgWmZmSdx"
+        ? "KT1MEp2woeDB4tSyEZuYdWNJzE7L7Y8BV6dn"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",
     contractInstance: undefined,
     storage: undefined,
     favoriteList: null,
-    isBlogger: false,
+    bloggerAccount: undefined,
     trendingTags: [],
   });
 
@@ -49,8 +49,8 @@ const store = () => {
     updateFavoriteList: (list) => {
       update((currentStore) => ({ ...currentStore, favoriteList: list }));
     },
-    updateIsBlogger: (status) => {
-      update((currentStore) => ({ ...currentStore, isBlogger: status }));
+    updateBloggerAccount: (account) => {
+      update((currentStore) => ({ ...currentStore, bloggerAccount: account }));
     },
     updateUserName: (userName) => {
       update((currentStore) => ({ ...currentStore, userName }));

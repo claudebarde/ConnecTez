@@ -6,7 +6,7 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@taquito/taquito": "^6.0.3-beta.0",
+    "@taquito/taquito": "^6.3.0-wallet.3",
     "eztz.js": "git+https://github.com/TezTech/eztz.git",
     "lodash": "^4.17.15",
     "promise-retry": "^1.1.1",

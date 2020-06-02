@@ -4,6 +4,7 @@
   import Loader from "../components/Loader.svelte";
   import Search from "../components/Search.svelte";
   import TrendingTags from "../components/TrendingTags.svelte";
+  import CreateAccount from "../components/CreateAccount.svelte";
 </script>
 
 <style>
@@ -20,6 +21,10 @@
 
   .illustration {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
   }
 
   .illustration__pic {
@@ -69,8 +74,8 @@
             identifying your unique posts is stored on the Tezos blockchain.
             <br />
             <br />
-            All you have to do is connect your wallet, sit back and create your
-            blog posts :)
+            All you have to do is connect your wallet, create an account, sit
+            back and write :)
           </div>
         </div>
         <div class="column is-half illustration">
@@ -78,6 +83,7 @@
             src="undraw_blogging_vpvv.svg"
             alt="blogging-illustration"
             class="illustration__pic" />
+          <CreateAccount />
         </div>
       </div>
     </div>

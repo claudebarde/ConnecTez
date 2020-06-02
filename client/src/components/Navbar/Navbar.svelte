@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, afterUpdate, onDestroy } from "svelte";
   import { fly } from "svelte/transition";
   import { Tezos } from "@taquito/taquito";
   import { TezBridgeSigner } from "@taquito/tezbridge-signer";
@@ -29,23 +29,6 @@
     try {
       // gets user's address
       const address = await window.tezbridge.request({ method: "get_source" });
-      /*let address;
-      if (config.DEV_ENV === "local") {
-        address = await window.tezbridge.request({
-          method: "set_host",
-          host: "http://localhost:8732"
-        });
-      } else if (config.DEV_ENV === "carthage") {
-        address = await window.tezbridge.request({
-          method: "set_host",
-          host: "https://carthagenet.SmartPy.io"
-        });
-      } else if (config.DEV_ENV === "main") {
-        address = await window.tezbridge.request({
-          method: "set_host",
-          host: "https://mainnet.tezrpc.me"
-        });
-      }*/
       store.updateUserAddress(address);
       // gets user's balance
       const balance = await Tezos.tz.getBalance(address);
@@ -78,6 +61,7 @@
 
   onMount(async () => {
     navbar = document.getElementById("navbar");
+    let sortedResults = [];
     if (config.DEV_ENV === "local") {
       Tezos.setProvider({
         rpc: "http://localhost:8732",
@@ -107,8 +91,7 @@
       );
     }
 
-    let sortedResults = storage.last_posts;
-    // sends posts to Pinata to check if they exist and sorts them
+    // fetches last posts from Pinata
     try {
       const urlToFetchPosts =
         process.env.NODE_ENV === "development"
@@ -116,7 +99,6 @@
           : "https://connectez.cc/.netlify/functions/fetchPosts";
       const data = await fetch(urlToFetchPosts, {
         body: JSON.stringify({
-          posts: storage.last_posts.slice(0, 30),
           network: config.DEV_ENV
         }),
         method: "POST"
@@ -125,7 +107,6 @@
       sortedResults = results
         .sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1))
         .map(entry => entry.ipfs_pin_hash);
-      //sortedResults = [...sortedResults, ...sortedResults];
     } catch (error) {
       console.log(error);
     }
@@ -167,9 +148,9 @@
           }
         }
         // checks if new tips were sent
-        if ($store.userAddress && $store.isBlogger) {
+        if ($store.userAddress && $store.bloggerAccount) {
           // checks if tips have changed
-          try {
+          /*try {
             const newTips = await newStorage.bloggers_tips.get(
               $store.userAddress
             );
@@ -178,7 +159,7 @@
             }
           } catch (error) {
             //console.log(error);
-          }
+          }*/
         }
         if ($store.userAddress) {
           // checks if balance has changed
@@ -218,16 +199,21 @@
         store.updateUserBalance(undefined);
       }
     }
-    // checks if the user is a blogger
-    if ($store.userAddress) {
+  });
+
+  afterUpdate(async () => {
+    // checks if the address is not already associated with an account
+    if (
+      $store.userAddress &&
+      $store.storage &&
+      $store.bloggerAccount === undefined
+    ) {
       try {
-        const blogger = await storage.bloggers.get($store.userAddress);
-        store.updateIsBlogger(true);
-        if (blogger.name && blogger.name.length > 0) {
-          store.updateUserName(blogger.name);
-        }
-      } catch (error) {
-        store.updateIsBlogger(false);
+        const blogger = await $store.storage.bloggers.get($store.userAddress);
+        console.log(blogger);
+        store.updateBloggerAccount(blogger.account);
+      } catch (err) {
+        store.updateBloggerAccount(null);
       }
     }
   });

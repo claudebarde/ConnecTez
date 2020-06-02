@@ -1,4 +1,5 @@
 export default {
-  DEV_ENV: "carthage", // local, carthage, main
+  DEV_ENV: "local", // local, carthage, main
   postProps: ["title", "content", "author", "icon", "tags", "timestamp"],
+  adminAddress: "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
 };
