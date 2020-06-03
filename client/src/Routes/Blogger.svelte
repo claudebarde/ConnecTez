@@ -3,6 +3,7 @@
   import { fade } from "svelte/transition";
   import moment from "moment";
   import { push } from "svelte-spa-router";
+  import { validateAddress } from "@taquito/utils";
   import store from "../store/store.js";
   import Avatar from "../components/Avatar.svelte";
   import Rating from "../components/Rating.svelte";
@@ -12,17 +13,6 @@
   let generalInfo = {};
   let loading = true;
   let addingToFavorite = false;
-
-  const getPostInfo = async posts =>
-    Promise.all(
-      posts.map(async hash => {
-        const post = await $store.storage.all_posts.get(hash);
-        return Promise.resolve({
-          ipfsHash: hash,
-          timestamp: post.timestamp
-        });
-      })
-    );
 
   const addToFavorite = () => {
     if (window.localStorage) {
@@ -57,13 +47,28 @@
       address = params.address;
       if ($store.storage) {
         try {
+          // fetches blogger's address if name is provided
+          if (validateAddress(address) !== 3) {
+            address = await $store.storage.bloggersNameToAddress.get(
+              params.address
+            );
+          }
           const info = await $store.storage.bloggers.get(address);
-          generalInfo = { ...info };
-          // adds info to IPFS hashes
-          profile = {
-            ...info,
-            posts_set: await getPostInfo(info.posts_set)
-          };
+          if (info) {
+            // gets blogger's info from smart contract
+            const account = await $store.TezosProvider.contract.at(
+              info.account
+            );
+            const storage = await account.storage();
+            // adds info to IPFS hashes
+            profile = {
+              ...info,
+              ...storage,
+              address
+            };
+          } else {
+            throw "No account found!";
+          }
           loading = false;
           error = false;
         } catch (error) {
@@ -133,7 +138,9 @@
               <h1 class="title is-size-4">Blogger's profile</h1>
             </div>
             <div class="media-right">
-              <Avatar seed={address} />
+              {#if validateAddress(address) === 3}
+                <Avatar seed={address} />
+              {/if}
             </div>
           </div>
           {#if profile.name}
@@ -151,8 +158,8 @@
           <div class="columns is-mobile">
             <div class="column is-two-fifth">Rating</div>
             <div class="column is-three-fifths">
-              {#if profile.total_tips.toNumber() > 0}
-                <Rating tips={profile.total_tips.toNumber()} />
+              {#if profile.tips.toNumber() > 0}
+                <Rating tips={profile.tips.toNumber()} />
               {:else}No rating yet{/if}
             </div>
           </div>
@@ -178,29 +185,27 @@
               </div>
             </div>
           {/if}
-          <div class="columns">
-            <div class="column is-two-fifth">Blog posts</div>
-            <div class="column is-three-fifths">
-              {#if profile.posts_set.length === 0}
-                <div in:fade={{ delay: 400 }}>No post yet</div>
-              {:else}
-                {#each profile.posts_set as post}
-                  <div class="columns is-mobile">
-                    <div class="column is-two-fifths">
-                      <a href={`/#/post/${post.ipfsHash}`}>
-                        {post.ipfsHash.slice(0, 10)}...
-                      </a>
-                    </div>
-                    <div class="column is-three-fifths">
-                      <span class="is-size-7">
-                        {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
-                      </span>
-                    </div>
-                  </div>
-                {/each}
-              {/if}
+          <hr />
+          <h1 class="title is-size-4">Blog Posts</h1>
+          {#each profile.postsList as title}
+            <div class="columns is-mobile">
+              {#await profile.posts.get(title)}
+                <div class="column is-12">Loading post data...</div>
+              {:then post}
+                <div class="column is-half has-text-left">
+                  <a
+                    href={`/#/post/${profile.name || profile.address}/${title}`}>
+                    {decodeURIComponent(title)}
+                  </a>
+                </div>
+                <div class="column is-half has-text-centered">
+                  <span class="is-size-7">
+                    {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
+                  </span>
+                </div>
+              {/await}
             </div>
-          </div>
+          {/each}
         </div>
       {:else}No profile{/if}
     </div>

@@ -34,15 +34,12 @@ exports.handler = async (event, context) => {
         pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
       },
     });
-    if (lastPinResponse.data.count > 0) throw new Error("post delay");
+    if (lastPinResponse.data.count > 0) throw new Error("POSTDELAY");
     // pins posts
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
     // if string is too long
     if (!rightByteLength(req.content)) throw new Error("Content is too large!");
 
-    /*const postID =
-      Math.round(Math.random() * 36 ** 12).toString(36) +
-      Date.now().toString().slice(-6);*/
     const postID = uuidv4();
 
     const response = await axios.post(
@@ -103,32 +100,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-
-/*
-{
-        "pinataOptions": { "cidVersion": 0 },
-        "pinataMetadata": {
-          "name": "tzblgipfs-carthage-9xtjp5hgmc8028989",
-          "keyvalues": {
-            "author": "tz1PVAAVKbvASA79wBVVsgTVHvkEakupHJ9Y",
-            "origin": "tezos-ipfs-blog",
-            "timestamp": "1586791428989",
-            "tags": [],
-          },
-        },
-        "pinataContent": {
-          "title": "Test One",
-          "content": "Trying to figure out what's going on",
-          "author": "tz1PVAAVKbvASA79wBVVsgTVHvkEakupHJ9Y",
-          "icon": "scroll",
-          "tags": [],
-          "timestamp": 1586791428989,
-        },
-      },
-      {
-        "headers": {
-          "pinata_api_key": "b76e99641d4661867d85",
-          "pinata_secret_api_key": "891e5c6f9542aa605dfc403cba8796a1c9efffd29e7960ca37f71bb6111db3f1",
-        },
-      }
-      */

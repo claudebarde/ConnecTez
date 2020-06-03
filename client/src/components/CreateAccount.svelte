@@ -22,6 +22,7 @@
       const originOp = await $store.TezosProvider.contract.originate({
         code: bloggerAccount,
         storage: {
+          version: config.bloggerAccountVersion,
           postsList: [],
           posts: new MichelsonMap(),
           blogger: $store.userAddress,
@@ -42,7 +43,21 @@
       waitingForSavingNewAccount = false;
       savingNewAccount = true;
       await op.confirmation();
-      store.updateBloggerAccount(newAccount.address);
+      // creates bloggers data
+      const accountInstance = await $store.TezosProvider.contract.at(
+        newAccount.address
+      );
+      const storage = await accountInstance.storage();
+      const balance = await $store.TezosProvider.tz.getBalance(
+        newAccount.address
+      );
+      store.updateBloggerAccount({
+        account: newAccount.address,
+        name: null,
+        ...storage,
+        balance,
+        instance: accountInstance
+      });
     } catch (err) {
       console.log(err);
       newAccountError = true;

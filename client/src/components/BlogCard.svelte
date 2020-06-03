@@ -4,11 +4,12 @@
   import { Remarkable } from "remarkable";
   import moment from "moment";
   import { push } from "svelte-spa-router";
+  import { validateAddress } from "@taquito/utils";
   import store from "../store/store.js";
   import config from "../config.js";
   import Avatar from "../components/Avatar.svelte";
 
-  export let ipfsHash, maxHeight, type, orientation;
+  export let postInfo, maxHeight, type, orientation;
 
   let md = undefined;
   let post, author, error;
@@ -19,7 +20,7 @@
     md = new Remarkable();
     try {
       const postIPFS = await fetch(
-        `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
+        `https://gateway.pinata.cloud/ipfs/${postInfo.ipfsHash}`
       );
       const pendingPost = await postIPFS.json();
       // checks if post has required properties
@@ -44,11 +45,11 @@
         if (info.name) {
           author = info.name;
         } else {
-          author = store.shortenAddress(post.author);
+          author = post.author;
         }
         updated = true;
       } catch (error) {
-        author = store.shortenAddress(post.author);
+        author = post.author;
         console.log(error);
       }
     }
@@ -119,11 +120,11 @@
               </figure>
               <div
                 class="media-content"
-                on:click={() => push(`/post/${ipfsHash}`)}
+                on:click={() => push(`/post/${validateAddress(author) === 3 ? store.shortenAddress(author) : author}/${postInfo.urlTitle}`)}
                 style="cursor:pointer">
                 <p class="title is-5">{post.title}</p>
                 <p class="subtitle is-6">
-                  {!author ? 'loading...' : 'From ' + author}
+                  {!author ? 'loading...' : 'From ' + validateAddress(author) === 3 ? store.shortenAddress(author) : author}
                   <Avatar seed={post.author} size="small" />
                 </p>
               </div>
@@ -186,7 +187,7 @@
           </figure>
           <div
             class="media-content"
-            on:click={() => push(`/post/${ipfsHash}`)}
+            on:click={() => push(`/post/${validateAddress(author) === 3 ? store.shortenAddress(author) : author}/${postInfo.urlTitle}`)}
             style="cursor:pointer">
             <p class="title is-5">{post.title}</p>
             <p class="subtitle is-6">

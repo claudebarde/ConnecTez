@@ -5,6 +5,7 @@ const { MichelsonMap } = require("@taquito/taquito");
 
 const initial_storage = {
   bloggers: new MichelsonMap(),
+  bloggersNameToAddress: new MichelsonMap(),
   admin: alice.pkh, //testnetKey,
   updateNameFee: 500000,
   highlightFee: 1000000,

@@ -59,56 +59,19 @@
               {
                 "prim": "pair",
                 "args": [
-                  { "prim": "address", "annots": ["%admin"] },
-                  { "prim": "address", "annots": ["%blogger"] }
-                ]
-              },
-              {
-                "prim": "pair",
-                "args": [
-                  { "prim": "string", "annots": ["%hashChars"] },
-                  { "prim": "nat", "annots": ["%hashLength"] }
-                ]
-              }
-            ]
-          },
-          {
-            "prim": "pair",
-            "args": [
-              {
-                "prim": "pair",
-                "args": [
                   {
-                    "prim": "map",
-                    "args": [{ "prim": "string" }, { "prim": "string" }],
-                    "annots": ["%info"]
+                    "prim": "pair",
+                    "args": [
+                      { "prim": "address", "annots": ["%admin"] },
+                      { "prim": "address", "annots": ["%blogger"] }
+                    ]
                   },
                   {
-                    "prim": "big_map",
+                    "prim": "pair",
                     "args": [
-                      { "prim": "string" },
-                      {
-                        "prim": "pair",
-                        "args": [
-                          {
-                            "prim": "pair",
-                            "args": [
-                              {
-                                "prim": "map",
-                                "args": [
-                                  { "prim": "string" },
-                                  { "prim": "string" }
-                                ],
-                                "annots": ["%info"]
-                              },
-                              { "prim": "string", "annots": ["%ipfs_hash"] }
-                            ]
-                          },
-                          { "prim": "timestamp", "annots": ["%timestamp"] }
-                        ]
-                      }
-                    ],
-                    "annots": ["%posts"]
+                      { "prim": "string", "annots": ["%hashChars"] },
+                      { "prim": "nat", "annots": ["%hashLength"] }
+                    ]
                   }
                 ]
               },
@@ -116,15 +79,58 @@
                 "prim": "pair",
                 "args": [
                   {
-                    "prim": "set",
-                    "args": [{ "prim": "string" }],
-                    "annots": ["%postsList"]
+                    "prim": "pair",
+                    "args": [
+                      {
+                        "prim": "map",
+                        "args": [{ "prim": "string" }, { "prim": "string" }],
+                        "annots": ["%info"]
+                      },
+                      {
+                        "prim": "big_map",
+                        "args": [
+                          { "prim": "string" },
+                          {
+                            "prim": "pair",
+                            "args": [
+                              {
+                                "prim": "pair",
+                                "args": [
+                                  {
+                                    "prim": "map",
+                                    "args": [
+                                      { "prim": "string" },
+                                      { "prim": "string" }
+                                    ],
+                                    "annots": ["%info"]
+                                  },
+                                  { "prim": "string", "annots": ["%ipfs_hash"] }
+                                ]
+                              },
+                              { "prim": "timestamp", "annots": ["%timestamp"] }
+                            ]
+                          }
+                        ],
+                        "annots": ["%posts"]
+                      }
+                    ]
                   },
-                  { "prim": "mutez", "annots": ["%tips"] }
+                  {
+                    "prim": "pair",
+                    "args": [
+                      {
+                        "prim": "set",
+                        "args": [{ "prim": "string" }],
+                        "annots": ["%postsList"]
+                      },
+                      { "prim": "mutez", "annots": ["%tips"] }
+                    ]
+                  }
                 ]
               }
             ]
-          }
+          },
+          { "prim": "nat", "annots": ["%version"] }
         ]
       }
     ]
@@ -159,12 +165,14 @@
                           { "prim": "CAR" },
                           { "prim": "CAR" },
                           { "prim": "CAR" },
+                          { "prim": "CAR" },
                           { "prim": "SOURCE" },
                           { "prim": "COMPARE" },
                           { "prim": "NEQ" },
                           { "prim": "DIG", "args": [{ "int": "4" }] },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [{ "int": "5" }] },
+                          { "prim": "CAR" },
                           { "prim": "CAR" },
                           { "prim": "CAR" },
                           { "prim": "CDR" },
@@ -189,6 +197,7 @@
                                 { "prim": "DIG", "args": [{ "int": "3" }] },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [{ "int": "4" }] },
+                                { "prim": "CAR" },
                                 { "prim": "CDR" },
                                 { "prim": "CDR" },
                                 { "prim": "CAR" },
@@ -229,6 +238,7 @@
                                         "prim": "DUG",
                                         "args": [{ "int": "5" }]
                                       },
+                                      { "prim": "CAR" },
                                       { "prim": "CDR" },
                                       { "prim": "CDR" },
                                       { "prim": "CAR" },
@@ -255,6 +265,10 @@
                                         "args": [
                                           [
                                             { "prim": "DUP" },
+                                            { "prim": "CDR" },
+                                            { "prim": "SWAP" },
+                                            { "prim": "CAR" },
+                                            { "prim": "DUP" },
                                             { "prim": "CAR" },
                                             { "prim": "SWAP" },
                                             { "prim": "CDR" },
@@ -270,6 +284,7 @@
                                       { "prim": "SWAP" },
                                       { "prim": "PAIR" },
                                       { "prim": "SWAP" },
+                                      { "prim": "PAIR" },
                                       { "prim": "PAIR" },
                                       {
                                         "prim": "NIL",
@@ -313,117 +328,6 @@
                                   {
                                     "prim": "pair",
                                     "args": [
-                                      {
-                                        "prim": "pair",
-                                        "args": [
-                                          {
-                                            "prim": "pair",
-                                            "args": [
-                                              {
-                                                "prim": "address",
-                                                "annots": ["%admin"]
-                                              },
-                                              {
-                                                "prim": "address",
-                                                "annots": ["%blogger"]
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "prim": "pair",
-                                            "args": [
-                                              {
-                                                "prim": "string",
-                                                "annots": ["%hashChars"]
-                                              },
-                                              {
-                                                "prim": "nat",
-                                                "annots": ["%hashLength"]
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "prim": "pair",
-                                        "args": [
-                                          {
-                                            "prim": "pair",
-                                            "args": [
-                                              {
-                                                "prim": "map",
-                                                "args": [
-                                                  { "prim": "string" },
-                                                  { "prim": "string" }
-                                                ],
-                                                "annots": ["%info"]
-                                              },
-                                              {
-                                                "prim": "big_map",
-                                                "args": [
-                                                  { "prim": "string" },
-                                                  {
-                                                    "prim": "pair",
-                                                    "args": [
-                                                      {
-                                                        "prim": "pair",
-                                                        "args": [
-                                                          {
-                                                            "prim": "map",
-                                                            "args": [
-                                                              {
-                                                                "prim": "string"
-                                                              },
-                                                              {
-                                                                "prim": "string"
-                                                              }
-                                                            ],
-                                                            "annots": ["%info"]
-                                                          },
-                                                          {
-                                                            "prim": "string",
-                                                            "annots": [
-                                                              "%ipfs_hash"
-                                                            ]
-                                                          }
-                                                        ]
-                                                      },
-                                                      {
-                                                        "prim": "timestamp",
-                                                        "annots": ["%timestamp"]
-                                                      }
-                                                    ]
-                                                  }
-                                                ],
-                                                "annots": ["%posts"]
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "prim": "pair",
-                                            "args": [
-                                              {
-                                                "prim": "set",
-                                                "args": [{ "prim": "string" }],
-                                                "annots": ["%postsList"]
-                                              },
-                                              {
-                                                "prim": "mutez",
-                                                "annots": ["%tips"]
-                                              }
-                                            ]
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "prim": "pair",
-                                    "args": [
-                                      {
-                                        "prim": "list",
-                                        "args": [{ "prim": "operation" }]
-                                      },
                                       {
                                         "prim": "pair",
                                         "args": [
@@ -536,6 +440,140 @@
                                             ]
                                           }
                                         ]
+                                      },
+                                      { "prim": "nat", "annots": ["%version"] }
+                                    ]
+                                  },
+                                  {
+                                    "prim": "pair",
+                                    "args": [
+                                      {
+                                        "prim": "list",
+                                        "args": [{ "prim": "operation" }]
+                                      },
+                                      {
+                                        "prim": "pair",
+                                        "args": [
+                                          {
+                                            "prim": "pair",
+                                            "args": [
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "address",
+                                                        "annots": ["%admin"]
+                                                      },
+                                                      {
+                                                        "prim": "address",
+                                                        "annots": ["%blogger"]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "string",
+                                                        "annots": ["%hashChars"]
+                                                      },
+                                                      {
+                                                        "prim": "nat",
+                                                        "annots": [
+                                                          "%hashLength"
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "prim": "pair",
+                                                "args": [
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "map",
+                                                        "args": [
+                                                          { "prim": "string" },
+                                                          { "prim": "string" }
+                                                        ],
+                                                        "annots": ["%info"]
+                                                      },
+                                                      {
+                                                        "prim": "big_map",
+                                                        "args": [
+                                                          { "prim": "string" },
+                                                          {
+                                                            "prim": "pair",
+                                                            "args": [
+                                                              {
+                                                                "prim": "pair",
+                                                                "args": [
+                                                                  {
+                                                                    "prim": "map",
+                                                                    "args": [
+                                                                      {
+                                                                        "prim": "string"
+                                                                      },
+                                                                      {
+                                                                        "prim": "string"
+                                                                      }
+                                                                    ],
+                                                                    "annots": [
+                                                                      "%info"
+                                                                    ]
+                                                                  },
+                                                                  {
+                                                                    "prim": "string",
+                                                                    "annots": [
+                                                                      "%ipfs_hash"
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              },
+                                                              {
+                                                                "prim": "timestamp",
+                                                                "annots": [
+                                                                  "%timestamp"
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ],
+                                                        "annots": ["%posts"]
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "prim": "pair",
+                                                    "args": [
+                                                      {
+                                                        "prim": "set",
+                                                        "args": [
+                                                          { "prim": "string" }
+                                                        ],
+                                                        "annots": ["%postsList"]
+                                                      },
+                                                      {
+                                                        "prim": "mutez",
+                                                        "annots": ["%tips"]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "prim": "nat",
+                                            "annots": ["%version"]
+                                          }
+                                        ]
                                       }
                                     ]
                                   }
@@ -550,6 +588,11 @@
                                   "prim": "DIP",
                                   "args": [[{ "prim": "DUP" }]]
                                 },
+                                { "prim": "DUP" },
+                                {
+                                  "prim": "DIP",
+                                  "args": [[{ "prim": "PAIR" }]]
+                                },
                                 { "prim": "SWAP" },
                                 {
                                   "prim": "LAMBDA",
@@ -557,7 +600,13 @@
                                     {
                                       "prim": "pair",
                                       "args": [
-                                        { "prim": "string" },
+                                        {
+                                          "prim": "pair",
+                                          "args": [
+                                            { "prim": "string" },
+                                            { "prim": "string" }
+                                          ]
+                                        },
                                         {
                                           "prim": "pair",
                                           "args": [
@@ -568,12 +617,34 @@
                                                   "prim": "pair",
                                                   "args": [
                                                     {
-                                                      "prim": "address",
-                                                      "annots": ["%admin"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "address",
+                                                          "annots": ["%admin"]
+                                                        },
+                                                        {
+                                                          "prim": "address",
+                                                          "annots": ["%blogger"]
+                                                        }
+                                                      ]
                                                     },
                                                     {
-                                                      "prim": "address",
-                                                      "annots": ["%blogger"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "string",
+                                                          "annots": [
+                                                            "%hashChars"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "prim": "nat",
+                                                          "annots": [
+                                                            "%hashLength"
+                                                          ]
+                                                        }
+                                                      ]
                                                     }
                                                   ]
                                                 },
@@ -581,93 +652,90 @@
                                                   "prim": "pair",
                                                   "args": [
                                                     {
-                                                      "prim": "string",
-                                                      "annots": ["%hashChars"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "map",
+                                                          "args": [
+                                                            {
+                                                              "prim": "string"
+                                                            },
+                                                            { "prim": "string" }
+                                                          ],
+                                                          "annots": ["%info"]
+                                                        },
+                                                        {
+                                                          "prim": "big_map",
+                                                          "args": [
+                                                            {
+                                                              "prim": "string"
+                                                            },
+                                                            {
+                                                              "prim": "pair",
+                                                              "args": [
+                                                                {
+                                                                  "prim": "pair",
+                                                                  "args": [
+                                                                    {
+                                                                      "prim": "map",
+                                                                      "args": [
+                                                                        {
+                                                                          "prim": "string"
+                                                                        },
+                                                                        {
+                                                                          "prim": "string"
+                                                                        }
+                                                                      ],
+                                                                      "annots": [
+                                                                        "%info"
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "prim": "string",
+                                                                      "annots": [
+                                                                        "%ipfs_hash"
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "prim": "timestamp",
+                                                                  "annots": [
+                                                                    "%timestamp"
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ],
+                                                          "annots": ["%posts"]
+                                                        }
+                                                      ]
                                                     },
                                                     {
-                                                      "prim": "nat",
-                                                      "annots": ["%hashLength"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "set",
+                                                          "args": [
+                                                            { "prim": "string" }
+                                                          ],
+                                                          "annots": [
+                                                            "%postsList"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "prim": "mutez",
+                                                          "annots": ["%tips"]
+                                                        }
+                                                      ]
                                                     }
                                                   ]
                                                 }
                                               ]
                                             },
                                             {
-                                              "prim": "pair",
-                                              "args": [
-                                                {
-                                                  "prim": "pair",
-                                                  "args": [
-                                                    {
-                                                      "prim": "map",
-                                                      "args": [
-                                                        { "prim": "string" },
-                                                        { "prim": "string" }
-                                                      ],
-                                                      "annots": ["%info"]
-                                                    },
-                                                    {
-                                                      "prim": "big_map",
-                                                      "args": [
-                                                        { "prim": "string" },
-                                                        {
-                                                          "prim": "pair",
-                                                          "args": [
-                                                            {
-                                                              "prim": "pair",
-                                                              "args": [
-                                                                {
-                                                                  "prim": "map",
-                                                                  "args": [
-                                                                    {
-                                                                      "prim": "string"
-                                                                    },
-                                                                    {
-                                                                      "prim": "string"
-                                                                    }
-                                                                  ],
-                                                                  "annots": [
-                                                                    "%info"
-                                                                  ]
-                                                                },
-                                                                {
-                                                                  "prim": "string",
-                                                                  "annots": [
-                                                                    "%ipfs_hash"
-                                                                  ]
-                                                                }
-                                                              ]
-                                                            },
-                                                            {
-                                                              "prim": "timestamp",
-                                                              "annots": [
-                                                                "%timestamp"
-                                                              ]
-                                                            }
-                                                          ]
-                                                        }
-                                                      ],
-                                                      "annots": ["%posts"]
-                                                    }
-                                                  ]
-                                                },
-                                                {
-                                                  "prim": "pair",
-                                                  "args": [
-                                                    {
-                                                      "prim": "set",
-                                                      "args": [
-                                                        { "prim": "string" }
-                                                      ],
-                                                      "annots": ["%postsList"]
-                                                    },
-                                                    {
-                                                      "prim": "mutez",
-                                                      "annots": ["%tips"]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
+                                              "prim": "nat",
+                                              "annots": ["%version"]
                                             }
                                           ]
                                         }
@@ -690,12 +758,34 @@
                                                   "prim": "pair",
                                                   "args": [
                                                     {
-                                                      "prim": "address",
-                                                      "annots": ["%admin"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "address",
+                                                          "annots": ["%admin"]
+                                                        },
+                                                        {
+                                                          "prim": "address",
+                                                          "annots": ["%blogger"]
+                                                        }
+                                                      ]
                                                     },
                                                     {
-                                                      "prim": "address",
-                                                      "annots": ["%blogger"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "string",
+                                                          "annots": [
+                                                            "%hashChars"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "prim": "nat",
+                                                          "annots": [
+                                                            "%hashLength"
+                                                          ]
+                                                        }
+                                                      ]
                                                     }
                                                   ]
                                                 },
@@ -703,93 +793,90 @@
                                                   "prim": "pair",
                                                   "args": [
                                                     {
-                                                      "prim": "string",
-                                                      "annots": ["%hashChars"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "map",
+                                                          "args": [
+                                                            {
+                                                              "prim": "string"
+                                                            },
+                                                            { "prim": "string" }
+                                                          ],
+                                                          "annots": ["%info"]
+                                                        },
+                                                        {
+                                                          "prim": "big_map",
+                                                          "args": [
+                                                            {
+                                                              "prim": "string"
+                                                            },
+                                                            {
+                                                              "prim": "pair",
+                                                              "args": [
+                                                                {
+                                                                  "prim": "pair",
+                                                                  "args": [
+                                                                    {
+                                                                      "prim": "map",
+                                                                      "args": [
+                                                                        {
+                                                                          "prim": "string"
+                                                                        },
+                                                                        {
+                                                                          "prim": "string"
+                                                                        }
+                                                                      ],
+                                                                      "annots": [
+                                                                        "%info"
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "prim": "string",
+                                                                      "annots": [
+                                                                        "%ipfs_hash"
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "prim": "timestamp",
+                                                                  "annots": [
+                                                                    "%timestamp"
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ],
+                                                          "annots": ["%posts"]
+                                                        }
+                                                      ]
                                                     },
                                                     {
-                                                      "prim": "nat",
-                                                      "annots": ["%hashLength"]
+                                                      "prim": "pair",
+                                                      "args": [
+                                                        {
+                                                          "prim": "set",
+                                                          "args": [
+                                                            { "prim": "string" }
+                                                          ],
+                                                          "annots": [
+                                                            "%postsList"
+                                                          ]
+                                                        },
+                                                        {
+                                                          "prim": "mutez",
+                                                          "annots": ["%tips"]
+                                                        }
+                                                      ]
                                                     }
                                                   ]
                                                 }
                                               ]
                                             },
                                             {
-                                              "prim": "pair",
-                                              "args": [
-                                                {
-                                                  "prim": "pair",
-                                                  "args": [
-                                                    {
-                                                      "prim": "map",
-                                                      "args": [
-                                                        { "prim": "string" },
-                                                        { "prim": "string" }
-                                                      ],
-                                                      "annots": ["%info"]
-                                                    },
-                                                    {
-                                                      "prim": "big_map",
-                                                      "args": [
-                                                        { "prim": "string" },
-                                                        {
-                                                          "prim": "pair",
-                                                          "args": [
-                                                            {
-                                                              "prim": "pair",
-                                                              "args": [
-                                                                {
-                                                                  "prim": "map",
-                                                                  "args": [
-                                                                    {
-                                                                      "prim": "string"
-                                                                    },
-                                                                    {
-                                                                      "prim": "string"
-                                                                    }
-                                                                  ],
-                                                                  "annots": [
-                                                                    "%info"
-                                                                  ]
-                                                                },
-                                                                {
-                                                                  "prim": "string",
-                                                                  "annots": [
-                                                                    "%ipfs_hash"
-                                                                  ]
-                                                                }
-                                                              ]
-                                                            },
-                                                            {
-                                                              "prim": "timestamp",
-                                                              "annots": [
-                                                                "%timestamp"
-                                                              ]
-                                                            }
-                                                          ]
-                                                        }
-                                                      ],
-                                                      "annots": ["%posts"]
-                                                    }
-                                                  ]
-                                                },
-                                                {
-                                                  "prim": "pair",
-                                                  "args": [
-                                                    {
-                                                      "prim": "set",
-                                                      "args": [
-                                                        { "prim": "string" }
-                                                      ],
-                                                      "annots": ["%postsList"]
-                                                    },
-                                                    {
-                                                      "prim": "mutez",
-                                                      "annots": ["%tips"]
-                                                    }
-                                                  ]
-                                                }
-                                              ]
+                                              "prim": "nat",
+                                              "annots": ["%version"]
                                             }
                                           ]
                                         }
@@ -800,7 +887,19 @@
                                       { "prim": "CAR" },
                                       { "prim": "SWAP" },
                                       { "prim": "CDR" },
+                                      {
+                                        "prim": "DIP",
+                                        "args": [
+                                          [
+                                            { "prim": "DUP" },
+                                            { "prim": "CDR" },
+                                            { "prim": "SWAP" },
+                                            { "prim": "CAR" }
+                                          ]
+                                        ]
+                                      },
                                       { "prim": "DUP" },
+                                      { "prim": "CAR" },
                                       { "prim": "CAR" },
                                       { "prim": "CAR" },
                                       { "prim": "CDR" },
@@ -824,6 +923,7 @@
                                           ],
                                           [
                                             { "prim": "DUP" },
+                                            { "prim": "CAR" },
                                             { "prim": "CDR" },
                                             { "prim": "CDR" },
                                             { "prim": "CAR" },
@@ -846,7 +946,7 @@
                                                     "args": [
                                                       { "prim": "string" },
                                                       {
-                                                        "string": "DuplicateIPFSHash"
+                                                        "string": "DuplicateTitle"
                                                       }
                                                     ]
                                                   },
@@ -855,16 +955,17 @@
                                                 [
                                                   { "prim": "DUP" },
                                                   { "prim": "CAR" },
+                                                  { "prim": "CAR" },
                                                   { "prim": "CDR" },
                                                   { "prim": "CAR" },
                                                   {
                                                     "prim": "DIG",
-                                                    "args": [{ "int": "2" }]
+                                                    "args": [{ "int": "3" }]
                                                   },
                                                   { "prim": "DUP" },
                                                   {
                                                     "prim": "DUG",
-                                                    "args": [{ "int": "3" }]
+                                                    "args": [{ "int": "4" }]
                                                   },
                                                   {
                                                     "prim": "PUSH",
@@ -913,16 +1014,17 @@
                                                     "args": [{ "int": "2" }]
                                                   },
                                                   { "prim": "CAR" },
+                                                  { "prim": "CAR" },
                                                   { "prim": "CDR" },
                                                   { "prim": "CDR" },
                                                   {
                                                     "prim": "DIG",
-                                                    "args": [{ "int": "3" }]
+                                                    "args": [{ "int": "4" }]
                                                   },
                                                   { "prim": "DUP" },
                                                   {
                                                     "prim": "DUG",
-                                                    "args": [{ "int": "4" }]
+                                                    "args": [{ "int": "5" }]
                                                   },
                                                   { "prim": "SIZE" },
                                                   { "prim": "COMPARE" },
@@ -950,14 +1052,14 @@
                                                         {
                                                           "prim": "DIG",
                                                           "args": [
-                                                            { "int": "2" }
+                                                            { "int": "3" }
                                                           ]
                                                         },
                                                         { "prim": "DUP" },
                                                         {
                                                           "prim": "DUG",
                                                           "args": [
-                                                            { "int": "3" }
+                                                            { "int": "4" }
                                                           ]
                                                         },
                                                         {
@@ -997,6 +1099,7 @@
                                                             { "int": "3" }
                                                           ]
                                                         },
+                                                        { "prim": "CAR" },
                                                         { "prim": "CDR" },
                                                         { "prim": "CDR" },
                                                         { "prim": "CAR" },
@@ -1027,6 +1130,12 @@
                                                           "args": [
                                                             [
                                                               { "prim": "DUP" },
+                                                              { "prim": "CDR" },
+                                                              {
+                                                                "prim": "SWAP"
+                                                              },
+                                                              { "prim": "CAR" },
+                                                              { "prim": "DUP" },
                                                               { "prim": "CAR" },
                                                               {
                                                                 "prim": "SWAP"
@@ -1047,6 +1156,7 @@
                                                         { "prim": "PAIR" },
                                                         { "prim": "SWAP" },
                                                         { "prim": "PAIR" },
+                                                        { "prim": "PAIR" },
                                                         {
                                                           "prim": "DIG",
                                                           "args": [
@@ -1060,6 +1170,7 @@
                                                             { "int": "3" }
                                                           ]
                                                         },
+                                                        { "prim": "CAR" },
                                                         { "prim": "CDR" },
                                                         { "prim": "CAR" },
                                                         { "prim": "CDR" },
@@ -1096,6 +1207,12 @@
                                                           "args": [
                                                             [
                                                               { "prim": "DUP" },
+                                                              { "prim": "CDR" },
+                                                              {
+                                                                "prim": "SWAP"
+                                                              },
+                                                              { "prim": "CAR" },
+                                                              { "prim": "DUP" },
                                                               { "prim": "CAR" },
                                                               {
                                                                 "prim": "SWAP"
@@ -1115,6 +1232,7 @@
                                                         { "prim": "PAIR" },
                                                         { "prim": "PAIR" },
                                                         { "prim": "SWAP" },
+                                                        { "prim": "PAIR" },
                                                         { "prim": "PAIR" },
                                                         {
                                                           "prim": "NIL",
@@ -1146,7 +1264,7 @@
                                           [
                                             {
                                               "prim": "DROP",
-                                              "args": [{ "int": "2" }]
+                                              "args": [{ "int": "3" }]
                                             }
                                           ]
                                         ]
@@ -1215,6 +1333,7 @@
                                 { "prim": "DUG", "args": [{ "int": "4" }] },
                                 { "prim": "CAR" },
                                 { "prim": "CAR" },
+                                { "prim": "CAR" },
                                 { "prim": "CDR" },
                                 { "prim": "SOURCE" },
                                 { "prim": "COMPARE" },
@@ -1243,6 +1362,7 @@
                                         "prim": "DUG",
                                         "args": [{ "int": "5" }]
                                       },
+                                      { "prim": "CAR" },
                                       { "prim": "CDR" },
                                       { "prim": "CDR" },
                                       { "prim": "CDR" },
@@ -1270,6 +1390,10 @@
                                         "args": [
                                           [
                                             { "prim": "DUP" },
+                                            { "prim": "CDR" },
+                                            { "prim": "SWAP" },
+                                            { "prim": "CAR" },
+                                            { "prim": "DUP" },
                                             { "prim": "CAR" },
                                             { "prim": "SWAP" },
                                             { "prim": "CDR" },
@@ -1286,6 +1410,7 @@
                                       { "prim": "SWAP" },
                                       { "prim": "PAIR" },
                                       { "prim": "SWAP" },
+                                      { "prim": "PAIR" },
                                       { "prim": "PAIR" },
                                       {
                                         "prim": "NIL",
@@ -1308,6 +1433,7 @@
                           { "prim": "DIG", "args": [{ "int": "3" }] },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [{ "int": "4" }] },
+                          { "prim": "CAR" },
                           { "prim": "CAR" },
                           { "prim": "CAR" },
                           { "prim": "CDR" },
@@ -1334,6 +1460,7 @@
                                 { "prim": "DIG", "args": [{ "int": "4" }] },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [{ "int": "5" }] },
+                                { "prim": "CAR" },
                                 { "prim": "CDR" },
                                 { "prim": "CAR" },
                                 { "prim": "CAR" },
@@ -1352,6 +1479,10 @@
                                   "args": [
                                     [
                                       { "prim": "DUP" },
+                                      { "prim": "CDR" },
+                                      { "prim": "SWAP" },
+                                      { "prim": "CAR" },
+                                      { "prim": "DUP" },
                                       { "prim": "CAR" },
                                       { "prim": "SWAP" },
                                       { "prim": "CDR" },
@@ -1366,6 +1497,7 @@
                                 { "prim": "PAIR" },
                                 { "prim": "PAIR" },
                                 { "prim": "SWAP" },
+                                { "prim": "PAIR" },
                                 { "prim": "PAIR" },
                                 {
                                   "prim": "NIL",
@@ -1394,6 +1526,7 @@
                     { "prim": "DIG", "args": [{ "int": "2" }] },
                     { "prim": "DUP" },
                     { "prim": "DUG", "args": [{ "int": "3" }] },
+                    { "prim": "CAR" },
                     { "prim": "CAR" },
                     { "prim": "CAR" },
                     { "prim": "CDR" },
@@ -1430,6 +1563,10 @@
                                 { "prim": "SWAP" },
                                 { "prim": "CAR" },
                                 { "prim": "DUP" },
+                                { "prim": "CDR" },
+                                { "prim": "SWAP" },
+                                { "prim": "CAR" },
+                                { "prim": "DUP" },
                                 { "prim": "CAR" },
                                 { "prim": "SWAP" },
                                 { "prim": "CDR" },
@@ -1442,6 +1579,7 @@
                           { "prim": "SWAP" },
                           { "prim": "PAIR" },
                           { "prim": "PAIR" },
+                          { "prim": "PAIR" },
                           { "prim": "DIG", "args": [{ "int": "1" }] },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [{ "int": "2" }] },
@@ -1450,6 +1588,10 @@
                             "prim": "DIP",
                             "args": [
                               [
+                                { "prim": "DUP" },
+                                { "prim": "CDR" },
+                                { "prim": "SWAP" },
+                                { "prim": "CAR" },
                                 { "prim": "DUP" },
                                 { "prim": "CDR" },
                                 { "prim": "SWAP" },
@@ -1466,6 +1608,7 @@
                           { "prim": "SWAP" },
                           { "prim": "PAIR" },
                           { "prim": "PAIR" },
+                          { "prim": "PAIR" },
                           { "prim": "NIL", "args": [{ "prim": "operation" }] },
                           { "prim": "PAIR" }
                         ]
@@ -1477,6 +1620,7 @@
                     { "prim": "DIG", "args": [{ "int": "2" }] },
                     { "prim": "DUP" },
                     { "prim": "DUG", "args": [{ "int": "3" }] },
+                    { "prim": "CAR" },
                     { "prim": "CAR" },
                     { "prim": "CAR" },
                     { "prim": "CDR" },
@@ -1520,6 +1664,7 @@
                                 { "prim": "DIG", "args": [{ "int": "2" }] },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [{ "int": "3" }] },
+                                { "prim": "CAR" },
                                 { "prim": "CAR" },
                                 { "prim": "CAR" },
                                 { "prim": "CDR" },

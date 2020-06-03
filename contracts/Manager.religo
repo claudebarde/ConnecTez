@@ -9,6 +9,7 @@ type bloggerInfo = {account: address, name: option (string), other: map(string, 
 
 type storage = {
   bloggers: big_map(address, bloggerInfo),
+  bloggersNameToAddress: big_map(string, address),
   bloggers_reserved_names: set (string),
   highlights: list(highlight),
   admin: address,
@@ -85,6 +86,7 @@ let updateBlogger = ((name, s): (string, storage)): return => {
                 // returns new storage
                 ([]: list(operation), {...s, 
                 bloggers: Big_map.update(Tezos.source, Some ({...blogger, name: Some (name)}), s.bloggers),
+                bloggersNameToAddress: Big_map.update(name, Some (Tezos.source), s.bloggersNameToAddress),
                 bloggers_reserved_names: Set.add(name, updatedBloggersNames),
                 revenue: s.revenue + Tezos.amount})
               }

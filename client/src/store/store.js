@@ -11,7 +11,7 @@ const store = () => {
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1Ri8eZAR78i2sBNtMp9S6ZEe6VckQsZtCX"
+        ? "KT1RuZJXVayyaJARWobpawaF74nWudi74VGK"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",

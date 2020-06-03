@@ -14,6 +14,7 @@ type action =
   | UpdateHashProperties ((nat, string));
 
 type storage = {
+  version: nat,
   postsList: set (ipfs_hash),
   posts: big_map(string, post),
   blogger: address,
@@ -33,21 +34,21 @@ let post = (ipfs_hash: ipfs_hash, title: string, s: storage): return => {
   if(Tezos.source != s.blogger) {
     failwith("UnauthorizedAction"): return ;
   } else {
-    if(Set.mem(ipfs_hash, s.postsList)){
-      // if hash already exists
-      failwith("DuplicateIPFSHash"): return ;
+    if(Set.mem(title, s.postsList)){
+      // if title already exists
+      failwith("DuplicateTitle"): return ;
     } else {
       if(String.size(ipfs_hash) != s.hashLength && String.sub(0n, 2n, ipfs_hash) != s.hashChars) {
         // if hash is not correctly formatted
         failwith("WrongHashFormat"): return;
       } else {
-        let newPostsList = Set.add(ipfs_hash, s.postsList) ;
+        let newPostsList = Set.add(title, s.postsList) ;
         let newPost: post = { ipfs_hash, timestamp: Tezos.now, info: Map.empty: map(string, string) };
 
         ([]: list (operation), 
         {...s, 
         postsList: newPostsList, 
-        posts: Big_map.update(ipfs_hash, Some (newPost), s.posts)}) ;
+        posts: Big_map.update(title, Some (newPost), s.posts)}) ;
       }
     }
   }

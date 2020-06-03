@@ -11,7 +11,8 @@
   import config from "../config.js";
 
   let title,
-    subtitle = "";
+    subtitle,
+    urlTitle = "";
   let banner = {};
   let post = "";
   let IPFSHash = undefined;
@@ -128,6 +129,8 @@
       }
     }
 
+    urlTitle = encodeURIComponent(title.toLowerCase().replace(/\s+/g, "-"));
+
     const PINJSON =
       process.env.NODE_ENV === "development"
         ? "http://localhost:34567/pinJSON"
@@ -143,6 +146,7 @@
           body: JSON.stringify({
             title,
             subtitle,
+            urlTitle,
             content: post,
             author: $store.userAddress,
             username: $store.userName || "",
@@ -159,18 +163,36 @@
         if (response.IpfsHash) {
           IPFSHash = response.IpfsHash;
           savePost = "waitingForBlockchain";
+          // creates
           // saves IPFS hash onto the blockchain
-          const op = await $store.contractInstance.methods
-            .post(IPFSHash)
+          const op = await $store.bloggerAccount.instance.methods
+            .post(IPFSHash, urlTitle)
             .send();
           txHash = op.hash;
-          await op.confirmation(1);
+          await op.confirmation();
           if (window.localStorage) {
             window.localStorage.setItem("lastPost", Date.now());
+            // sets new delay
+            lastPostInterval = setInterval(
+              () =>
+                (lastPostDelay =
+                  Date.now() >
+                  parseInt(window.localStorage.getItem("lastPost")) +
+                    15 * 60 * 1000),
+              5000
+            );
           }
           savePost = "confirmed";
         } else {
-          throw new Error("No IPFS hash received");
+          if (response.error) {
+            if (response.error.includes("POSTDELAY")) {
+              throw new Error("You must wait 15 minutes between each post.");
+            } else {
+              throw new Error(response.error);
+            }
+          } else {
+            throw new Error("An error has occurred");
+          }
         }
       } else {
         throw new Error("Invalid title or post");
@@ -309,22 +331,35 @@
         in:fly={{ y: -200, duration: 400, delay: 100 }}
         out:fly={{ y: -200, duration: 400, delay: 0 }}>
         <div class="box">
-          <h2 class="subtitle">Confirm IPFS Upload?</h2>
-          <p>Are you sure you want to upload this post to the IPFS?</p>
-          <p>
-            Content uploaded to the IPFS cannot be modified without modifying
-            its reference hash.
-          </p>
-          <div class="confirm-buttons">
-            <button
-              class="button is-danger is-light"
-              on:click={() => (savePost = undefined)}>
-              Cancel
-            </button>
-            <button class="button is-success is-light" on:click={confirmUpload}>
-              Confirm
-            </button>
-          </div>
+          {#if lastPostDelay}
+            <h2 class="subtitle">Confirm IPFS Upload?</h2>
+            <p>Are you sure you want to upload this post to the IPFS?</p>
+            <p>
+              Content uploaded to the IPFS cannot be modified without modifying
+              its reference hash.
+            </p>
+            <p>
+              You will be able to modify the content of your post later, but not
+              its title and subtitle.
+            </p>
+            <div class="confirm-buttons">
+              <button
+                class="button is-danger is-light"
+                on:click={() => (savePost = undefined)}>
+                Cancel
+              </button>
+              <button
+                class="button is-success is-light"
+                on:click={confirmUpload}>
+                Confirm
+              </button>
+            </div>
+          {:else}
+            <h2 class="subtitle">Upload temporarily unavailable</h2>
+            <p>Writing good blog posts takes time.</p>
+            <br />
+            <p>Please wait 15 minutes between each new blog post.</p>
+          {/if}
         </div>
       </div>
       <button
@@ -431,7 +466,7 @@
       aria-label="close"
       on:click={() => {
         savePost = undefined;
-        push(`/post/${IPFSHash}`);
+        push(`/post/${$store.bloggerAccount && $store.bloggerAccount.name ? $store.bloggerAccount.name : $store.userAddress}/${urlTitle}`);
       }} />
   </div>
   <!-- MODAL ERROR -->

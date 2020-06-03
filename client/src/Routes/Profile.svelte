@@ -1,12 +1,10 @@
 <script>
-  import { afterUpdate } from "svelte";
   import { fade, fly, slide } from "svelte/transition";
   import moment from "moment";
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
 
   let profile;
-  let loading = true;
   let deletePostModal = false;
   let hashToDelete = undefined;
   let waitingForRemoval = undefined;
@@ -69,45 +67,18 @@
             amount: $store.storage.updateNameFee.toNumber(),
             mutez: true
           });
-        await op.confirmation(1);
+        await op.confirmation();
         profile = { ...profile, name: userName };
         store.updateUserName(userName);
-        updatingUserName = false;
-        userName = "";
       } catch (error) {
         console.log(error);
-        updatingUserName = false;
+      } finally {
+        addNameInputOpen = false;
         userName = "";
+        updatingUserName = false;
       }
     }
   };
-
-  afterUpdate(async () => {
-    if ($store.storage && $store.userAddress && loading) {
-      try {
-        // gets blogger's info from Manager contract
-        const info = await $store.storage.bloggers.get($store.userAddress);
-        // gets blogger's info from Account contract
-        if (info.account) {
-          const account = await $store.TezosProvider.contract.at(info.account);
-          const storage = await account.storage();
-          const balance = await $store.TezosProvider.tz.getBalance(
-            info.account
-          );
-          profile = { ...info, ...storage, balance };
-          console.log(profile);
-        } else {
-          throw "No account found!";
-        }
-        noProfile = false;
-      } catch (error) {
-        //console.log(error);
-        noProfile = true;
-      } finally {
-        loading = false;
-      }
-    }
-  });
 </script>
 
 <style>
@@ -193,22 +164,30 @@
 <main>
   <div class="card profile-container">
     <div class="card-content">
-      <h1 class="title is-size-4">Profile</h1>
-      {#if loading}
+      <div class="columns is-vcentered">
+        <div class="column is-half has-text-left">
+          <h1 class="title is-size-4">Profile</h1>
+        </div>
+        <div class="column is-half has-text-right is-size-7">
+          {#if $store.bloggerAccount}
+            Contract version: {$store.bloggerAccount.version}
+          {/if}
+        </div>
+      </div>
+      {#if $store.bloggerAccount === undefined}
         <p>Loading your profile information from the blockchain...</p>
-      {:else if profile && !noProfile}
+      {:else if $store.bloggerAccount}
         <div class="columns is-mobile">
           <div class="column is-two-fifth">Name</div>
           <div class="column is-three-fifths">
-            {#if profile.name !== null}
+            {#if $store.bloggerAccount.name !== null && !addNameInputOpen}
               <div class="columns">
-                <div class="column is-half">{profile.name}</div>
+                <div class="column is-half">{$store.bloggerAccount.name}</div>
                 <div class="column is-half">
                   <button
                     class="button is-small is-light is-info"
                     on:click={() => {
-                      userName = profile.name;
-                      profile = { ...profile, name: null };
+                      userName = $store.bloggerAccount.name;
                       addNameInputOpen = true;
                     }}>
                     Update
@@ -302,13 +281,13 @@
         <div class="columns is-mobile">
           <div class="column is-two-fifth">Total Tips</div>
           <div class="column is-three-fifths">
-            ꜩ {profile.tips.toNumber() / 1000000}
+            ꜩ {$store.bloggerAccount.tips.toNumber() / 1000000}
           </div>
         </div>
         <div class="columns is-mobile">
           <div class="column is-two-fifth">Current Balance</div>
           <div class="column is-three-fifths">
-            ꜩ {profile.balance.toNumber() / 1000000}
+            ꜩ {$store.bloggerAccount.balance.toNumber() / 1000000}
           </div>
         </div>
         {#if $store.favoriteList && $store.favoriteList.length > 0}
@@ -355,54 +334,56 @@
             </div>
           </div>
         {/if}
-        <div class="columns">
-          <div class="column is-two-fifth">Blog posts</div>
-          <div class="column is-three-fifths">
-            {#if profile.postsList.length === 0}
-              <div in:fade={{ delay: 400 }}>
-                <button
-                  class="button is-primary is-light is-small"
-                  on:click={() => push('/upload')}>
-                  Write your first post!
-                </button>
-              </div>
-            {:else}
-              {#each profile.postsList as post}
-                <div
-                  class="columns is-mobile"
-                  out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
-                  <div class="column is-two-fifths">
-                    <a href={`/#/post/${post.ipfsHash}`}>
-                      {post.ipfsHash.slice(0, 10)}...
-                    </a>
-                  </div>
-                  <div class="column is-two-fifths">
-                    <span class="is-size-7">
-                      {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
-                    </span>
-                  </div>
-                  <div class="column is-one-fifth">
-                    {#if waitingForRemoval === post.ipfsHash}
-                      <button class="button is-danger is-loading is-small">
-                        Loading
-                      </button>
-                    {:else}
-                      <img
-                        class="menu-icon"
-                        src="menu-icons/trash.svg"
-                        alt="delete"
-                        on:click={() => {
-                          hashToDelete = post.ipfsHash;
-                          deletePostModal = true;
-                        }} />
-                    {/if}
-                  </div>
-                </div>
-              {/each}
-            {/if}
+        <hr />
+        <h1 class="title is-size-4">Blog Posts</h1>
+        {#if $store.bloggerAccount.postsList.length === 0}
+          <div in:fade={{ delay: 400 }}>
+            <button
+              class="button is-primary is-light is-small"
+              on:click={() => push('/upload')}>
+              Write your first post!
+            </button>
           </div>
-        </div>
-      {:else if noProfile}
+        {:else}
+          {#each $store.bloggerAccount.postsList as title}
+            <div
+              class="columns is-mobile"
+              out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
+              {#await $store.bloggerAccount.posts.get(title)}
+                <div class="column is-12">Loading post data...</div>
+              {:then post}
+                <div class="column is-two-fifths has-text-left">
+                  <a
+                    href={`/#/post/${$store.bloggerAccount && $store.bloggerAccount.name ? $store.bloggerAccount.name : $store.userAddress}/${title}`}>
+                    {decodeURIComponent(title)}
+                  </a>
+                </div>
+                <div class="column is-two-fifths has-text-centered">
+                  <span class="is-size-7">
+                    {moment(Date.parse(post.timestamp)).format('MMM Do Y')}
+                  </span>
+                </div>
+                <div class="column is-one-fifth has-text-right">
+                  {#if waitingForRemoval === post.ipfs_hash}
+                    <button class="button is-danger is-loading is-small">
+                      Loading
+                    </button>
+                  {:else}
+                    <img
+                      class="menu-icon"
+                      src="menu-icons/trash.svg"
+                      alt="delete"
+                      on:click={() => {
+                        hashToDelete = post.ipfs_hash;
+                        deletePostModal = true;
+                      }} />
+                  {/if}
+                </div>
+              {/await}
+            </div>
+          {/each}
+        {/if}
+      {:else if $store.bloggerAccount === null}
         <div>You must create an account to see your profile!</div>
       {/if}
     </div>

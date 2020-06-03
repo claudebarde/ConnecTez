@@ -104,9 +104,9 @@
         method: "POST"
       });
       const results = await data.json();
-      sortedResults = results
-        .sort((a, b) => (a.timestamp > b.timestamp ? -1 : 1))
-        .map(entry => entry.ipfs_pin_hash);
+      sortedResults = results.sort((a, b) =>
+        a.timestamp > b.timestamp ? -1 : 1
+      );
     } catch (error) {
       console.log(error);
     }
@@ -211,13 +211,24 @@
       try {
         const blogger = await $store.storage.bloggers.get($store.userAddress);
         if (blogger.account) {
-          store.updateBloggerAccount(blogger);
+          const accountInstance = await Tezos.contract.at(blogger.account);
+          const storage = await accountInstance.storage();
+          const balance = await Tezos.tz.getBalance(blogger.account);
+          store.updateBloggerAccount({
+            ...blogger,
+            ...storage,
+            balance,
+            instance: accountInstance
+          });
         } else {
           store.updateBloggerAccount(null);
         }
       } catch (err) {
+        console.log(err);
         store.updateBloggerAccount(null);
       }
+    } else if (!$store.userAddress && $store.bloggerAccount === undefined) {
+      store.updateBloggerAccount(null);
     }
   });
 

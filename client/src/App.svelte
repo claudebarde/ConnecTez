@@ -11,7 +11,7 @@
 
   const routes = {
     "/": Home,
-    "/post/:ipfsHash": Post,
+    "/post/:blogger/:title": Post,
     "/upload": Upload,
     "/profile": Profile,
     "/blogger/:address": Blogger,
@@ -40,7 +40,7 @@
 
   footer {
     flex-shrink: 0;
-    padding: 10px 0px;
+    padding: 20px 0px 10px 0px;
   }
 </style>
 

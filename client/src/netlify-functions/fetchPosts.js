@@ -43,9 +43,10 @@ exports.handler = async (event, context) => {
     }*/
 
     const posts = response.data.rows.map((el) => ({
-      ipfs_pin_hash: el.ipfs_pin_hash,
+      ipfsHash: el.ipfs_pin_hash,
       timestamp: el.metadata.keyvalues.timestamp,
       id: el.metadata.name.replace(`tzblgipfs-${req.network}-post-`, ""),
+      urlTitle: el.metadata.keyvalues.urlTitle,
     }));
 
     return {

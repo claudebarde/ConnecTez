@@ -2,6 +2,7 @@
   import { onMount, afterUpdate } from "svelte";
   import { slide, fade, fly } from "svelte/transition";
   import { Remarkable } from "remarkable";
+  import { validateAddress } from "@taquito/utils";
   import moment from "moment";
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
@@ -26,38 +27,46 @@
   });
 
   afterUpdate(async () => {
-    if (params.ipfsHash && $store.storage && loading) {
+    if (
+      params.blogger &&
+      params.title &&
+      $store.storage &&
+      $store.bloggerAccount !== undefined &&
+      loading
+    ) {
+      let address = params.blogger;
       // checks if the hash exists in the smart contract
+      let postInfo, bloggersAccountStorage;
       try {
-        if (
-          $store.storage.last_posts.filter(el => el === params.ipfsHash)
-            .length === 0 &&
-          $store.storage.highlights.filter(
-            el => el.ipfs_hash === params.ipfsHash
-          ).length === 0
-        ) {
-          throw new Error("Unknown IPFS hash");
+        // fetches blogger's address if name is provided
+        if (validateAddress(address) !== 3) {
+          address = await $store.storage.bloggersNameToAddress.get(
+            params.blogger
+          );
+        }
+        if (address === $store.userAddress) {
+          // if request comes from blogger who wrote the post
+          postInfo = await $store.bloggerAccount.posts.get(params.title);
+        } else {
+          // if request comes from an other user
+          // fetches blogger's account address
+          const blogger = await $store.storage.bloggers.get(address);
+          // gets blogger's posts
+          const bloggersAccount = await $store.TezosProvider.contract.at(
+            blogger.account
+          );
+          bloggersAccountStorage = await bloggersAccount.storage();
+          // saves total tips
+          tips = bloggersAccountStorage.tips.toNumber();
+          // fetches IPFS hash
+          postInfo = await bloggersAccountStorage.posts.get(params.title);
         }
 
         const postIPFS = await fetch(
-          `https://gateway.pinata.cloud/ipfs/${params.ipfsHash}`
+          `https://gateway.pinata.cloud/ipfs/${postInfo.ipfs_hash}`
         );
         const pendingPost = await postIPFS.json();
-        /*
-         *  THIS CODE INJECTS POST ID TO MAKE IT WORK
-         *  WITH POSTS THAT WERE UPLOADED BEFORE THE ID WAS INCLUDED IN THE CONTENT
-         *  TODO: TO REMOVE WHEN DAPP IS DEPLOYED ON MAINNET
-         */
-        const idMatches = {
-          QmRQJjrX31vRxpZaUT263z4MYToVTRsJc5LKX82k1KZ91J: "c8ox5smh3ow044178",
-          QmbvUPziDJ6STBC55zz2VKwxsp1S4rn125pEUT62NDLMgc: "9xtjp5hgmc8028989",
-          QmXPEdHr2oYyNTRFRaYWbhDVSsXXQXyBFjzWFtG9mx868C: "ae5ax854i7k051430",
-          QmaGrrA7HUhpkizUj1FgZJonLSnAAaXq6VsTQjnrVc7AAG: "gq7o0fq4wew053305",
-          QmcmDv1LHGaZiwsj5nikBudjESh7jHaPj9hbfFRqGwKQMC: "d44rkyfyw28063601"
-        };
-        if (idMatches.hasOwnProperty(params.ipfsHash)) {
-          pendingPost.id = idMatches[params.ipfsHash];
-        }
+
         // checks if post has required properties
         config.postProps.forEach(prop => {
           if (!pendingPost.hasOwnProperty(prop)) {
@@ -80,13 +89,12 @@
           } else {
             author = store.shortenAddress(post.author);
           }
-          tips = info.total_tips.toNumber();
         } catch (error) {
           author = store.shortenAddress(post.author);
           console.log(error);
         }
       }
-    } else if (!params.ipfsHash) {
+    } else if (!params.blogger && !params.title) {
       post = "error";
     }
   });
@@ -254,7 +262,7 @@
               <p>
                 Posted by
                 <span
-                  on:click={() => push(`#/blogger/${post.author}`)}
+                  on:click={() => push(`#/blogger/${author}`)}
                   class="author-link is-bold">
                   {!author ? store.shortenAddress(post.author) : author}
                 </span>

@@ -165,7 +165,7 @@
                 <div class="tile is-child is-hidden-touch" style="display:flex">
                   <BlogCard
                     maxHeight={500}
-                    ipfsHash={chunk[0]}
+                    postInfo={chunk[0]}
                     type="normal"
                     orientation="portrait" />
                 </div>
@@ -174,7 +174,7 @@
                   style="display:flex">
                   <BlogCard
                     maxHeight={200}
-                    ipfsHash={chunk[0]}
+                    postInfo={chunk[0]}
                     type="normal"
                     orientation="portrait" />
                 </div>
@@ -186,7 +186,7 @@
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
                       maxHeight={200}
-                      ipfsHash={chunk[1]}
+                      postInfo={chunk[1]}
                       type="normal"
                       orientation="portrait" />
                   </div>
@@ -195,7 +195,7 @@
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
                       maxHeight={200}
-                      ipfsHash={chunk[2]}
+                      postInfo={chunk[2]}
                       type="normal"
                       orientation="portrait" />
                   </div>
@@ -205,7 +205,7 @@
                 <div class="tile is-child">
                   <BlogCard
                     maxHeight={100}
-                    ipfsHash={chunk[3]}
+                    postInfo={chunk[3]}
                     type="normal"
                     orientation="portrait" />
                 </div>
@@ -220,7 +220,7 @@
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
                       maxHeight={200}
-                      ipfsHash={chunk[1]}
+                      postInfo={chunk[1]}
                       type="normal"
                       orientation="portrait" />
                   </div>
@@ -229,7 +229,7 @@
                   <div class="tile is-child" style="display:flex">
                     <BlogCard
                       maxHeight={200}
-                      ipfsHash={chunk[2]}
+                      postInfo={chunk[2]}
                       type="normal"
                       orientation="portrait" />
                   </div>
@@ -239,7 +239,7 @@
                 <div class="tile is-child">
                   <BlogCard
                     maxHeight={200}
-                    ipfsHash={chunk[3]}
+                    postInfo={chunk[3]}
                     type="normal"
                     orientation="portrait" />
                 </div>
@@ -250,7 +250,7 @@
                 <div class="tile is-child" style="display:flex">
                   <BlogCard
                     maxHeight={500}
-                    ipfsHash={chunk[0]}
+                    postInfo={chunk[0]}
                     type="normal"
                     orientation="portrait" />
                 </div>
@@ -264,7 +264,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={200}
-                ipfsHash={chunk[0]}
+                postInfo={chunk[0]}
                 type="normal"
                 orientation="portrait" />
             </div>
@@ -273,7 +273,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={200}
-                ipfsHash={chunk[1]}
+                postInfo={chunk[1]}
                 type="normal"
                 orientation="portrait" />
             </div>
@@ -282,7 +282,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={200}
-                ipfsHash={chunk[2]}
+                postInfo={chunk[2]}
                 type="normal"
                 orientation="portrait" />
             </div>
@@ -294,7 +294,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={200}
-                ipfsHash={chunk[0]}
+                postInfo={chunk[0]}
                 type="normal"
                 orientation="portrait" />
             </div>
@@ -303,7 +303,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={200}
-                ipfsHash={chunk[1]}
+                postInfo={chunk[1]}
                 type="normal"
                 orientation="portrait" />
             </div>
@@ -315,7 +315,7 @@
             <div class="tile is-child">
               <BlogCard
                 maxHeight={100}
-                ipfsHash={chunk[0]}
+                postInfo={chunk[0]}
                 type="normal"
                 orientation="landscape" />
             </div>
