@@ -5,7 +5,7 @@
   import { push } from "svelte-spa-router";
   import store from "../store/store.js";
 
-  let generalInfo, profile;
+  let profile;
   let loading = true;
   let deletePostModal = false;
   let hashToDelete = undefined;
@@ -54,21 +54,6 @@
     }
   };
 
-  const getPostInfo = async posts =>
-    Promise.all(
-      posts.map(async hash => {
-        const post = await $store.storage.all_posts.get(hash);
-        if (post.author === $store.userAddress) {
-          return Promise.resolve({
-            ipfsHash: hash,
-            timestamp: post.timestamp
-          });
-        } else {
-          return Promise.reject("Addresses do not match");
-        }
-      })
-    );
-
   const formatUserName = event => {
     let user = event.target.value.replace(/ /g, "-");
     userName = user;
@@ -100,18 +85,25 @@
   afterUpdate(async () => {
     if ($store.storage && $store.userAddress && loading) {
       try {
+        // gets blogger's info from Manager contract
         const info = await $store.storage.bloggers.get($store.userAddress);
-        generalInfo = { ...info };
-        // adds info to IPFS hashes
-        profile = {
-          ...info,
-          posts_set: await getPostInfo(info.posts_set),
-          name: !info.name ? null : info.name
-        };
-        loading = false;
+        // gets blogger's info from Account contract
+        if (info.account) {
+          const account = await $store.TezosProvider.contract.at(info.account);
+          const storage = await account.storage();
+          const balance = await $store.TezosProvider.tz.getBalance(
+            info.account
+          );
+          profile = { ...info, ...storage, balance };
+          console.log(profile);
+        } else {
+          throw "No account found!";
+        }
+        noProfile = false;
       } catch (error) {
         //console.log(error);
         noProfile = true;
+      } finally {
         loading = false;
       }
     }
@@ -253,7 +245,6 @@
                         class="button is-light is-danger is-small"
                         on:click={() => {
                           addNameInputOpen = false;
-                          profile = { ...profile, name: generalInfo.name };
                         }}>
                         Cancel
                       </button>
@@ -288,7 +279,6 @@
                         class="button is-light is-danger is-small"
                         on:click={() => {
                           addNameInputOpen = false;
-                          profile = { ...profile, name: generalInfo.name };
                         }}>
                         Cancel
                       </button>
@@ -312,13 +302,13 @@
         <div class="columns is-mobile">
           <div class="column is-two-fifth">Total Tips</div>
           <div class="column is-three-fifths">
-            ꜩ {profile.total_tips.toNumber() / 1000000}
+            ꜩ {profile.tips.toNumber() / 1000000}
           </div>
         </div>
         <div class="columns is-mobile">
-          <div class="column is-two-fifth">Current Tips</div>
+          <div class="column is-two-fifth">Current Balance</div>
           <div class="column is-three-fifths">
-            ꜩ {$store.userTips / 1000000}
+            ꜩ {profile.balance.toNumber() / 1000000}
           </div>
         </div>
         {#if $store.favoriteList && $store.favoriteList.length > 0}
@@ -331,7 +321,8 @@
                     class="button is-info is-light is-small"
                     aria-haspopup="true"
                     aria-controls="dropdown-menu"
-                    on:click={() => (displayFavoriteList = !displayFavoriteList)}>
+                    on:click={() => (displayFavoriteList = !displayFavoriteList)}
+                    on:blur={() => (displayFavoriteList = false)}>
                     <span>Favorite list</span>
                     <span class="icon is-small">
                       <img
@@ -367,10 +358,16 @@
         <div class="columns">
           <div class="column is-two-fifth">Blog posts</div>
           <div class="column is-three-fifths">
-            {#if profile.posts_set.length === 0}
-              <div in:fade={{ delay: 400 }}>No post yet</div>
+            {#if profile.postsList.length === 0}
+              <div in:fade={{ delay: 400 }}>
+                <button
+                  class="button is-primary is-light is-small"
+                  on:click={() => push('/upload')}>
+                  Write your first post!
+                </button>
+              </div>
             {:else}
-              {#each profile.posts_set as post}
+              {#each profile.postsList as post}
                 <div
                   class="columns is-mobile"
                   out:fly={waitingForRemoval ? { x: 200, duration: 400 } : { x: 0, duration: 0 }}>
@@ -406,7 +403,7 @@
           </div>
         </div>
       {:else if noProfile}
-        <div>Write a post to see your account information!</div>
+        <div>You must create an account to see your profile!</div>
       {/if}
     </div>
   </div>

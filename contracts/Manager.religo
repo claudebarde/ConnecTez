@@ -5,7 +5,7 @@ type highlight = {
   creator: address
 };
 
-type bloggerInfo = {account: address, name: option (string)};
+type bloggerInfo = {account: address, name: option (string), other: map(string, string)};
 
 type storage = {
   bloggers: big_map(address, bloggerInfo),
@@ -47,7 +47,7 @@ let addBlogger = (bloggerAddr: address, accountAddr: address, s: storage): retur
       switch(Big_map.find_opt(bloggerAddr, s.bloggers)) {
         | Some (b) => failwith("BloggerAlreadyExists"): return ;
         | None => {
-            let info = {account: accountAddr, name: None: option (string)} ;
+            let info = {account: accountAddr, name: None: option (string), other: Map.empty: map(string, string)} ;
 
             ([]: list (operation), 
             {...s, bloggers: Big_map.add(bloggerAddr, info, s.bloggers)})

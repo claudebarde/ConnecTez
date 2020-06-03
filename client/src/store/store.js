@@ -8,11 +8,10 @@ const store = () => {
     TezosProvider: undefined,
     userAddress: undefined,
     userBalance: undefined,
-    userName: undefined,
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1MEp2woeDB4tSyEZuYdWNJzE7L7Y8BV6dn"
+        ? "KT1Ri8eZAR78i2sBNtMp9S6ZEe6VckQsZtCX"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",
@@ -53,7 +52,10 @@ const store = () => {
       update((currentStore) => ({ ...currentStore, bloggerAccount: account }));
     },
     updateUserName: (userName) => {
-      update((currentStore) => ({ ...currentStore, userName }));
+      update((currentStore) => ({
+        ...currentStore,
+        bloggerAccount: { ...currentStore.bloggerAccount, name: userName },
+      }));
     },
     updateTrendingTags: (tags) => {
       update((currentStore) => ({ ...currentStore, trendingTags: tags }));

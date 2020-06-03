@@ -29,19 +29,33 @@
 </script>
 
 <style>
+  .ui {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .ui-main {
+    flex: 1 0 auto;
+  }
+
   footer {
-    padding: 20px 0px;
+    flex-shrink: 0;
+    padding: 10px 0px;
   }
 </style>
 
 <Navbar />
-<Router {routes} on:routeLoaded={routeLoaded} />
-<footer class="is-size-7 has-text-centered">
-  <p>🌮 All rights reserved 2020, Claude Barde 🌮</p>
-  <p>
-    The identicons are provided by
-    <a href="https://tzkt.io" target="_blank" rel="noopener noreferrer">
-      Baking Bad
-    </a>
-  </p>
-</footer>
+<div class="ui">
+  <div class="ui-main">
+    <Router {routes} on:routeLoaded={routeLoaded} />
+  </div>
+  <footer class="is-size-7 has-text-centered">
+    <p>🌮 All rights reserved 2020, Claude Barde 🌮</p>
+    <p>
+      The identicons are provided by
+      <a href="https://tzkt.io" target="_blank" rel="noopener noreferrer">
+        Baking Bad
+      </a>
+    </p>
+  </footer>
+</div>

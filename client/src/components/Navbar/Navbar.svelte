@@ -210,8 +210,11 @@
     ) {
       try {
         const blogger = await $store.storage.bloggers.get($store.userAddress);
-        console.log(blogger);
-        store.updateBloggerAccount(blogger.account);
+        if (blogger.account) {
+          store.updateBloggerAccount(blogger);
+        } else {
+          store.updateBloggerAccount(null);
+        }
       } catch (err) {
         store.updateBloggerAccount(null);
       }
@@ -420,7 +423,7 @@
         on:click={() => push('/upload')}>
         Upload
       </div>
-      {#if $store.userAddress}
+      {#if $store.bloggerAccount}
         <div
           class="navbar-item navbar-item-custom"
           class:navbar-navigation={!$store.darkMode}
@@ -467,7 +470,7 @@
           {#if $store.darkMode}
             <div class="tags has-addons">
               <span class="tag is-light">
-                ꜩ {$store.userBalance.toNumber() / 1000000}
+                ꜩ {($store.userBalance.toNumber() / 1000000).toLocaleString('en-US')}
               </span>
               <span class="tag is-success">
                 {store.shortenAddress($store.userAddress)}
@@ -481,7 +484,7 @@
           {:else}
             <div class="tags has-addons">
               <span class="tag">
-                ꜩ {$store.userBalance.toNumber() / 1000000}
+                ꜩ {($store.userBalance.toNumber() / 1000000).toLocaleString('en-US')}
               </span>
               <span class="tag is-success is-light">
                 {store.shortenAddress($store.userAddress)}
