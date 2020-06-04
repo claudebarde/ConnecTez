@@ -120,11 +120,11 @@
               </figure>
               <div
                 class="media-content"
-                on:click={() => push(`/post/${validateAddress(author) === 3 ? store.shortenAddress(author) : author}/${postInfo.urlTitle}`)}
+                on:click={() => push(`/post/${author}/${postInfo.urlTitle}`)}
                 style="cursor:pointer">
                 <p class="title is-5">{post.title}</p>
                 <p class="subtitle is-6">
-                  {!author ? 'loading...' : 'From ' + validateAddress(author) === 3 ? store.shortenAddress(author) : author}
+                  {!author ? 'loading...' : 'From ' + (validateAddress(author) === 3 ? store.shortenAddress(author) : author)}
                   <Avatar seed={post.author} size="small" />
                 </p>
               </div>
@@ -187,11 +187,11 @@
           </figure>
           <div
             class="media-content"
-            on:click={() => push(`/post/${validateAddress(author) === 3 ? store.shortenAddress(author) : author}/${postInfo.urlTitle}`)}
+            on:click={() => push(`/post/${author}/${postInfo.urlTitle}`)}
             style="cursor:pointer">
             <p class="title is-5">{post.title}</p>
             <p class="subtitle is-6">
-              {!author ? 'loading...' : 'From ' + author}
+              {!author ? 'loading...' : 'From ' + (validateAddress(author) === 3 ? store.shortenAddress(author) : author)}
               <Avatar seed={post.author} size="small" />
             </p>
           </div>

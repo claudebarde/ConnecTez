@@ -44,7 +44,7 @@
 
   const withdrawTips = async () => {
     try {
-      const op = await $store.contractInstance.methods
+      const op = await $store.bloggerAccount.instance.methods
         .withdraw([["unit"]])
         .send();
       await op.confirmation(1);
@@ -110,6 +110,8 @@
     } catch (error) {
       console.log(error);
     }
+
+    console.log(sortedResults);
     // removes highlights from last_posts list
     // TODO: QUICK FIX UNTIL NEW CONTRACT IS DEPLOYED "if storage.highlights"
     if (storage.highlights) {
@@ -203,11 +205,7 @@
 
   afterUpdate(async () => {
     // checks if the address is not already associated with an account
-    if (
-      $store.userAddress &&
-      $store.storage &&
-      $store.bloggerAccount === undefined
-    ) {
+    if ($store.userAddress && $store.storage && !$store.bloggerAccount) {
       try {
         const blogger = await $store.storage.bloggers.get($store.userAddress);
         if (blogger.account) {
@@ -227,7 +225,7 @@
         console.log(err);
         store.updateBloggerAccount(null);
       }
-    } else if (!$store.userAddress && $store.bloggerAccount === undefined) {
+    } else if (!$store.userAddress && !$store.bloggerAccount) {
       store.updateBloggerAccount(null);
     }
   });

@@ -57,6 +57,7 @@ exports.handler = async (event, context) => {
               req.tags.slice(0, 3).map((tag) => tag.toLowerCase())
             ),
             type: req.type,
+            urlTitle: req.urlTitle,
           },
         },
         pinataContent: {

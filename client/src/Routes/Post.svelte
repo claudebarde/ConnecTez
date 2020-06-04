@@ -44,7 +44,7 @@
             params.blogger
           );
         }
-        if (address === $store.userAddress) {
+        if (address === $store.userAddress && $store.bloggerAccount) {
           // if request comes from blogger who wrote the post
           postInfo = await $store.bloggerAccount.posts.get(params.title);
         } else {
