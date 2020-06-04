@@ -1,10 +1,12 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
   import store from "../store/store.js";
   import Loader from "../components/Loader.svelte";
 
-  export let blogger;
+  export let blogger, bloggersAccount;
 
+  const dispatch = createEventDispatcher();
   const tippingAmounts = ["0.1", "0.2", "0.5", "0.8", "1", "2", "5"];
   let selectedAmount, txHash, error, confirmed;
 
@@ -12,17 +14,24 @@
     error = false;
     selectedAmount = amount;
     try {
+      // checks if blogger's account exists
+      if (!bloggersAccount) throw "NoBloggerAccountProvided";
       // sends transaction
-      const op = await $store.contractInstance.methods
-        .tip(blogger)
+      const op = await bloggersAccount.methods
+        .tip([["unit"]])
         .send({ amount: parseFloat(amount) * 1000000, mutez: true });
       txHash = op.hash;
       await op.confirmation(1);
       confirmed = true;
       // turns state back to default after 4 seconds
-      setTimeout(() => {
+      setTimeout(async () => {
+        dispatch("closeModal", true);
         confirmed = false;
         txHash = undefined;
+        // updates user's balance
+        store.updateUserBalance(
+          await $store.TezosProvider.tz.getBalance($store.userAddress)
+        );
       }, 4000);
     } catch (err) {
       error = true;

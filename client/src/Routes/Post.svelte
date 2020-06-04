@@ -17,7 +17,7 @@
   export let params;
   let loading = true;
   let md = undefined;
-  let post, author, tips;
+  let post, author, tips, bloggersAccount;
   let openTipModal = false;
   let bannerLoading = true;
 
@@ -52,7 +52,7 @@
           // fetches blogger's account address
           const blogger = await $store.storage.bloggers.get(address);
           // gets blogger's posts
-          const bloggersAccount = await $store.TezosProvider.contract.at(
+          bloggersAccount = await $store.TezosProvider.contract.at(
             blogger.account
           );
           bloggersAccountStorage = await bloggersAccount.storage();
@@ -270,7 +270,7 @@
               <p>On {moment(post.timestamp).format('MMM Do Y - h:mm A')}</p>
             </div>
             <div class="column is-2">
-              {#if $store.userAddress !== post.author}
+              {#if $store.userAddress && $store.userAddress !== post.author}
                 <div
                   class="tip-image-container"
                   on:click={() => (openTipModal = !openTipModal)}>
@@ -286,8 +286,11 @@
               {/if}
             </div>
           </div>
-          {#if openTipModal}
-            <TippingBox blogger={post.author} />
+          {#if $store.userAddress && openTipModal}
+            <TippingBox
+              blogger={post.author}
+              {bloggersAccount}
+              on:closeModal={e => (openTipModal = false)} />
           {/if}
         </div>
         <div class="columns">
