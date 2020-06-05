@@ -183,6 +183,19 @@
             );
           }
           savePost = "confirmed";
+          // adds new post to the list of last_posts
+          store.updateStorage({
+            ...$store.storage,
+            last_posts: [
+              {
+                ipfsHash: IPFSHash,
+                timestamp: Date.now(),
+                id: null,
+                urlTitle
+              },
+              ...$store.storage.last_posts
+            ]
+          });
         } else {
           if (response.error) {
             if (response.error.includes("POSTDELAY")) {
@@ -410,7 +423,9 @@
           <div class="media-content">
             {#if txHash}
               <p>
-                <strong>Waiting for confirmation from Tezos blockchain</strong>
+                <strong>
+                  Waiting for confirmation from the Tezos blockchain
+                </strong>
               </p>
               <p>This may take a few seconds, please wait.</p>
               <br />

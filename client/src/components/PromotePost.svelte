@@ -4,7 +4,7 @@
   import config from "../config.js";
   import Loader from "./Loader.svelte";
 
-  export let author, ipfsHash;
+  export let author, title;
   let openPromotionModal = undefined; // confirmation, waitingForBlockchain, confirmed
   let selectPromotionDays = 0;
   let txHash, errorMessage;
@@ -14,21 +14,21 @@
 
   const promotePost = async () => {
     if (
-      ipfsHash &&
+      title &&
       selectPromotionDays &&
       $store.storage.highlightFee.toNumber()
     ) {
       openPromotionModal = "waitingForBlockchain";
       try {
         const op = await $store.contractInstance.methods
-          .addHighlight(selectPromotionDays, ipfsHash)
+          .addHighlight(selectPromotionDays, title)
           .send({
             amount:
               $store.storage.highlightFee.toNumber() * selectPromotionDays,
             mutez: true
           });
         txHash = op.hash;
-        await op.confirmation(1);
+        await op.confirmation();
         openPromotionModal = "confirmed";
       } catch (error) {
         console.log(error);

@@ -94,52 +94,70 @@
   {#if $store.storage !== undefined}
     {#if $store.storage.highlights && $store.storage.highlights.length > 0}
       <h1 class="title is-3 has-text-centered">Highlights</h1>
-      <div class="column is-multiline highlights">
+      <div class="highlights">
         {#each store.chunkPostsList($store.storage.highlights, 3) as chunk}
           {#if chunk.length === 3}
-            <div class="column is-one-third">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[0].ipfs_hash}
-                type="highlight"
-                orientation="portrait" />
-            </div>
-            <div class="column is-one-third">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[1].ipfs_hash}
-                type="highlight"
-                orientation="portrait" />
-            </div>
-            <div class="column is-one-third">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[2].ipfs_hash}
-                type="highlight"
-                orientation="portrait" />
+            <div class="tile is-ancestor">
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={200}
+                    postInfo={chunk[0]}
+                    type="normal"
+                    orientation="portrait" />
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={200}
+                    postInfo={chunk[1]}
+                    type="normal"
+                    orientation="portrait" />
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={200}
+                    postInfo={chunk[2]}
+                    type="normal"
+                    orientation="portrait" />
+                </div>
+              </div>
             </div>
           {:else if chunk.length === 2}
-            <div class="column is-half">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[0].ipfs_hash}
-                type="highlight"
-                orientation="portrait" />
+            <div class="tile is-ancestor">
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={200}
+                    postInfo={chunk[0]}
+                    type="normal"
+                    orientation="portrait" />
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={200}
+                    postInfo={chunk[1]}
+                    type="normal"
+                    orientation="portrait" />
+                </div>
+              </div>
             </div>
-            <div class="column is-half">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[1].ipfs_hash}
-                type="highlight"
-                orientation="portrait" />
-            </div>
-          {:else if chunk.length === 1}
-            <div class="column is-full">
-              <BlogCard
-                maxHeight={200}
-                ipfsHash={chunk[0].ipfs_hash}
-                type="highlight"
-                orientation="landscape" />
+          {:else}
+            <div class="tile is-ancestor">
+              <div class="tile is-parent">
+                <div class="tile is-child">
+                  <BlogCard
+                    maxHeight={100}
+                    postInfo={chunk[0]}
+                    type="normal"
+                    orientation="landscape" />
+                </div>
+              </div>
             </div>
           {/if}
         {/each}

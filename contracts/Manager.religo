@@ -1,5 +1,5 @@
 type highlight = {
-  ipfs_hash: string,
+  title: string,
   startTime: timestamp,
   endTime: timestamp,
   creator: address
@@ -11,7 +11,7 @@ type storage = {
   bloggers: big_map(address, bloggerInfo),
   bloggersNameToAddress: big_map(string, address),
   bloggers_reserved_names: set (string),
-  highlights: list(highlight),
+  highlights: map(string, highlight),
   admin: address,
   updateNameFee: tez,
   highlightFee: tez, // per day
@@ -19,7 +19,7 @@ type storage = {
   blacklist: set (address)
 }
 
-type new_highlight = {ipfs_hash: string, duration: nat}; // duration in days
+type new_highlight = {title: string, duration: nat}; // duration in days
 
 type return = (list(operation), storage);
 
@@ -106,13 +106,27 @@ let addHighlight = ((info, s): (new_highlight, storage)): return => {
   // checks if amount equals duration * fee
   if(Tezos.amount == info.duration * s.highlightFee){
     // creates new highlight
-        let newHighlight = {
-          ipfs_hash: info.ipfs_hash,
-          startTime: Tezos.now,
-          endTime: Tezos.now + int(info.duration * 24n * 60n * 60n),
-          creator: Tezos.sender
-        };
-        ([]: list(operation), {...s, highlights: [newHighlight, ...s.highlights]});
+    let newHighlight = {
+      title: info.title,
+      startTime: Tezos.now,
+      endTime: Tezos.now + int(info.duration * 24n * 60n * 60n),
+      creator: Tezos.source
+    };
+    // removes outdated highlights
+    let folding = ((acc, binding): (map(string, highlight), (string, highlight))) => {
+      if(binding[1].endTime > Tezos.now){
+        Map.remove(binding[0], acc);
+      } else {
+        acc;
+      }
+    };
+    let newHighlights = Map.fold(folding, s.highlights, Map.empty: map(string, highlight));
+    // checks if highlight doesn't exist
+    switch(Map.find_opt(info.title, s.highlights)) {
+      | Some (h) => failwith ("HighlightTitleAlreadyExists"): return
+      | None => 
+        ([]: list(operation), {...s, highlights: Map.add(info.title, newHighlight, newHighlights)})
+    };
   } else {
     failwith("WrongAmount!"): return;
   }

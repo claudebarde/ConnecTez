@@ -10,7 +10,7 @@ const initial_storage = {
   updateNameFee: 500000,
   highlightFee: 1000000,
   bloggers_reserved_names: [],
-  highlights: [],
+  highlights: new MichelsonMap(),
   revenue: 0,
   blacklist: [],
 };

@@ -47,6 +47,7 @@ exports.handler = async (event, context) => {
       timestamp: el.metadata.keyvalues.timestamp,
       id: el.metadata.name.replace(`tzblgipfs-${req.network}-post-`, ""),
       urlTitle: el.metadata.keyvalues.urlTitle,
+      author: el.metadata.keyvalues.author,
     }));
 
     return {

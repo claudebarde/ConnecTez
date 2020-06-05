@@ -57,6 +57,11 @@
 </script>
 
 <style>
+  .columns,
+  .column {
+    height: 100%;
+  }
+
   .post-overview {
     overflow: hidden;
     position: relative;
@@ -92,6 +97,11 @@
     position: absolute;
     bottom: 10px;
   }
+
+  .landscape-card {
+    width: 100%;
+    height: 100%;
+  }
 </style>
 
 {#if post}
@@ -108,7 +118,7 @@
         </div>
       {/if}
       <div class={`column ${post.banner ? 'is-7' : 'is-12'}`}>
-        <div class="card" style="width:100%">
+        <div class="card landscape-card">
           <div class="card-content" style="height:100%;position:relative">
             <div class="media">
               <figure class="media-left">

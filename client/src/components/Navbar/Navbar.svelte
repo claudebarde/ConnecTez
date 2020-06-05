@@ -62,6 +62,7 @@
   onMount(async () => {
     navbar = document.getElementById("navbar");
     let sortedResults = [];
+    let highlights = [];
     if (config.DEV_ENV === "local") {
       Tezos.setProvider({
         rpc: "http://localhost:8732",
@@ -110,18 +111,42 @@
     } catch (error) {
       console.log(error);
     }
-
-    console.log(sortedResults);
     // removes highlights from last_posts list
-    // TODO: QUICK FIX UNTIL NEW CONTRACT IS DEPLOYED "if storage.highlights"
-    if (storage.highlights) {
-      const promotedIPFShashes = storage.highlights.map(post => post.ipfs_hash);
+    if (storage.highlights && storage.highlights.size > 0) {
+      // gets highlights info
+      highlights = await Promise.all(
+        [...storage.highlights.entries()].map(async el => {
+          try {
+            // gets blogger's info
+            const bloggerInfo = await storage.bloggers.get(el[1].creator);
+            // fetches blogger's account
+            const bloggerAccount = await Tezos.contract.at(bloggerInfo.account);
+            const accountStorage = await bloggerAccount.storage();
+            // gets blogger's post
+            const post = await accountStorage.posts.get(el[1].title);
+
+            return { ...el[1], ipfsHash: post.ipfs_hash };
+          } catch (err) {
+            console.log(err);
+            return null;
+          }
+        })
+      );
+      // removes highlighted posts from last posts (if any)
       sortedResults = sortedResults.filter(
-        ipfsHash => !promotedIPFShashes.includes(ipfsHash)
+        el =>
+          !highlights.filter(
+            highlight =>
+              highlight.creator === el.author && highlight.title === el.urlTitle
+          ).length
+      );
+      // removes outdated posts
+      highlights = highlights.filter(
+        highlight => Date.now() < Date.parse(highlight.endTime)
       );
     }
 
-    store.updateStorage({ ...storage, last_posts: sortedResults });
+    store.updateStorage({ ...storage, last_posts: sortedResults, highlights });
 
     refreshStorageInterval = setInterval(async () => {
       try {
@@ -205,7 +230,11 @@
 
   afterUpdate(async () => {
     // checks if the address is not already associated with an account
-    if ($store.userAddress && $store.storage && !$store.bloggerAccount) {
+    if (
+      $store.userAddress &&
+      $store.storage &&
+      $store.bloggerAccount === undefined
+    ) {
       try {
         const blogger = await $store.storage.bloggers.get($store.userAddress);
         if (blogger.account) {
@@ -225,9 +254,9 @@
         console.log(err);
         store.updateBloggerAccount(null);
       }
-    } else if (!$store.userAddress && !$store.bloggerAccount) {
+    } /*else if (!$store.userAddress && !$store.bloggerAccount) {
       store.updateBloggerAccount(null);
-    }
+    }*/
   });
 
   onDestroy(() => {

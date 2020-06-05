@@ -27,13 +27,7 @@
   });
 
   afterUpdate(async () => {
-    if (
-      params.blogger &&
-      params.title &&
-      $store.storage &&
-      $store.bloggerAccount !== undefined &&
-      loading
-    ) {
+    if (params.blogger && params.title && $store.storage && loading) {
       let address = params.blogger;
       // checks if the hash exists in the smart contract
       let postInfo, bloggersAccountStorage;
@@ -295,7 +289,7 @@
         </div>
         <div class="columns">
           <div class="column is-half is-offset-half has-text-right">
-            <PromotePost author={post.author} ipfsHash={params.ipfsHash} />
+            <PromotePost author={post.author} title={params.title} />
           </div>
         </div>
         <div class="content">
