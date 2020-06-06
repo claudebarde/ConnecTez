@@ -6,6 +6,7 @@
   import { push, location } from "svelte-spa-router";
   import store from "../../store/store";
   import config from "../../config.js";
+  import ConnectWalletButton from "./ConnectWalletButton.svelte";
 
   let refreshStorageInterval;
   let isSidebarVisible = false;
@@ -24,23 +25,6 @@
     navbar.style.backgroundColor = "transparent";
     navbar.classList.remove("has-shadow");
   }
-
-  const initWallet = async () => {
-    try {
-      // gets user's address
-      const address = await window.tezbridge.request({ method: "get_source" });
-      store.updateUserAddress(address);
-      // gets user's balance
-      const balance = await Tezos.tz.getBalance(address);
-      store.updateUserBalance(balance);
-      // saves the address in local storage for autoconnection on the next visit
-      if (window.localStorage) {
-        window.localStorage.setItem("previousAddress", address);
-      }
-    } catch (error) {
-      console.log("error fetching the address or balance:", error);
-    }
-  };
 
   const withdrawTips = async () => {
     try {
@@ -65,23 +49,20 @@
     let highlights = [];
     if (config.DEV_ENV === "local") {
       Tezos.setProvider({
-        rpc: "http://localhost:8732",
-        signer: new TezBridgeSigner()
+        rpc: "http://localhost:8732"
       });
     } else if (config.DEV_ENV === "carthage") {
       Tezos.setProvider({
-        rpc: "https://carthagenet.SmartPy.io",
-        signer: new TezBridgeSigner()
+        rpc: "https://carthagenet.SmartPy.io"
       });
     } else if (config.DEV_ENV === "main") {
       Tezos.setProvider({
-        rpc: "",
-        signer: new TezBridgeSigner()
+        rpc: ""
       });
     }
     store.setTezosProvider(Tezos);
     // creates contract instance
-    const contract = await Tezos.contract.at($store.contractAddress);
+    const contract = await Tezos.wallet.at($store.contractAddress);
     store.updateContractInstance(contract);
     // fetches contract storage
     const storage = await contract.storage();
@@ -125,7 +106,13 @@
             // gets blogger's post
             const post = await accountStorage.posts.get(el[1].title);
 
-            return { ...el[1], ipfsHash: post.ipfs_hash };
+            return {
+              urlTitle: el[1].title,
+              author: el[1].creator,
+              ipfsHash: post.ipfs_hash,
+              startTime: el[1].startTime,
+              endTime: el[1].endTime
+            };
           } catch (err) {
             console.log(err);
             return null;
@@ -137,7 +124,8 @@
         el =>
           !highlights.filter(
             highlight =>
-              highlight.creator === el.author && highlight.title === el.urlTitle
+              highlight.author === el.author &&
+              highlight.urlTitle === el.urlTitle
           ).length
       );
       // removes outdated posts
@@ -221,6 +209,11 @@
         store.updateUserAddress(address);
         const balance = await Tezos.tz.getBalance(address);
         store.updateUserBalance(balance);
+        // updates Tezos Provider
+        store.setTezosProvider({
+          ...$store.TezosProvider,
+          signer: new TezBridgeSigner()
+        });
       } catch (error) {
         store.updateUserAddress(undefined);
         store.updateUserBalance(undefined);
@@ -486,7 +479,7 @@
             Github Repo
           </a>
           <a
-            href="https://you.better-call.dev/carthagenet/KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC/operations"
+            href={`https://you.better-call.dev/carthagenet/${$store.contractAddress}/operations`}
             target="_blank"
             rel="noopener noreferrer"
             class="navbar-item"
@@ -534,14 +527,8 @@
               {/if}
             </div>
           {/if}
-        {:else if $store.darkMode}
-          <button class="button is-info" on:click={initWallet}>
-            Connect wallet
-          </button>
         {:else}
-          <button class="button is-info is-light" on:click={initWallet}>
-            Connect wallet
-          </button>
+          <ConnectWalletButton />
         {/if}
       </div>
       {#if $location.includes('/post/')}

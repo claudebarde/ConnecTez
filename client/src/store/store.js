@@ -6,12 +6,14 @@ const store = () => {
     DEV_ENV: config.DEV_ENV,
     darkMode: false,
     TezosProvider: undefined,
+    walletProvider: undefined,
+    beaconWallet: undefined,
     userAddress: undefined,
     userBalance: undefined,
     userTips: 0,
     contractAddress:
       config.DEV_ENV === "local"
-        ? "KT1EwZcwfuHDTY4iCPcgs53yneuVcLMtKNXx"
+        ? "KT1NBqnm6zVsPeV4Pu23AZ2BSbQyb75JcKYX"
         : config.DEV_ENV === "carthage"
         ? "KT1FvmwJTzzQx2ntMiQ4re3vSA9uFtgAAFiC"
         : "",
@@ -26,6 +28,9 @@ const store = () => {
     subscribe,
     setTezosProvider: (Tezos) => {
       update((currentStore) => ({ ...currentStore, TezosProvider: Tezos }));
+    },
+    updateWalletProvider: (provider) => {
+      update((currentStore) => ({ ...currentStore, walletProvider: provider }));
     },
     updateUserAddress: (address) => {
       update((currentStore) => ({ ...currentStore, userAddress: address }));
@@ -59,6 +64,9 @@ const store = () => {
     },
     updateTrendingTags: (tags) => {
       update((currentStore) => ({ ...currentStore, trendingTags: tags }));
+    },
+    updateBeaconWallet: (wallet) => {
+      update((currentStore) => ({ ...currentStore, beaconWallet: wallet }));
     },
     toggleDarkMode: (status) => {
       const dark = "#2d3748";

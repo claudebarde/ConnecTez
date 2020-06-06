@@ -20,8 +20,8 @@
       const op = await bloggersAccount.methods
         .tip([["unit"]])
         .send({ amount: parseFloat(amount) * 1000000, mutez: true });
-      txHash = op.hash;
-      await op.confirmation(1);
+      txHash = op.opHash;
+      await op.confirmation();
       confirmed = true;
       // turns state back to default after 4 seconds
       setTimeout(async () => {

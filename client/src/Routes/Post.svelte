@@ -46,7 +46,7 @@
           // fetches blogger's account address
           const blogger = await $store.storage.bloggers.get(address);
           // gets blogger's posts
-          bloggersAccount = await $store.TezosProvider.contract.at(
+          bloggersAccount = await $store.TezosProvider.wallet.at(
             blogger.account
           );
           bloggersAccountStorage = await bloggersAccount.storage();
