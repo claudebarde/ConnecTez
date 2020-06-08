@@ -88,7 +88,7 @@
       try {
         const url =
           process.env.NODE_ENV === "development"
-            ? "http://localhost:34567/fetchUnsplashPhoto"
+            ? `http://localhost:${config.NETLIFY_PORT}/fetchUnsplashPhoto`
             : "https://connectez.cc/.netlify/functions/fetchUnsplashPhoto";
         const data = await fetch(url, {
           body: JSON.stringify({
@@ -133,7 +133,7 @@
 
     const PINJSON =
       process.env.NODE_ENV === "development"
-        ? "http://localhost:34567/pinJSON"
+        ? `http://localhost:${config.NETLIFY_PORT}/pinJSON`
         : "https://connectez.cc/.netlify/functions/pinJSON";
     try {
       // checks if title and post is provided
@@ -221,7 +221,7 @@
       if (IPFSHash) {
         const UNPINJSON =
           process.env.NODE_ENV === "development"
-            ? "http://localhost:34567/unpinJSON"
+            ? `http://localhost:${config.NETLIFY_PORT}/unpinJSON`
             : "https://connectez.cc/.netlify/functions/unpinJSON";
         const response = await fetch(UNPINJSON, {
           body: JSON.stringify({ hash: IPFSHash }),
@@ -328,8 +328,16 @@
 </style>
 
 <svelte:head>
-  <title>ConnecTez</title>
+  <title>New Post - ConnecTez</title>
+  <link
+    rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/atom-one-dark.min.css" />
+  <script
+    src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js">
+
+  </script>
 </svelte:head>
+
 <svelte:window on:beforeunload={checkPostStatus} />
 {#if $store.userAddress}
   <!-- MODAL TO CONFIRM UPLOAD TO IPFS -->

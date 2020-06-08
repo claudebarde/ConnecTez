@@ -22,10 +22,13 @@
       store.updateWalletProvider("tezbridge");
       if (config.DEV_ENV === "local") {
         // sending money to Beacon address for testing purposes
-        await $store.TezosProvider.contract.transfer({
-          to: "tz1a53c5dfKMRGjk7SZs7n7M3oPpj1VPnXzD",
-          amount: 10000
-        });
+        const op = await $store.TezosProvider.wallet
+          .transfer({
+            to: "tz1a53c5dfKMRGjk7SZs7n7M3oPpj1VPnXzD",
+            amount: 10000
+          })
+          .send();
+        await op.confirmation();
       }
     } catch (error) {
       console.log("error fetching the address or balance:", error);
@@ -45,7 +48,7 @@
       };
       $store.TezosProvider.setWalletProvider(wallet);
 
-      const response = await wallet.requestPermissions({ network });
+      await wallet.requestPermissions({ network });
       if (wallet.permissions.address) {
         // saves user's address
         store.updateUserAddress(wallet.permissions.address);

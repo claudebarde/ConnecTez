@@ -8,7 +8,7 @@
       try {
         const url =
           process.env.NODE_ENV === "development"
-            ? "http://localhost:34567/searchTrendingTags"
+            ? `http://localhost:${config.NETLIFY_PORT}/searchTrendingTags`
             : "https://connectez.cc/.netlify/functions/searchTrendingTags";
         const data = await fetch(url, {
           body: JSON.stringify({ network: config.DEV_ENV }),

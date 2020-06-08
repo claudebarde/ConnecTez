@@ -20,7 +20,7 @@
     try {
       const url =
         process.env.NODE_ENV === "development"
-          ? "http://localhost:34567/searchPosts"
+          ? `http://localhost:${config.NETLIFY_PORT}/searchPosts`
           : "https://connectez.cc/.netlify/functions/searchPosts";
       const data = await fetch(url, {
         body: JSON.stringify({ input, type, value, network: config.DEV_ENV }),

@@ -21,7 +21,7 @@
       // unpins JSON content from Pinata
       const UNPINJSON =
         process.env.NODE_ENV === "development"
-          ? "http://localhost:34567/unpinJSON"
+          ? `http://localhost:${config.NETLIFY_PORT}/unpinJSON`
           : "https://tezos-ipfs-blog.netlify.com/.netlify/functions/unpinJSON";
       const response = await fetch(UNPINJSON, {
         body: JSON.stringify({ hash: hashToDelete }),

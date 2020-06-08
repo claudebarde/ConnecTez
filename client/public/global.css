@@ -96,3 +96,11 @@ body {
 .banner-loading span:nth-child(3) {
   animation-delay: 0.4s;
 }
+
+pre {
+  background-color: #282d33;
+  color: #abb3bf;
+  border-radius: 10px;
+  width: 90%;
+  margin: 0 auto;
+}

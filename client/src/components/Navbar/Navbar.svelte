@@ -77,7 +77,7 @@
     try {
       const urlToFetchPosts =
         process.env.NODE_ENV === "development"
-          ? "http://localhost:34567/fetchPosts"
+          ? `http://localhost:${config.NETLIFY_PORT}/fetchPosts`
           : "https://connectez.cc/.netlify/functions/fetchPosts";
       const data = await fetch(urlToFetchPosts, {
         body: JSON.stringify({
@@ -86,9 +86,13 @@
         method: "POST"
       });
       const results = await data.json();
-      sortedResults = results.sort((a, b) =>
-        a.timestamp > b.timestamp ? -1 : 1
-      );
+      if (results && Array.isArray(results)) {
+        sortedResults = results.sort((a, b) =>
+          a.timestamp > b.timestamp ? -1 : 1
+        );
+      } else {
+        throw results;
+      }
     } catch (error) {
       console.log(error);
     }

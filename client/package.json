@@ -21,7 +21,7 @@
     "@dicebear/avatars": "^4.0.5",
     "@dicebear/avatars-bottts-sprites": "^4.0.5",
     "@taquito/beacon-wallet": "^6.3.0-wallet.4",
-    "@taquito/taquito": "^6.3.0-wallet.3",
+    "@taquito/taquito": "^6.3.0-wallet.4",
     "@taquito/tezbridge-signer": "^6.1.1-beta.0",
     "axios": "^0.19.2",
     "insert-text-at-cursor": "^0.3.0",

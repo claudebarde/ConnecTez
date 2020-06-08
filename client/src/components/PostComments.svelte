@@ -32,7 +32,7 @@
     pinningComments = true;
     const PINCOMMENT =
       process.env.NODE_ENV === "development"
-        ? "http://localhost:34567/pinComment"
+        ? `http://localhost:${config.NETLIFY_PORT}/pinComment`
         : "https://connectez.cc/.netlify/functions/pinComment";
     try {
       const data = await fetch(PINCOMMENT, {
@@ -69,7 +69,7 @@
   onMount(async () => {
     const FETCHCOMMENTS =
       process.env.NODE_ENV === "development"
-        ? "http://localhost:34567/fetchComments"
+        ? `http://localhost:${config.NETLIFY_PORT}/fetchComments`
         : "https://connectez.cc/.netlify/functions/fetchComments";
     try {
       const data = await fetch(FETCHCOMMENTS, {

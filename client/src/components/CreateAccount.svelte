@@ -19,20 +19,22 @@
     // creates user's account
     try {
       confirmingNewAccount = true;
-      const originOp = await $store.TezosProvider.contract.originate({
-        code: bloggerAccount,
-        storage: {
-          version: config.bloggerAccountVersion,
-          postsList: [],
-          posts: new MichelsonMap(),
-          blogger: $store.userAddress,
-          admin: config.adminAddress,
-          info: new MichelsonMap(),
-          tips: 0,
-          hashLength: 46,
-          hashChars: "Qm"
-        }
-      });
+      const originOp = await $store.TezosProvider.wallet
+        .originate({
+          code: bloggerAccount,
+          storage: {
+            version: config.bloggerAccountVersion,
+            postsList: [],
+            posts: new MichelsonMap(),
+            blogger: $store.userAddress,
+            admin: config.adminAddress,
+            info: new MichelsonMap(),
+            tips: 0,
+            hashLength: 46,
+            hashChars: "Qm"
+          }
+        })
+        .send();
       const newAccount = await originOp.contract();
       // saving new address to main contract
       confirmingNewAccount = false;
@@ -44,7 +46,7 @@
       savingNewAccount = true;
       await op.confirmation();
       // creates bloggers data
-      const accountInstance = await $store.TezosProvider.contract.at(
+      const accountInstance = await $store.TezosProvider.wallet.at(
         newAccount.address
       );
       const storage = await accountInstance.storage();
@@ -137,7 +139,7 @@
           {#if waitingForSavingNewAccount}
             <div class="message is-warning">
               <div class="message-body">
-                Please confirm this transaction in the TezBridge window to save
+                Please confirm this transaction in the wallet window to save
                 your newly created account into the main database.
               </div>
             </div>
